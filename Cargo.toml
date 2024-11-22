@@ -1,0 +1,8 @@
+[package]
+name = "gameProject"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bracket-lib = "0.8.7"
+hecs = "0.10.5"

@@ -1,7 +1,9 @@
 use bracket_lib::prelude::*;
 use hecs::*;
 use std::cmp::*;
-
+use map::*;
+mod map;
+mod rect;
 struct State
 {
     world : World,
@@ -27,32 +29,11 @@ impl Graphic
         }
     }
 }
-#[derive(PartialEq,Clone, Copy)]
-pub enum TileType
-{
-    Floor,Wall,
-}
 
-fn create_map() -> Vec<TileType> 
-{
-let mut  map = vec![TileType::Floor; 80*50];
-for x in 0..80
-{
-    map[xy_id(x, 0)] = TileType::Wall;
-    map[xy_id(x,49)] = TileType::Wall;
-}
-for y in 0..50
-{
-    map[xy_id(0,y)] = TileType::Wall;
-    map[xy_id(79,y)] = TileType::Wall;
-}
-map
-}
 
-fn xy_id(x:i32,y:i32) ->usize 
-{
-    (y as usize *80)+ x as usize
-}
+
+
+
 struct Position
 {
  x: i32,
@@ -136,27 +117,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
    }
 
 }
-fn draw_map(ctx:&mut BTerm,map:&[TileType])
-{
-let mut x = 0;
-let mut y = 0;
-for tile in map.iter()
-{
-match tile
-{
-    TileType::Floor => ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
-    TileType::Wall => ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
-}
-x+= 1;
-if  x > 79
-{
-x = 0;
-y += 1;
-}
 
-}
-
-}
 
 fn main() ->BError {
     //println!("Hello, world!");

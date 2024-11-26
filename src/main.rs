@@ -131,5 +131,6 @@ fn main() ->BError {
         maproom : create_room_map(),
     };
     game_init(&mut gs);
+    create_map_corridors(&mut gs);
     main_loop(context,gs)
 }

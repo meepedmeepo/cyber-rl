@@ -1,6 +1,7 @@
 
 
 use bracket_lib::prelude::*;
+use crate::State;
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
@@ -73,7 +74,7 @@ pub fn create_room_map() -> MapRoomBundle
     let mut rooms : Vec<Rect> = Vec::new();
     let mut rng = bracket_lib::random::RandomNumberGenerator::new();
     
-    while rooms.len() < 5
+    while rooms.len() < 14
     {
         let  room = create_room(&mut rng);
         let mut intersects = false;
@@ -101,11 +102,74 @@ pub fn create_room_map() -> MapRoomBundle
 
 pub fn create_room( rng : &mut bracket_lib::random::RandomNumberGenerator) -> Rect
 { 
-    let x =rng.range(1, 79);
-    let w = rng.range(4,15);
-    let y: i32 = rng.range(1,49);
-    let h = rng.range(3,7);
+    let x =rng.range(1, 74);
+    let mut  w = rng.range(4,15);
+    let y: i32 = rng.range(1,43);
+    let mut h = rng.range(3,15);
     //Rect::with_exact(x1,x2,y2,y2)
+    if x+w > 78
+    {
+        w = 78-x;
+    }
+    if y + h > 48
+    {
+        h = 48 - y;
+    }
     Rect::with_size(x, y, w, h)
 
+}
+pub fn create_map_corridors(state: &mut State)
+{
+        //let mut start : Point;
+        //let mut target : Point;
+        let mut rooms : Vec<Rect> = Vec::new();
+        let mut rng =  bracket_lib::random::RandomNumberGenerator::new();
+        rooms = generate_simple_corridors(state, &mut rng, &mut rooms);
+        rooms = generate_simple_corridors(state, &mut rng, &mut rooms);
+    
+    for r in rooms.iter()
+    {
+        r.for_each(|xy| state.maproom.map[xy_id(xy.x, xy.y)] = TileType::Floor);
+    }
+
+}
+
+fn generate_simple_corridors (
+    state: &mut State,
+    rng : &mut bracket_lib::random::RandomNumberGenerator,
+    rooms :&mut Vec<Rect>) ->  Vec<Rect>
+{
+    let mut start: Point;
+    let mut target: Point;
+    for r in state.maproom.rooms.iter()
+    {
+        let start_x = rng.range(r.x1,r.x2);
+        let start_y = rng.range(r.y1, r.y2);
+        start = Point::new(start_x, start_y);
+
+        let mut is_valid_target = false;
+        let mut target_room = *r;
+        while !is_valid_target
+         {
+            target_room = state.maproom.rooms[rng.range(0, state.maproom.rooms.len())];
+            
+            if target_room!= *r
+            {
+                is_valid_target = true;
+            }
+        }
+
+        //let target_room = state.maproom.rooms[rng.range(0, state.maproom.rooms.len())];
+        
+        let target_x = rng.range(target_room.x1+1, target_room.x2);
+        let target_y =rng.range(target_room.y1+1, target_room.y2);
+        
+        target = Point::new(target_x,target_y);
+    
+        let  r1 = Rect::with_exact(start.x, start.y, target.x+2, start.y+2);
+        let  r2 = Rect::with_exact(target.x,start.y,target.x+2,target.y+2);
+        rooms.push(r1);
+        rooms.push(r2);
+    }
+    rooms.to_vec()
 }

@@ -127,7 +127,7 @@ fn main() ->BError {
 
     let mut gs: State = State{
         world: World::new(),
-        map : create_map(),
+        map : create_room_map(),
     };
     game_init(&mut gs);
     main_loop(context,gs)

@@ -6,7 +6,7 @@ pub enum TileType
     Floor,Wall,
 }
 
-pub fn create_map() -> Vec<TileType> 
+pub fn _create_map() -> Vec<TileType> 
 {
 let mut  map = vec![TileType::Floor; 80*50];
 for x in 0..80
@@ -44,18 +44,45 @@ y += 1;
 }
 }
 }
-fn create_room_map()
+pub fn create_room_map() -> Vec<TileType>
 {
-    let mut rooms : Vec<Rect>;
-   let rng = bracket_lib::random::RandomNumberGenerator::new();
+    let mut  map = vec![TileType::Wall; 80*50];
+   
+    let mut rooms : Vec<Rect> = Vec::new();
+    let mut rng = bracket_lib::random::RandomNumberGenerator::new();
+    
+    while rooms.len() < 10
+    {
+        let  room = create_room(&mut rng);
+        let mut intersects = false;
+        for r in rooms.iter()
+        {
+            if room.intersect(r)
+            {
+                intersects = true;
+                break;
+            }
+        }
+        if !intersects
+        {
+            rooms.push(room);
+        }
+    }
+    for r in rooms.iter()
+    {
+        r.for_each(|xy| map[xy_id(xy.x, xy.y)] = TileType::Floor);
+    }
+    map
+
 }
 
-fn create_room( rng : &mut bracket_lib::random::RandomNumberGenerator) -> Rect
+pub fn create_room( rng : &mut bracket_lib::random::RandomNumberGenerator) -> Rect
 { 
-    let x1 =rng.range(1, 79);
-    let x2 = rng.range(x1+3,x1+7);
-    let y1 = rng.range(1,49);
-    let y2 = rng.range(y1+3, y1+6);
-    Rect::with_exact(x1,x2,y2,y2)
+    let x =rng.range(1, 79);
+    let w = rng.range(4,15);
+    let y: i32 = rng.range(1,49);
+    let h = rng.range(3,7);
+    //Rect::with_exact(x1,x2,y2,y2)
+    Rect::with_size(x, y, w, h)
 
 }

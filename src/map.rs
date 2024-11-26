@@ -1,9 +1,31 @@
+
+
 use bracket_lib::prelude::*;
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
 {
     Floor,Wall,
+}
+
+pub struct MapRoomBundle
+{
+    pub map : Vec<TileType>,
+    pub rooms: Vec<Rect>,
+}
+
+impl MapRoomBundle
+{
+    fn new(map : Vec<TileType> , rooms:Vec<Rect>) -> MapRoomBundle
+    {
+        MapRoomBundle
+        {
+            map,
+            rooms,
+        }
+
+    }
+
 }
 
 pub fn _create_map() -> Vec<TileType> 
@@ -44,14 +66,14 @@ y += 1;
 }
 }
 }
-pub fn create_room_map() -> Vec<TileType>
+pub fn create_room_map() -> MapRoomBundle
 {
     let mut  map = vec![TileType::Wall; 80*50];
    
     let mut rooms : Vec<Rect> = Vec::new();
     let mut rng = bracket_lib::random::RandomNumberGenerator::new();
     
-    while rooms.len() < 10
+    while rooms.len() < 5
     {
         let  room = create_room(&mut rng);
         let mut intersects = false;
@@ -72,7 +94,8 @@ pub fn create_room_map() -> Vec<TileType>
     {
         r.for_each(|xy| map[xy_id(xy.x, xy.y)] = TileType::Floor);
     }
-    map
+    
+    MapRoomBundle::new(map, rooms)
 
 }
 

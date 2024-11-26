@@ -7,7 +7,7 @@ mod rect;
 struct State
 {
     world : World,
-    map: Vec<TileType>,
+    maproom: MapRoomBundle,
 }
 
 struct Graphic
@@ -83,7 +83,7 @@ fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
     for(_id,(_player,position)) in state.world.query_mut::<(&Player,&mut Position)>()
     {
         let destination_id = xy_id(position.x+delta_x, position.y+delta_y);
-        if state.map[destination_id] != TileType::Wall
+        if state.maproom.map[destination_id] != TileType::Wall
         {
         position.x = min(79,max(0,position.x+delta_x));
         position.y = min(49,max(0,position.y+delta_y));
@@ -97,7 +97,7 @@ impl GameState for State{
         ctx.cls();
         //ctx.print(1, 1, "Heya nerds");
         player_input_system(ctx, self);
-        draw_map(ctx, self.map.as_mut_slice());
+        draw_map(ctx, self.maproom.map.as_mut_slice());
         render_system(self, ctx);
         
     }
@@ -105,7 +105,8 @@ impl GameState for State{
 
 fn game_init ( state: &mut State)
 {
-    state.world.spawn((Position::new(15,25),Graphic::new('@',RGB::from_f32(1., 1., 1.),RGB::from_f32(0., 0., 0.)),Player{}));
+    let xy = state.maproom.rooms[0].center();
+    state.world.spawn((Position::new(xy.x,xy.y),Graphic::new('@',RGB::from_f32(1., 1., 1.),RGB::from_f32(0., 0., 0.)),Player{}));
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
@@ -127,7 +128,7 @@ fn main() ->BError {
 
     let mut gs: State = State{
         world: World::new(),
-        map : create_room_map(),
+        maproom : create_room_map(),
     };
     game_init(&mut gs);
     main_loop(context,gs)

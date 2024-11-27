@@ -9,22 +9,26 @@ pub enum TileType
     Floor,Wall,
 }
 
-pub struct MapRoomBundle
+pub struct Map
 {
     pub map : Vec<TileType>,
     pub rooms: Vec<Rect>,
 }
 
-impl MapRoomBundle
+impl Map
 {
-    fn new(map : Vec<TileType> , rooms:Vec<Rect>) -> MapRoomBundle
+    pub fn new(map : Vec<TileType> , rooms:Vec<Rect>) -> Map
     {
-        MapRoomBundle
+        Map
         {
             map,
             rooms,
         }
 
+    }
+    pub fn xy_id(x:i32,y:i32) ->usize 
+    {
+    (y as usize *80)+ x as usize
     }
 
 }
@@ -34,20 +38,18 @@ pub fn _create_map() -> Vec<TileType>
 let mut  map = vec![TileType::Floor; 80*50];
 for x in 0..80
 {
-    map[xy_id(x, 0)] = TileType::Wall;
-    map[xy_id(x,49)] = TileType::Wall;
+    map[Map::xy_id(x, 0)] = TileType::Wall;
+    map[Map::xy_id(x,49)] = TileType::Wall;
 }
 for y in 0..50
 {
-    map[xy_id(0,y)] = TileType::Wall;
-    map[xy_id(79,y)] = TileType::Wall;
+    map[Map::xy_id(0,y)] = TileType::Wall;
+    map[Map::xy_id(79,y)] = TileType::Wall;
 }
 map
 }
-pub fn xy_id(x:i32,y:i32) ->usize 
-{
-    (y as usize *80)+ x as usize
-}
+
+
 pub fn draw_map(ctx:&mut BTerm,map:&[TileType])
 {
 let mut x = 0;
@@ -67,16 +69,20 @@ y += 1;
 }
 }
 }
-pub fn create_room_map() -> MapRoomBundle
+
+
+impl Map
+{
+pub fn create_room_map(state : &mut State) -> Map
 {
     let mut  map = vec![TileType::Wall; 80*50];
    
     let mut rooms : Vec<Rect> = Vec::new();
-    let mut rng = bracket_lib::random::RandomNumberGenerator::new();
+
     
     while rooms.len() < 14
     {
-        let  room = create_room(&mut rng);
+        let  room = Map::create_room(state);
         let mut intersects = false;
         for r in rooms.iter()
         {
@@ -93,19 +99,19 @@ pub fn create_room_map() -> MapRoomBundle
     }
     for r in rooms.iter()
     {
-        r.for_each(|xy| map[xy_id(xy.x, xy.y)] = TileType::Floor);
+        r.for_each(|xy| map[Map::xy_id(xy.x, xy.y)] = TileType::Floor);
     }
     
-    MapRoomBundle::new(map, rooms)
+    Map::new(map, rooms)
 
 }
 
-pub fn create_room( rng : &mut bracket_lib::random::RandomNumberGenerator) -> Rect
+pub fn create_room( state : &mut State) -> Rect
 { 
-    let x =rng.range(1, 74);
-    let mut  w = rng.range(4,15);
-    let y: i32 = rng.range(1,43);
-    let mut h = rng.range(3,15);
+    let x =state.rng.range(1, 74);
+    let mut  w = state.rng.range(4,15);
+    let y: i32 = state.rng.range(1,43);
+    let mut h = state.rng.range(3,15);
     //Rect::with_exact(x1,x2,y2,y2)
     if x+w > 78
     {
@@ -118,30 +124,26 @@ pub fn create_room( rng : &mut bracket_lib::random::RandomNumberGenerator) -> Re
     Rect::with_size(x, y, w, h)
 
 }
-pub fn create_map_corridors(state: &mut State)
+
+pub fn create_map_corridors(&mut self)
 {
         //let mut start : Point;
         //let mut target : Point;
         let mut rooms : Vec<Rect> = Vec::new();
-        let mut rng =  bracket_lib::random::RandomNumberGenerator::new();
-        rooms = generate_simple_corridors(state, &mut rng, &mut rooms);
-        rooms = generate_simple_corridors(state, &mut rng, &mut rooms);
+        rooms = self.generate_simple_corridors(  &mut rooms);
+        rooms = self.generate_simple_corridors( &mut rooms);
     
-    for r in rooms.iter()
-    {
-        r.for_each(|xy| state.maproom.map[xy_id(xy.x, xy.y)] = TileType::Floor);
-    }
+        self.apply_rooms(&mut rooms);
 
 }
 
-fn generate_simple_corridors (
-    state: &mut State,
-    rng : &mut bracket_lib::random::RandomNumberGenerator,
+fn generate_simple_corridors (&self,
     rooms :&mut Vec<Rect>) ->  Vec<Rect>
 {
     let mut start: Point;
     let mut target: Point;
-    for r in state.maproom.rooms.iter()
+    let mut rng = bracket_lib::random::RandomNumberGenerator::new();
+    for r in self.rooms.iter()
     {
         let start_x = rng.range(r.x1,r.x2);
         let start_y = rng.range(r.y1, r.y2);
@@ -151,7 +153,7 @@ fn generate_simple_corridors (
         let mut target_room = *r;
         while !is_valid_target
          {
-            target_room = state.maproom.rooms[rng.range(0, state.maproom.rooms.len())];
+            target_room = self.rooms[rng.range(0, self.rooms.len())];
             
             if target_room!= *r
             {
@@ -162,7 +164,7 @@ fn generate_simple_corridors (
         //let target_room = state.maproom.rooms[rng.range(0, state.maproom.rooms.len())];
         
         let target_x = rng.range(target_room.x1+1, target_room.x2);
-        let target_y =rng.range(target_room.y1+1, target_room.y2);
+        let target_y = rng.range(target_room.y1+1, target_room.y2);
         
         target = Point::new(target_x,target_y);
     
@@ -173,3 +175,15 @@ fn generate_simple_corridors (
     }
     rooms.to_vec()
 }
+
+
+fn apply_rooms(&mut self,rooms: &Vec<Rect>)
+{
+    for r in rooms.iter()
+    {
+        r.for_each(|xy| self.map[Map::xy_id(xy.x, xy.y)] = TileType::Floor);
+    }
+    }
+
+}
+

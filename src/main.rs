@@ -3,27 +3,28 @@ use hecs::*;
 use std::cmp::*;
 use map::*;
 mod map;
-mod rect;
+
 struct State
 {
     world : World,
-    maproom: MapRoomBundle,
+    map: Map,
+    rng : bracket_lib::random::RandomNumberGenerator,
 }
 
-struct Graphic
+struct Renderable
 {
-    img : char,
+    glyph : char,
     fg : RGB,
     bg : RGB
 }
 
-impl Graphic
+impl Renderable
 {
-    fn new(img: char,fg : RGB, bg: RGB) -> Graphic
+    fn new(glyph: char,fg : RGB, bg: RGB) -> Renderable
     {
-        Graphic
+        Renderable
         {
-            img,
+            glyph,
             fg,
             bg
         }
@@ -82,8 +83,8 @@ fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 {
     for(_id,(_player,position)) in state.world.query_mut::<(&Player,&mut Position)>()
     {
-        let destination_id = xy_id(position.x+delta_x, position.y+delta_y);
-        if state.maproom.map[destination_id] != TileType::Wall
+        let destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
+        if state.map.map[destination_id] != TileType::Wall
         {
         position.x = min(79,max(0,position.x+delta_x));
         position.y = min(49,max(0,position.y+delta_y));
@@ -97,7 +98,7 @@ impl GameState for State{
         ctx.cls();
         //ctx.print(1, 1, "Heya nerds");
         player_input_system(ctx, self);
-        draw_map(ctx, self.maproom.map.as_mut_slice());
+        draw_map(ctx, self.map.map.as_mut_slice());
         render_system(self, ctx);
         
     }
@@ -105,16 +106,16 @@ impl GameState for State{
 
 fn game_init ( state: &mut State)
 {
-    let xy = state.maproom.rooms[0].center();
-    state.world.spawn((Position::new(xy.x,xy.y),Graphic::new('@',RGB::from_f32(1., 1., 1.),RGB::from_f32(0., 0., 0.)),Player{}));
+    let xy = state.map.rooms[0].center();
+    state.world.spawn((Position::new(xy.x,xy.y),Renderable::new('@',RGB::from_f32(1., 0., 0.),RGB::from_f32(0., 0., 0.)),Player{}));
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
 {
     for (_id,(position,graphic)) in
-    state.world.query::<(&Position,&Graphic)>().iter()
+    state.world.query::<(&Position,&Renderable)>().iter()
    {
-       ctx.set(position.x, position.y,graphic.fg,graphic.bg,graphic.img)
+       ctx.set(position.x, position.y,graphic.fg,graphic.bg,graphic.glyph)
    }
 
 }
@@ -128,9 +129,11 @@ fn main() ->BError {
 
     let mut gs: State = State{
         world: World::new(),
-        maproom : create_room_map(),
+        map : Map {map :Vec::new(), rooms : Vec::new(),},
+        rng : bracket_lib::random::RandomNumberGenerator::new(),
     };
+    gs.map = Map::create_room_map(&mut gs);
+    gs.map.create_map_corridors();
     game_init(&mut gs);
-    create_map_corridors(&mut gs);
     main_loop(context,gs)
 }

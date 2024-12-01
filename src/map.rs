@@ -1,7 +1,7 @@
 
 use hecs::Entity;
 use bracket_lib::prelude::*;
-use bracket_lib::pathfinding::SmallVec;
+use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
 use crate::{BlocksTiles, Position, State};
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
@@ -96,6 +96,14 @@ impl Map
         }
     }
 
+    pub fn reset_tile_contents(&mut self)
+    {
+        for (_i, tile_contents) in self.tile_contents.iter_mut().enumerate()
+        {
+            tile_contents.clear();
+        }
+    }
+
 }
 
 pub fn _create_map() -> Vec<TileType> 
@@ -156,6 +164,49 @@ y += 1;
 
 impl Map
 {
+    pub fn check_map_validity(&self) -> bool
+    {
+        let p1 = self.rooms[0].center();
+        for room in self.rooms.iter().skip(1)
+        {
+            let p2 = room.center();
+            if(!self.check_room_path(p1,p2))
+            {
+                return false;
+            }
+        }
+        true
+    }
+    pub fn check_room_path(&self, p1 : Point, p2 : Point) -> bool
+    {
+        //let distance = DistanceAlg::Pythagoras.distance2d(p1,p2);
+        let path = a_star_search(Map::xy_id(p1.x, p1.y), Map::xy_id(p2.x, p2.y), self);
+        if path.success
+        {
+            return true;
+        }
+        return false;
+    }
+    pub fn generate_map_checked(state: &mut State)
+    {
+        let isValid = false;
+        let mut i = 1;
+        while(!isValid)
+        {
+           state.map = Map::create_room_map(state);
+           state.map.create_map_corridors();
+           if(state.map.check_map_validity())
+           {
+            console::log(format!("Successfully generated map after {} tries!",i));
+            return;
+           }
+           else 
+           {
+            console::log(format!("Failed to generate valid map! Attempt {}!",i));
+            i+=1;
+           }
+        }
+    }
 pub fn create_room_map(state : &mut State) -> Map
 {
     let mut  map = vec![TileType::Wall; 80*50];

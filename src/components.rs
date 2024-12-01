@@ -16,10 +16,10 @@ pub struct Attack
 
 pub struct Statistics
 {
-    max_hp : i32,
-    hp : i32,
-    strength: i32,
-    defence : i32,
+    pub max_hp : i32,
+    pub hp : i32,
+    pub strength: i32,
+    pub defence : i32,
 
 }
 

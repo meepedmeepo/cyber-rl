@@ -1,6 +1,6 @@
 use bracket_lib::prelude::*;
 use hecs::*;
-use std::cmp::*;
+use std::{cmp::*, fmt::format};
 use map::*;
 mod map;
 mod components;
@@ -97,17 +97,46 @@ fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
 fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 {
+    let mut moved =  false;
+    let mut destination_id : usize = 0;
     for(_id,(_player,position,fov)) in state.world.query_mut::<(&Player,&mut Position,&mut FoV)>()
     {
-        let destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
+        destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
         if !state.map.blocked[destination_id]
         {
         position.x = min(79,max(0,position.x+delta_x));
         position.y = min(49,max(0,position.y+delta_y));
         state.player_pos = Point::new(position.x, position.y);
         fov.dirty = true;
+        moved = true;
+        break;
         }
     }
+        if state.map.tile_contents[destination_id].len() > 0 && !moved
+        {
+            let mut target;
+            for potential_target in state.map.tile_contents[destination_id].iter()
+            {
+                // for (entity,(_stats,name,_pos)) in 
+                // state.world.query::<(&Statistics,&Name,&Position)>().
+                // {
+                //     target = entity;
+                //     console::log(&format!("I will stab thee now, {}!",name.name));
+                // }
+                let query = state.world.query_one_mut::<(&Statistics,
+                &Name)>(*potential_target);
+                match query
+                {
+                    Ok(res) =>
+                    {
+                        console::log(&format!("I will stab thee now, {}!",res.1.name));
+                        target = potential_target;
+                    }
+                    Err(_) =>{}
+                }
+            }
+        
+        }
 
 }
 
@@ -131,12 +160,13 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 {
     ctx.cls();
     //ctx.print(1, 1, "Heya nerds");
-    state.current_state = player_input_system(ctx, state);
+    //state.current_state = player_input_system(ctx, state);
     VisibilitySystem::run(state);
     MonsterAI::run(state);
     map_indexing_system::MapIndexingSystem::run(state);
     draw_map(ctx, &state.map);
     render_system(state, ctx);
+    state.current_state = ProgramState::Paused;
 }
 
 fn game_init ( state: &mut State)
@@ -151,7 +181,7 @@ fn game_init ( state: &mut State)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
     , Player{}));
-    
+    let mut i = 1;
     //Spawn test purple goblin enemies in every room apart from the starting room.
     for room in state.map.rooms.iter().skip(1)
     {
@@ -159,7 +189,8 @@ fn game_init ( state: &mut State)
     {
     state.world.spawn((Position::new(pos.x, pos.y),
     Renderable::new('g', RGB::from_f32(1., 0., 1.), RGB::from_f32(0.,0.,0.)),
-    FoV::new(5),Monster{},BlocksTiles {},Name{name: "Goblin".to_string()}));
+    FoV::new(5),Monster{},BlocksTiles {},Statistics{max_hp:12,hp:12,defence: 5,strength: 2},Name{name: format!("Goblin {}",i)}));
+    i += 1;
     }
 }
 }
@@ -197,8 +228,9 @@ fn main() ->BError {
         current_state : ProgramState::ExecutingTurn,
         player_pos : Point::zero(),
     };
-    gs.map = Map::create_room_map(&mut gs);
-    gs.map.create_map_corridors();
+    // gs.map = Map::create_room_map(&mut gs);
+    // gs.map.create_map_corridors();
+    Map::generate_map_checked(&mut gs);
     game_init(&mut gs);
     main_loop(context,gs)
 }

@@ -3,21 +3,34 @@ use hecs::*;
 use std::cmp::*;
 use map::*;
 mod map;
+mod components;
+use components::*;
+mod visibility_system;
+use visibility_system::*;
+mod monster_ai_system;
+use monster_ai_system::*;
+mod map_indexing_system;
+//use map_indexing_system;
 
-struct State
+pub struct State
 {
     world : World,
     map: Map,
     rng : bracket_lib::random::RandomNumberGenerator,
+    current_state: ProgramState,
+    player_pos: Point,
 }
 
-struct Renderable
+pub struct Renderable
 {
     glyph : char,
     fg : RGB,
     bg : RGB
 }
-
+pub struct Name
+{
+    name : String,
+}
 impl Renderable
 {
     fn new(glyph: char,fg : RGB, bg: RGB) -> Renderable
@@ -30,12 +43,15 @@ impl Renderable
         }
     }
 }
+#[derive(PartialEq,Copy,Clone)]
+pub enum ProgramState
+{
+    Paused,
+    ExecutingTurn,
+}
 
 
-
-
-
-struct Position
+pub struct Position
 {
  x: i32,
  y : i32,
@@ -53,15 +69,14 @@ impl Position
     }
 }
 
-
 struct Player
 {}
 
-fn player_input_system(ctx:&BTerm, state: &mut State)
+fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 {
     match ctx.key
     {
-        None => {},
+        None => {return ProgramState::Paused;},
         Some(key) => match key
         {
             VirtualKeyCode::Left =>try_move(state, -1, 0),
@@ -72,22 +87,25 @@ fn player_input_system(ctx:&BTerm, state: &mut State)
             VirtualKeyCode::D => try_move(state,1,0),
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
-            _ =>{},
+            _ =>{return ProgramState::Paused;},
 
         }
 
     }
+    ProgramState::ExecutingTurn
 }
 
 fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 {
-    for(_id,(_player,position)) in state.world.query_mut::<(&Player,&mut Position)>()
+    for(_id,(_player,position,fov)) in state.world.query_mut::<(&Player,&mut Position,&mut FoV)>()
     {
         let destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
-        if state.map.map[destination_id] != TileType::Wall
+        if !state.map.blocked[destination_id]
         {
         position.x = min(79,max(0,position.x+delta_x));
         position.y = min(49,max(0,position.y+delta_y));
+        state.player_pos = Point::new(position.x, position.y);
+        fov.dirty = true;
         }
     }
 
@@ -95,19 +113,55 @@ fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 
 impl GameState for State{
     fn tick(&mut self, ctx: &mut BTerm) {
-        ctx.cls();
-        //ctx.print(1, 1, "Heya nerds");
-        player_input_system(ctx, self);
-        draw_map(ctx, self.map.map.as_mut_slice());
-        render_system(self, ctx);
-        
+        if self.current_state == ProgramState::ExecutingTurn
+        {
+            run_systems(self, ctx);
+        }
+        else
+        {
+            ctx.cls();
+            self.current_state = player_input_system(ctx, self);
+            draw_map(ctx, &self.map);
+            render_system(self, ctx);
+        }
     }
+}
+
+fn run_systems(state: &mut State, ctx: &mut BTerm)
+{
+    ctx.cls();
+    //ctx.print(1, 1, "Heya nerds");
+    state.current_state = player_input_system(ctx, state);
+    VisibilitySystem::run(state);
+    MonsterAI::run(state);
+    map_indexing_system::MapIndexingSystem::run(state);
+    draw_map(ctx, &state.map);
+    render_system(state, ctx);
 }
 
 fn game_init ( state: &mut State)
 {
+    //Spawn player object
     let xy = state.map.rooms[0].center();
-    state.world.spawn((Position::new(xy.x,xy.y),Renderable::new('@',RGB::from_f32(1., 0., 0.),RGB::from_f32(0., 0., 0.)),Player{}));
+    state.player_pos = xy;
+    state.world.spawn((Position::new(xy.x,xy.y),
+    Renderable::new('@',
+    RGB::from_f32(1., 0., 0.),
+    RGB::from_f32(0., 0., 0.))
+    ,FoV::new(8)
+    ,Name{name: "Player".to_string(),}
+    , Player{}));
+    
+    //Spawn test purple goblin enemies in every room apart from the starting room.
+    for room in state.map.rooms.iter().skip(1)
+    {
+    let pos = room.center();
+    {
+    state.world.spawn((Position::new(pos.x, pos.y),
+    Renderable::new('g', RGB::from_f32(1., 0., 1.), RGB::from_f32(0.,0.,0.)),
+    FoV::new(5),Monster{},BlocksTiles {},Name{name: "Goblin".to_string()}));
+    }
+}
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
@@ -115,7 +169,11 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     for (_id,(position,graphic)) in
     state.world.query::<(&Position,&Renderable)>().iter()
    {
-       ctx.set(position.x, position.y,graphic.fg,graphic.bg,graphic.glyph)
+        let idx = Map::xy_id(position.x, position.y);
+        if state.map.visible_tiles[idx]
+        {
+            ctx.set(position.x, position.y,graphic.fg,graphic.bg,graphic.glyph)
+        }
    }
 
 }
@@ -129,8 +187,15 @@ fn main() ->BError {
 
     let mut gs: State = State{
         world: World::new(),
-        map : Map {map :Vec::new(), rooms : Vec::new(),},
+        map : Map {map :Vec::new(), rooms : Vec::new(),width:80,height:50
+        ,revealed_tiles : vec![false;80*50]
+        ,visible_tiles : vec![false;80*50]
+        ,blocked : vec![false;80*50]
+        ,tile_contents : vec![Vec::new(); 80*50]
+        },
         rng : bracket_lib::random::RandomNumberGenerator::new(),
+        current_state : ProgramState::ExecutingTurn,
+        player_pos : Point::zero(),
     };
     gs.map = Map::create_room_map(&mut gs);
     gs.map.create_map_corridors();

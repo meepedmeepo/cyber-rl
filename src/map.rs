@@ -1,7 +1,8 @@
 
-
+use hecs::Entity;
 use bracket_lib::prelude::*;
-use crate::State;
+use bracket_lib::pathfinding::SmallVec;
+use crate::{BlocksTiles, Position, State};
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
@@ -13,22 +14,86 @@ pub struct Map
 {
     pub map : Vec<TileType>,
     pub rooms: Vec<Rect>,
+    pub width: i32,
+    pub height: i32,
+    pub revealed_tiles: Vec<bool>,
+    pub visible_tiles: Vec<bool>,
+    pub blocked: Vec<bool>,
+    pub tile_contents: Vec<Vec<Entity>>,
 }
 
+impl BaseMap for Map
+ {
+    fn is_opaque(&self, _idx: usize) -> bool {
+        if self.map[_idx as usize] == TileType::Wall { true}
+        else 
+        {false}
+    }   
+    fn get_available_exits(&self, idx:usize) -> SmallVec<[(usize, f32); 10]> {
+        let mut exits = SmallVec::new();
+        let x = idx as i32 % self.width;
+        let y = idx as i32 / self.width;
+        let w = self.width as usize;
+    
+        // Cardinal directions
+        if self.is_exit_valid(x-1, y) { exits.push((idx-1, 1.0)) };
+        if self.is_exit_valid(x+1, y) { exits.push((idx+1, 1.0)) };
+        if self.is_exit_valid(x, y-1) { exits.push((idx-w, 1.0)) };
+        if self.is_exit_valid(x, y+1) { exits.push((idx+w, 1.0)) };
+    
+        exits
+    }
+    fn get_pathing_distance(&self, idx1:usize, idx2:usize) -> f32 {
+        let w = self.width as usize;
+        let p1 = Point::new(idx1 % w, idx1 / w);
+        let p2 = Point::new(idx2 % w, idx2 / w);
+        DistanceAlg::Pythagoras.distance2d(p1, p2)
+    }
+    
+ }
+
+ impl Algorithm2D for Map
+ {
+    fn dimensions(&self) -> Point {
+        Point::new(self.width,self.height)
+    }
+
+ }
 impl Map
 {
+
+    fn is_exit_valid(&self, x:i32, y:i32) -> bool {
+        if x < 1 || x > self.width-1 || y < 1 || y > self.height-1 { return false; }
+        let idx = Map::xy_id(x, y);
+        !self.blocked[idx as usize]
+    }
+
     pub fn new(map : Vec<TileType> , rooms:Vec<Rect>) -> Map
     {
         Map
         {
             map,
             rooms,
+            width : 80,
+            height : 50,
+            revealed_tiles : vec![false;80*50],
+            visible_tiles: vec![false;80*50],
+            blocked : vec![false;80*50],
+            tile_contents : vec![Vec::new(); 80*50],
         }
 
     }
     pub fn xy_id(x:i32,y:i32) ->usize 
     {
     (y as usize *80)+ x as usize
+    }
+
+    pub fn populate_blocked(&mut self)
+    {
+        for (i,tile) in self.map.iter_mut().enumerate()
+        {
+            self.blocked[i] = *tile == TileType::Wall;
+        }
     }
 
 }
@@ -50,16 +115,34 @@ map
 }
 
 
-pub fn draw_map(ctx:&mut BTerm,map:&[TileType])
+pub fn draw_map(ctx:&mut BTerm,map:&Map)
 {
 let mut x = 0;
 let mut y = 0;
-for tile in map.iter()
+for tile in map.map.iter()
 {
+if map.revealed_tiles[Map::xy_id(x,y)] == true
+{
+    let glyph;
+    let mut fg;
 match tile
 {
-    TileType::Floor => ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
-    TileType::Wall => ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
+    TileType::Floor =>
+    {
+        glyph = '.';
+        fg = RGB::from_f32(0.5, 0.5, 0.5);
+    }// ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
+    TileType::Wall => 
+    {
+        glyph = '#';
+        fg = RGB::from_f32(0.1,1.,0.);
+    }//ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
+}
+if !map.visible_tiles[Map::xy_id(x, y)]
+{
+    fg = fg.to_greyscale()
+}
+ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
 }
 x+= 1;
 if  x > 79

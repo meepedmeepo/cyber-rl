@@ -1,0 +1,44 @@
+use crate::{Player, State, Map};
+
+use super::{FoV, Position};
+use bracket_lib::prelude::{field_of_view,Point};
+//use hecs::World;
+pub struct VisibilitySystem
+{}
+
+impl VisibilitySystem
+{
+    pub fn run(state: &mut State)
+    {
+        for(_id ,(fov,pos, player )) in state.world.query_mut::<(&mut FoV,&Position, Option<&Player>)>()
+        {
+            if fov.dirty
+            {
+            fov.dirty = false;
+            fov.visible_tiles.clear();
+            fov.visible_tiles = field_of_view(Point::new(pos.x,pos.y), fov.range, &state.map);
+            fov.visible_tiles.retain(|p| p.x >= 0 && p.x < state.map.width && p.y >= 0 && p.y < state.map.height );
+
+            //let p: Option<&Player> = state.world.entity(_id).
+            match player
+            {
+                Some(_p) =>
+                {
+                    for rev in state.map.visible_tiles.iter_mut(){*rev = false;}
+                    for vis in fov.visible_tiles.iter() 
+                    {
+                        let idx = Map::xy_id(vis.x, vis.y);
+                        state.map.visible_tiles[idx] = true;
+                        state.map.revealed_tiles[idx] = true;
+                    }
+                },
+                None => continue,
+
+            }
+            }
+        }
+    }
+}
+        
+    
+

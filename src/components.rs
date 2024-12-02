@@ -1,7 +1,6 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
-use crate::Position;
 
 pub struct Monster
 {}
@@ -11,7 +10,13 @@ pub struct BlocksTiles
 
 pub struct Attack
 {
-    target: Entity,
+   pub target: Entity,
+}
+
+/// This is used to mark all the damage that an entity will take that is processed by the damage_system
+pub struct TakeDamage
+{
+    pub damage_to_take : Vec<i32>,
 }
 
 pub struct Statistics

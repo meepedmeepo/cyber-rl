@@ -23,9 +23,12 @@ impl MonsterAI
                 ,  &state.map);
                 if path.success && path.steps.len() > 2
                 {
+                    state.map.blocked[Map::xy_id(position.x,position.y)] = false;
+                   
                     position.x = path.steps[1] as i32 % state.map.width;
                     position.y = path.steps[1] as i32 / state.map.width;
 
+                    state.map.blocked[Map::xy_id(position.x,position.y)] = true;
                     fov.dirty = true;
                 }
             }

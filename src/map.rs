@@ -2,7 +2,7 @@
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
-use crate::{BlocksTiles, Position, State};
+use crate::State;
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
@@ -170,7 +170,7 @@ impl Map
         for room in self.rooms.iter().skip(1)
         {
             let p2 = room.center();
-            if(!self.check_room_path(p1,p2))
+            if !self.check_room_path(p1,p2)
             {
                 return false;
             }
@@ -189,13 +189,13 @@ impl Map
     }
     pub fn generate_map_checked(state: &mut State)
     {
-        let isValid = false;
+        let is_valid = false;
         let mut i = 1;
-        while(!isValid)
+        while !is_valid
         {
            state.map = Map::create_room_map(state);
            state.map.create_map_corridors();
-           if(state.map.check_map_validity())
+           if state.map.check_map_validity()
            {
             console::log(format!("Successfully generated map after {} tries!",i));
             return;

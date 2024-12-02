@@ -1,5 +1,6 @@
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
+use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use hecs::*;
 use std::cmp::*;
@@ -14,6 +15,7 @@ use monster_ai_system::*;
 mod map_indexing_system;
 mod attack_system;
 mod damage_system;
+mod clear_dead_system;
 //use map_indexing_system;
 
 pub struct State
@@ -183,7 +185,8 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     AttackSystem::run(state);
     DamageSystem::run(state);
-
+    ClearDeadSystem::run(state);
+    
     map_indexing_system::MapIndexingSystem::run(state);
     draw_map(ctx, &state.map);
     render_system(state, ctx);

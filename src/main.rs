@@ -16,6 +16,8 @@ mod map_indexing_system;
 mod attack_system;
 mod damage_system;
 mod clear_dead_system;
+mod gui;
+use crate::{MAPHEIGHT,MAPWIDTH};
 //use map_indexing_system;
 
 pub struct State
@@ -25,6 +27,7 @@ pub struct State
     rng : bracket_lib::random::RandomNumberGenerator,
     current_state: ProgramState,
     player_pos: Point,
+    player_ent :Option<Entity>,
 }
 
 pub struct Renderable
@@ -114,8 +117,8 @@ fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
         destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
         if !state.map.blocked[destination_id]
         {
-        position.x = min(79,max(0,position.x+delta_x));
-        position.y = min(49,max(0,position.y+delta_y));
+        position.x = min(MAPWIDTH -1,max(0,position.x+delta_x));
+        position.y = min(MAPHEIGHT - 1,max(0,position.y+delta_y));
         state.player_pos = Point::new(position.x, position.y);
         fov.dirty = true;
         moved = true;
@@ -172,6 +175,7 @@ impl GameState for State{
             self.current_state = player_input_system(ctx, self);
             draw_map(ctx, &self.map);
             render_system(self, ctx);
+            gui::draw_ui(self, ctx);
         }
     }
 }
@@ -186,10 +190,11 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     AttackSystem::run(state);
     DamageSystem::run(state);
     ClearDeadSystem::run(state);
-    
+
     map_indexing_system::MapIndexingSystem::run(state);
     draw_map(ctx, &state.map);
     render_system(state, ctx);
+    gui::draw_ui(state, ctx);
     state.current_state = ProgramState::Paused;
 }
 
@@ -198,14 +203,14 @@ fn game_init ( state: &mut State)
     //Spawn player object
     let xy = state.map.rooms[0].center();
     state.player_pos = xy;
-    state.world.spawn((Position::new(xy.x,xy.y),
+    state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
     Renderable::new('@',
     RGB::from_f32(1., 0., 0.),
     RGB::from_f32(0., 0., 0.))
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
     , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
-    , Player{}));
+    , Player{})));
     let mut i = 1;
     //Spawn test purple goblin enemies in every room apart from the starting room.
     for room in state.map.rooms.iter().skip(1)
@@ -243,15 +248,16 @@ fn main() ->BError {
 
     let mut gs: State = State{
         world: World::new(),
-        map : Map {map :Vec::new(), rooms : Vec::new(),width:80,height:50
-        ,revealed_tiles : vec![false;80*50]
-        ,visible_tiles : vec![false;80*50]
-        ,blocked : vec![false;80*50]
-        ,tile_contents : vec![Vec::new(); 80*50]
+        map : Map {map :Vec::new(), rooms : Vec::new()
+        ,revealed_tiles : vec![false;MAPSIZE]
+        ,visible_tiles : vec![false;MAPSIZE]
+        ,blocked : vec![false;MAPSIZE]
+        ,tile_contents : vec![Vec::new(); MAPSIZE]
         },
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::ExecutingTurn,
         player_pos : Point::zero(),
+        player_ent: None,
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

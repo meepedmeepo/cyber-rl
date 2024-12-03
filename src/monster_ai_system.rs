@@ -1,21 +1,26 @@
 use bracket_lib::prelude::{console, DistanceAlg,Point};
-use crate::Monster;
-use super::{Map,State,FoV,Name,Position};
+use hecs::Entity;
+use crate::{ Monster, Statistics, MAPWIDTH};
+use super::{Map,State,FoV,Name,Position,AttackSystem};
 
 pub struct MonsterAI{}
 impl MonsterAI
 {
     pub fn run(state : &mut State)
     {
-        for (_id,(fov,name,position,_monster)) 
-        in state.world.query_mut::<(&mut FoV,&Name,&mut Position,&Monster)>()  
+        let mut attacking_monsters : Vec<(Entity,i32)> = Vec::new();
+        for (_id,(fov,name,position,_monster,stats)) 
+        in state.world.query_mut::<(&mut FoV,&Name,&mut Position,&Monster,&Statistics)>()  
         {
             if fov.visible_tiles.contains(&state.player_pos)
             {
                 let distance = DistanceAlg::Pythagoras.distance2d(Point::new(position.x,position.y), state.player_pos);
                 if distance < 1.5
                 {
-                    console::log(&format!("{} shouts curses!",name.name));
+                    //console::log(&format!("{} shouts curses!",name.name));
+                    //AttackSystem::add_attack(_id, , state);
+                    console::log(format!("{} swings at you wildly!",name.name));
+                    attacking_monsters.push((_id,stats.strength));
                 }
 
                 let path = bracket_lib::pathfinding::a_star_search
@@ -25,8 +30,8 @@ impl MonsterAI
                 {
                     state.map.blocked[Map::xy_id(position.x,position.y)] = false;
                    
-                    position.x = path.steps[1] as i32 % state.map.width;
-                    position.y = path.steps[1] as i32 / state.map.width;
+                    position.x = path.steps[1] as i32 % MAPWIDTH;
+                    position.y = path.steps[1] as i32 / MAPWIDTH;
 
                     state.map.blocked[Map::xy_id(position.x,position.y)] = true;
                     fov.dirty = true;
@@ -34,6 +39,22 @@ impl MonsterAI
             }
 
         }   
+        for (attacker,_dmg) in attacking_monsters.iter()
+        {
+            match state.player_ent
+            {
+                Some(target) =>
+                {
+                    AttackSystem::add_attack(*attacker, target, state);
+                }
+
+                None =>
+                {
+                    console::log("Player not found!");
+                }
+
+            }
+        }
     }
 
 }

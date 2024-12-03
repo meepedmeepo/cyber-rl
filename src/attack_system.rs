@@ -45,7 +45,8 @@ impl AttackSystem
 
         for entity in attackers.iter()
         {
-            state.world.remove_one::<Attack>(*entity).expect("Couldn't remove Attack component from the attacker");
+            state.world.remove_one::<Attack>(*entity)
+            .expect("Couldn't remove Attack component from the attacker");
         }
     }
 

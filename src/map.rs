@@ -3,6 +3,11 @@ use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
 use crate::State;
+
+
+pub const MAPWIDTH : i32 = 80;
+pub const MAPHEIGHT : i32 = 43;
+pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
@@ -14,8 +19,6 @@ pub struct Map
 {
     pub map : Vec<TileType>,
     pub rooms: Vec<Rect>,
-    pub width: i32,
-    pub height: i32,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
     pub blocked: Vec<bool>,
@@ -31,9 +34,9 @@ impl BaseMap for Map
     }   
     fn get_available_exits(&self, idx:usize) -> SmallVec<[(usize, f32); 10]> {
         let mut exits = SmallVec::new();
-        let x = idx as i32 % self.width;
-        let y = idx as i32 / self.width;
-        let w = self.width as usize;
+        let x = idx as i32 % MAPWIDTH;
+        let y = idx as i32 / MAPWIDTH;
+        let w = MAPWIDTH as usize;
     
         // Cardinal directions
         if self.is_exit_valid(x-1, y) { exits.push((idx-1, 1.0)) };
@@ -44,7 +47,7 @@ impl BaseMap for Map
         exits
     }
     fn get_pathing_distance(&self, idx1:usize, idx2:usize) -> f32 {
-        let w = self.width as usize;
+        let w = MAPWIDTH as usize;
         let p1 = Point::new(idx1 % w, idx1 / w);
         let p2 = Point::new(idx2 % w, idx2 / w);
         DistanceAlg::Pythagoras.distance2d(p1, p2)
@@ -55,7 +58,7 @@ impl BaseMap for Map
  impl Algorithm2D for Map
  {
     fn dimensions(&self) -> Point {
-        Point::new(self.width,self.height)
+        Point::new(MAPWIDTH,MAPHEIGHT)
     }
 
  }
@@ -63,7 +66,7 @@ impl Map
 {
 
     fn is_exit_valid(&self, x:i32, y:i32) -> bool {
-        if x < 1 || x > self.width-1 || y < 1 || y > self.height-1 { return false; }
+        if x < 1 || x > MAPWIDTH-1 || y < 1 || y > MAPHEIGHT-1 { return false; }
         let idx = Map::xy_id(x, y);
         !self.blocked[idx as usize]
     }
@@ -74,18 +77,16 @@ impl Map
         {
             map,
             rooms,
-            width : 80,
-            height : 50,
-            revealed_tiles : vec![false;80*50],
-            visible_tiles: vec![false;80*50],
-            blocked : vec![false;80*50],
-            tile_contents : vec![Vec::new(); 80*50],
+            revealed_tiles : vec![false;MAPSIZE],
+            visible_tiles: vec![false;MAPSIZE],
+            blocked : vec![false;MAPSIZE],
+            tile_contents : vec![Vec::new(); MAPSIZE] ,
         }
 
     }
     pub fn xy_id(x:i32,y:i32) ->usize 
     {
-    (y as usize *80)+ x as usize
+    (y as usize * MAPWIDTH as usize)+ x as usize
     }
 
     pub fn populate_blocked(&mut self)
@@ -153,7 +154,7 @@ if !map.visible_tiles[Map::xy_id(x, y)]
 ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
 }
 x+= 1;
-if  x > 79
+if  x > MAPWIDTH - 1
 {
 x = 0;
 y += 1;
@@ -209,7 +210,7 @@ impl Map
     }
 pub fn create_room_map(state : &mut State) -> Map
 {
-    let mut  map = vec![TileType::Wall; 80*50];
+    let mut  map = vec![TileType::Wall; MAPSIZE];
    
     let mut rooms : Vec<Rect> = Vec::new();
 
@@ -242,18 +243,18 @@ pub fn create_room_map(state : &mut State) -> Map
 
 pub fn create_room( state : &mut State) -> Rect
 { 
-    let x =state.rng.range(1, 74);
+    let x =state.rng.range(1, MAPWIDTH - 6);
     let mut  w = state.rng.range(4,15);
-    let y: i32 = state.rng.range(1,43);
+    let y: i32 = state.rng.range(1,MAPHEIGHT - 6);
     let mut h = state.rng.range(3,15);
     //Rect::with_exact(x1,x2,y2,y2)
-    if x+w > 78
+    if x+w > MAPWIDTH -2
     {
-        w = 78-x;
+        w = MAPWIDTH-2-x;
     }
-    if y + h > 48
+    if y + h > MAPHEIGHT -2
     {
-        h = 48 - y;
+        h = MAPHEIGHT-2 - y;
     }
     Rect::with_size(x, y, w, h)
 

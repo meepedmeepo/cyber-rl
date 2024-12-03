@@ -1,4 +1,5 @@
-use crate::{Player, State, Map};
+use crate::{Player, State, Map,MAPHEIGHT,MAPWIDTH};
+
 
 use super::{FoV, Position};
 use bracket_lib::prelude::{field_of_view,Point};
@@ -17,7 +18,7 @@ impl VisibilitySystem
             fov.dirty = false;
             fov.visible_tiles.clear();
             fov.visible_tiles = field_of_view(Point::new(pos.x,pos.y), fov.range, &state.map);
-            fov.visible_tiles.retain(|p| p.x >= 0 && p.x < state.map.width && p.y >= 0 && p.y < state.map.height );
+            fov.visible_tiles.retain(|p| p.x >= 0 && p.x < MAPWIDTH && p.y >= 0 && p.y < MAPHEIGHT );
 
             //let p: Option<&Player> = state.world.entity(_id).
             match player

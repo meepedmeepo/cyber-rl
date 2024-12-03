@@ -13,7 +13,11 @@ pub struct ItemContainer
 {
     pub items : Vec<Entity>,
 }
-
+#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
+pub struct WantsToPickupItem
+{
+    pub item : Entity,
+}
 pub struct Monster
 {}
 

@@ -1,5 +1,6 @@
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
+use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use hecs::*;
@@ -34,7 +35,8 @@ pub struct Renderable
 {
     glyph : char,
     fg : RGB,
-    bg : RGB
+    bg : RGB,
+    order : i32,
 }
 pub struct Name
 {
@@ -42,13 +44,14 @@ pub struct Name
 }
 impl Renderable
 {
-    fn new(glyph: char,fg : RGB, bg: RGB) -> Renderable
+    fn new(glyph: char,fg : RGB, bg: RGB,order : i32) -> Renderable
     {
         Renderable
         {
             glyph,
             fg,
-            bg
+            bg,
+            order
         }
     }
 }
@@ -57,6 +60,10 @@ pub enum ProgramState
 {
     Paused,
     ExecutingTurn,
+    AwaitingInput,
+    PlayerTurn,
+    MonsterTurn,
+    GameOver,
 }
 
 
@@ -85,7 +92,7 @@ fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 {
     match ctx.key
     {
-        None => {return ProgramState::Paused;},
+        None => {return ProgramState::AwaitingInput;},
         Some(key) => match key
         {
             VirtualKeyCode::Left =>try_move(state, -1, 0),
@@ -96,12 +103,12 @@ fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::D => try_move(state,1,0),
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
-            _ =>{return ProgramState::Paused;},
+            _ =>{return ProgramState::AwaitingInput;},
 
         }
 
     }
-    ProgramState::ExecutingTurn
+    ProgramState::PlayerTurn
 }
 /// TODO: cleanup this absolute fucking mess holy shit wtf
 fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
@@ -165,17 +172,55 @@ fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 
 impl GameState for State{
     fn tick(&mut self, ctx: &mut BTerm) {
-        if self.current_state == ProgramState::ExecutingTurn
+        // if self.current_state == ProgramState::ExecutingTurn
+        // {
+        //     run_systems(self, ctx);
+        // }
+        // else
+        // {
+        //     ctx.cls();
+        //     self.current_state = player_input_system(ctx, self);
+        //     draw_map(ctx, &self.map);
+        //     render_system(self, ctx);
+        //     gui::draw_ui(self, ctx);
+        // }
+
+
+        match self.current_state
         {
-            run_systems(self, ctx);
-        }
-        else
-        {
-            ctx.cls();
-            self.current_state = player_input_system(ctx, self);
-            draw_map(ctx, &self.map);
-            render_system(self, ctx);
-            gui::draw_ui(self, ctx);
+
+            ProgramState::AwaitingInput =>
+            {
+                ctx.cls();
+                self.current_state = player_input_system(ctx, self);
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+            }
+
+            ProgramState::PlayerTurn =>
+            {
+                run_systems(self, ctx);
+                self.current_state = ProgramState::MonsterTurn;
+            }
+
+            ProgramState::MonsterTurn =>
+            {
+                run_systems(self, ctx);
+                if self.current_state != ProgramState::GameOver
+                {
+                    self.current_state = ProgramState::AwaitingInput;
+                }
+            }
+
+            ProgramState::GameOver =>
+            {
+                ctx.cls();
+                ctx.draw_box(20, 10, 40, 20, color::WHITE, color::BLACK);
+                ctx.print_color_centered_at(40, 21, color::WHITE, color::BLACK, "You have died!");
+            }
+            _ =>
+            {}
         }
     }
 }
@@ -185,7 +230,10 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     ctx.cls();
    
     VisibilitySystem::run(state);
-    MonsterAI::run(state);
+    if state.current_state == ProgramState::MonsterTurn
+    {
+        MonsterAI::run(state);
+    }
 
     AttackSystem::run(state);
     DamageSystem::run(state);
@@ -195,7 +243,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     draw_map(ctx, &state.map);
     render_system(state, ctx);
     gui::draw_ui(state, ctx);
-    state.current_state = ProgramState::Paused;
+    //state.current_state = ProgramState::Paused;
 }
 
 fn game_init ( state: &mut State)
@@ -206,7 +254,8 @@ fn game_init ( state: &mut State)
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
     Renderable::new('@',
     RGB::from_f32(1., 0., 0.),
-    RGB::from_f32(0., 0., 0.))
+    RGB::from_f32(0., 0., 0.),
+    3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
     , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
@@ -218,7 +267,7 @@ fn game_init ( state: &mut State)
     let pos = room.center();
     {
     state.world.spawn((Position::new(pos.x, pos.y),
-    Renderable::new('g', RGB::from_f32(1., 0., 1.), RGB::from_f32(0.,0.,0.)),
+    Renderable::new('g', RGB::from_f32(1., 0., 1.), RGB::from_f32(0.,0.,0.),3),
     FoV::new(5),Monster{},BlocksTiles {},Statistics{max_hp:12,hp:12,defence: 5,strength: 2},Name{name: format!("Goblin {}",i)}));
     i += 1;
     }
@@ -227,16 +276,25 @@ fn game_init ( state: &mut State)
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
 {
-    for (_id,(position,graphic)) in
-    state.world.query::<(&Position,&Renderable)>().iter()
-   {
-        let idx = Map::xy_id(position.x, position.y);
+    //queries the ECS to get a list of entities to render, collects them into a vec,
+    //and then reverse orders them by the order member of the renderable struct
+    let mut entities_to_render  = 
+    state.world.query_mut::<(&Position,&Renderable)>()
+    .into_iter()
+    .map(|ent|{(ent.1.0,ent.1.1)})
+    .collect::<Vec<_>>();
+
+    //todo test if this puts the lower order first like it should do
+    entities_to_render.sort_by_key(|a| -a.1.order);
+
+    for ent in entities_to_render
+    {
+        let idx = Map::xy_id(ent.0.x, ent.0.y);
         if state.map.visible_tiles[idx]
         {
-            ctx.set(position.x, position.y,graphic.fg,graphic.bg,graphic.glyph)
+            ctx.set(ent.0.x, ent.0.y, ent.1.fg, ent.1.bg, ent.1.glyph);
         }
-   }
-
+    }
 }
 
 
@@ -255,7 +313,7 @@ fn main() ->BError {
         ,tile_contents : vec![Vec::new(); MAPSIZE]
         },
         rng : bracket_lib::random::RandomNumberGenerator::new(),
-        current_state : ProgramState::ExecutingTurn,
+        current_state : ProgramState::PlayerTurn,
         player_pos : Point::zero(),
         player_ent: None,
     };

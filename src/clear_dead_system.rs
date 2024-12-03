@@ -1,3 +1,5 @@
+use crate::ProgramState;
+
 use super::{State,Name,Statistics,Player};
 use bracket_lib::terminal::console;
 use hecs::Entity;
@@ -21,6 +23,7 @@ impl ClearDeadSystem
                     Some(_p) => 
                     {
                         console::log("You have died!!!!!");
+                        state.current_state = ProgramState::GameOver;
                     }
                     None => 
                     {

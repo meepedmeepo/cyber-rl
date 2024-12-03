@@ -6,7 +6,7 @@ use crate::State;
 
 
 pub const MAPWIDTH : i32 = 80;
-pub const MAPHEIGHT : i32 = 43;
+pub const MAPHEIGHT : i32 = 42;
 pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
 //use crate::rect;
 #[derive(PartialEq,Clone, Copy)]

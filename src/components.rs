@@ -1,6 +1,18 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+pub struct Item
+{}
+
+pub struct HealingEffect
+{
+   pub healing_amount: i32,
+}
+
+pub struct ItemContainer
+{
+    pub items : Vec<Entity>,
+}
 
 pub struct Monster
 {}

@@ -5,6 +5,7 @@ use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
+use std::clone;
 use std::cmp::*;
 use map::*;
 mod map;
@@ -36,7 +37,7 @@ pub struct State
     player_pos: Point,
     player_ent :Option<Entity>,
 }
-
+#[derive(Clone, Copy)]
 pub struct Renderable
 {
     glyph : char,
@@ -44,6 +45,7 @@ pub struct Renderable
     bg : RGB,
     order : i32,
 }
+#[derive(Clone)]
 pub struct Name
 {
     name : String,
@@ -70,6 +72,7 @@ pub enum ProgramState
     PlayerTurn,
     MonsterTurn,
     GameOver,
+    Inventory,
 }
 
 
@@ -121,6 +124,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_inventory(self, ctx);
             }
 
             ProgramState::PlayerTurn =>
@@ -138,6 +142,17 @@ impl GameState for State{
                 }
             }
 
+            ProgramState::Inventory =>
+            {
+                ctx.cls();
+                //insert inventory input function here!
+
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                gui::draw_inventory(self, ctx);
+            }
+
             ProgramState::GameOver =>
             {
                 ctx.cls();
@@ -145,7 +160,9 @@ impl GameState for State{
                 ctx.print_color_centered_at(40, 21, color::WHITE, color::BLACK, "You have died!");
             }
             _ =>
-            {}
+            {
+                self.current_state = ProgramState::AwaitingInput;
+            }
         }
     }
 }

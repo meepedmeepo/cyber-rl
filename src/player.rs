@@ -43,16 +43,6 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                         Err(_) => 
                         {}
                     }
-                    // match state.world.query_one::<&Item>(*ent)
-                    // {
-                    //     Ok(_p) => 
-                    //     {
-                    //         item = Some(*ent);
-                    //         break;
-                    //     }
-
-                    //     Err(_) => { continue;}
-                    // }
                 }
                 match item
                 {
@@ -78,7 +68,34 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 }
 
 
+pub fn inventory_input(state : &mut State, ctx:&BTerm) -> ProgramState
+{
+    match ctx.key
+    {
+        None => {return ProgramState::Inventory;}
+        Some(key) => match key
+        {
+            //CHANGE THIS TO USE  bracket_lib::terminal::letter_to_option() 
+            VirtualKeyCode::Q => {use_item(0);}
+            VirtualKeyCode::W => {use_item(1);}
+            VirtualKeyCode::E => {use_item(2);}
+            VirtualKeyCode::R => {use_item(3);}
+            VirtualKeyCode::T => {use_item(4);}
+            VirtualKeyCode::Y => {use_item(5);}
+            VirtualKeyCode::U => {use_item(6);}
+            VirtualKeyCode::A => {use_item(7);}
 
+            _ => {}
+        }
+    }
+
+    ProgramState::Inventory
+}
+
+pub fn use_item(item_inv_pos :i32)
+{
+
+}
 
 
 /// TODO: cleanup this absolute fucking mess holy shit wtf
@@ -86,7 +103,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 {
     let mut moved =  false;
     let mut destination_id : usize = 0;
-    let (id,(_player)) =  state.world.query_mut::<(&Player)>().into_iter().next().expect("No Player found!");
+    let (id,_player) =  state.world.query_mut::<&Player>().into_iter().next().expect("No Player found!");
     let mut attacker : Entity = id;
     let mut target = id;
 

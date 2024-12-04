@@ -5,6 +5,7 @@ use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
+use menus::inventory_state;
 use std::clone;
 use std::cmp::*;
 use map::*;
@@ -24,7 +25,7 @@ mod spawning_system;
 mod player;
 mod item_pickup_system;
 use player::*;
-
+mod menus;
 use crate::{MAPHEIGHT,MAPWIDTH};
 //use map_indexing_system;
 
@@ -124,7 +125,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
-                gui::draw_inventory(self, ctx);
+                //gui::draw_inventory(self, ctx);
             }
 
             ProgramState::PlayerTurn =>
@@ -146,7 +147,13 @@ impl GameState for State{
             {
                 ctx.cls();
                 //insert inventory input function here!
-
+                let invent_state = menus::InventoryMenu::menu_input(ctx, self);
+                match invent_state
+                {
+                    inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
+                    inventory_state::Selected => {self.current_state = ProgramState::MonsterTurn;}
+                    inventory_state::None => {}
+                }
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
@@ -158,6 +165,19 @@ impl GameState for State{
                 ctx.cls();
                 ctx.draw_box(20, 10, 40, 20, color::WHITE, color::BLACK);
                 ctx.print_color_centered_at(40, 21, color::WHITE, color::BLACK, "You have died!");
+                let inp = ctx.key;
+                match inp
+                {
+                    Some(key) =>
+                    {
+                        match key
+                        {
+                            bracket_lib::terminal::VirtualKeyCode::Escape => ctx.quit(),
+                            _ => {}
+                        }
+                    }
+                    None => {}
+                }
             }
             _ =>
             {

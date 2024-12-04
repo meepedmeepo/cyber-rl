@@ -47,9 +47,11 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
     ctx.draw_box(22, 10, 35, height, bracket_lib::color::WHITE, bracket_lib::color::BLACK);
     ctx.print_centered_at(35, 11, "Inventory");
     let mut y = 13;
+    let mut index : u8 = 97;
     for item in items.iter()
     {
-        ctx.print_color(23, y,color::WHITE,color::BLACK, item.name.clone());
+        ctx.print_color(23, y,color::WHITE,color::BLACK, format!("{}.) {}",index as char,item.name.clone()));
         y+=2;
+        index += 1;
     }
 }

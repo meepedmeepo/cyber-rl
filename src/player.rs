@@ -25,7 +25,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::D => try_move(state,1,0),
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
-
+            VirtualKeyCode::I => return ProgramState::Inventory,
             VirtualKeyCode::G => 
             {
                 let mut item : Option<Entity> = None;
@@ -76,14 +76,7 @@ pub fn inventory_input(state : &mut State, ctx:&BTerm) -> ProgramState
         Some(key) => match key
         {
             //CHANGE THIS TO USE  bracket_lib::terminal::letter_to_option() 
-            VirtualKeyCode::Q => {use_item(0);}
-            VirtualKeyCode::W => {use_item(1);}
-            VirtualKeyCode::E => {use_item(2);}
-            VirtualKeyCode::R => {use_item(3);}
-            VirtualKeyCode::T => {use_item(4);}
-            VirtualKeyCode::Y => {use_item(5);}
-            VirtualKeyCode::U => {use_item(6);}
-            VirtualKeyCode::A => {use_item(7);}
+        
 
             _ => {}
         }

@@ -17,10 +17,15 @@ pub struct ItemContainer
 pub struct WantsToPickupItem
 {
     pub item : Entity,
+    
 }
 pub struct Monster
 {}
-
+#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
+pub struct WantsToUseItem
+{
+    pub item : Entity,
+}
 pub struct BlocksTiles
 {}
 

@@ -25,7 +25,10 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
 {
     let mut items_to_search = Vec::new();
     {
-        let itemlist = state.world.query_one_mut::<&ItemContainer>(Option::expect(state.player_ent, "Couldn't find player")).expect("Couldn't find item container on player!");
+        let itemlist = 
+        state.world.query_one_mut::<&ItemContainer>
+        (Option::expect(state.player_ent, "Couldn't find player"))
+        .expect("Couldn't find item container on player!");
         for i in itemlist.items.iter()
         {
             items_to_search.push(*i);

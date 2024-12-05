@@ -3,12 +3,12 @@ use hecs::Entity;
 
 pub struct Item
 {}
-
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HealingEffect
 {
    pub healing_amount: i32,
 }
-
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ItemContainer
 {
     pub items : Vec<Entity>,
@@ -39,7 +39,7 @@ pub struct TakeDamage
 {
     pub damage_to_take : Vec<i32>,
 }
-
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Statistics
 {
     pub max_hp : i32,

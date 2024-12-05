@@ -6,7 +6,6 @@ use damage_system::DamageSystem;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
-use std::clone;
 use std::cmp::*;
 use map::*;
 mod map;
@@ -26,6 +25,7 @@ mod player;
 mod item_pickup_system;
 use player::*;
 mod menus;
+mod item_use_system;
 use crate::{MAPHEIGHT,MAPWIDTH};
 //use map_indexing_system;
 
@@ -121,6 +121,7 @@ impl GameState for State{
                 ctx.cls();
                 self.current_state = player_input_system(ctx, self);
                 item_pickup_system::run(self);
+                item_use_system::run(self);
                 MapIndexingSystem::run(self);
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
@@ -196,7 +197,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     {
         MonsterAI::run(state);
     }
-
+    item_use_system::run(state);
     AttackSystem::run(state);
     DamageSystem::run(state);
     ClearDeadSystem::run(state);

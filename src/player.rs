@@ -1,5 +1,4 @@
 use bracket_lib::prelude::*;
-use hecs::With;
 use crate::{Item, WantsToPickupItem};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position,Statistics};

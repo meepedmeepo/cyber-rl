@@ -26,6 +26,7 @@ mod item_pickup_system;
 use player::*;
 mod menus;
 mod item_use_system;
+pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
 //use map_indexing_system;
 

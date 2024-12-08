@@ -10,6 +10,25 @@ pub struct DamageSystem
 
 impl DamageSystem
 {
+    pub fn mark_for_damage(state : &mut State, target : Entity, dmg : i32)
+    {
+        let query = state.world.get::<&mut TakeDamage>(target);
+        
+        match query
+        {
+            Ok(mut dmg_comp) =>
+            {
+                dmg_comp.damage_to_take.push(dmg);
+            }
+
+            Err(_) =>
+            {
+                std::mem::drop(query);
+                state.world.insert_one(target, TakeDamage{damage_to_take: vec![dmg]})
+                .expect("Couldn't insert TakeDamage component!");
+            }
+        }
+    }
    pub fn run(state : &mut State)
     {
         let mut dmg_comps_to_remove : Vec<Entity> = Vec::new();

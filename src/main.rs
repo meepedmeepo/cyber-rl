@@ -29,6 +29,9 @@ mod item_use_system;
 pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
 //use map_indexing_system;
+#[macro_use]
+extern crate lazy_static;
+
 
 pub struct State
 {
@@ -75,6 +78,7 @@ pub enum ProgramState
     MonsterTurn,
     GameOver,
     Inventory,
+    Targeting { range: i32, item : Entity, }
 }
 
 
@@ -100,19 +104,6 @@ impl Position
 
 impl GameState for State{
     fn tick(&mut self, ctx: &mut BTerm) {
-        // if self.current_state == ProgramState::ExecutingTurn
-        // {
-        //     run_systems(self, ctx);
-        // }
-        // else
-        // {
-        //     ctx.cls();
-        //     self.current_state = player_input_system(ctx, self);
-        //     draw_map(ctx, &self.map);
-        //     render_system(self, ctx);
-        //     gui::draw_ui(self, ctx);
-        // }
-
 
         match self.current_state
         {
@@ -153,15 +144,48 @@ impl GameState for State{
                 match invent_state
                 {
                     inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
-                    inventory_state::Selected => {self.current_state = ProgramState::MonsterTurn;}
+                    inventory_state::Selected => {self.current_state = ProgramState::PlayerTurn;}
                     inventory_state::None => {}
+                    inventory_state::TargetedItem { item, range } =>
+                    {
+                        self.current_state = ProgramState::Targeting { range: range, item: item };
+                    }
                 }
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_inventory(self, ctx);
             }
+            ProgramState::Targeting { range, item } =>
+            {
+                ctx.cls();
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                let (inv_state,point) = gui::_ranged_target(self, ctx, range);
+                match inv_state
+                {
+                    inventory_state::Cancel =>{ self.current_state = ProgramState::AwaitingInput;}
+                    inventory_state::Selected =>
+                    {
+                        if point.is_some()
+                        {
+                            let point = point.expect("Couldn't find point even tho it is Some??? like wtf");
+                            self.world.insert_one(self.player_ent.expect("Couldn't find player"),
+                             WantsToUseItem{item:item, target: Some(point)})
+                             .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
+                            self.current_state = ProgramState::PlayerTurn;
 
+                        }
+                    
+                    }
+                    inventory_state::None => {}
+
+                    _ => {}
+
+                    
+                }
+            }
             ProgramState::GameOver =>
             {
                 ctx.cls();
@@ -226,6 +250,7 @@ fn game_init ( state: &mut State)
     ,ItemContainer{items: Vec::new()}
     , Player{})));
     spawning_system::spawn_healing_item(state);
+    spawning_system::spawn_damage_item(state);
     let mut i = 1;
     //Spawn test purple goblin enemies in every room apart from the starting room.
     for room in state.map.rooms.iter().skip(1)

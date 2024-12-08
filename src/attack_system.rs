@@ -1,6 +1,6 @@
 use bracket_lib::terminal::console;
 use hecs::{World, Entity};
-use crate::{Statistics};
+use crate::{damage_system::DamageSystem, Statistics};
 
 use super::{State, Attack, Name, TakeDamage};
 pub struct AttackSystem
@@ -19,29 +19,20 @@ impl AttackSystem
     pub fn run(state : &mut State)
     {
         let mut attackers: Vec<Entity> = Vec::new();
-        let mut defendersToDamage : Vec<(Entity,i32)> = Vec::new();
+        let mut defenders_to_damage : Vec<(Entity,i32)> = Vec::new();
+        
         for (_id,(attack,_name, stats)) 
         in state.world.query::<(&mut Attack,&Name,&Statistics)>().iter()
         {
             attackers.push(_id);
-            let query = state.world.get::<&mut TakeDamage>(attack.target);
-            match query 
-            {
-                Ok(mut res)   => {res.damage_to_take.push(stats.strength);}
-                Err(_) => 
-                {
-                    //console::log("Gonna need to add a new damage comp");
-                    defendersToDamage.push((attack.target,stats.strength));
-                    //state.world.insert_one(attack.target, TakeDamage{damage_to_take: vec![stats.strength;1]});
-                } 
-            }
-            //state.world.insert_one(attack.target, )
+            defenders_to_damage.push((attack.target,stats.strength));
         }
-        for (target,dmg) in defendersToDamage.iter()
+
+        for (target,dmg) in defenders_to_damage
         {
-            state.world.insert_one(*target, TakeDamage{damage_to_take: vec![*dmg]})
-            .expect("Failed to add TakeDamage component to attack target!");
+            DamageSystem::mark_for_damage(state, target, dmg);
         }
+
 
         for entity in attackers.iter()
         {

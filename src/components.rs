@@ -1,9 +1,21 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+#[derive(Clone,PartialEq,Eq, PartialOrd, Ord)]
+pub struct RangedTargetting
+{
+    pub range : i32,
+}
+
+#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
+pub struct DamageEffect
+{
+   pub damage_amount: i32,
+}
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Item
 {}
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
 pub struct HealingEffect
 {
    pub healing_amount: i32,
@@ -19,12 +31,16 @@ pub struct WantsToPickupItem
     pub item : Entity,
     
 }
+#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
+pub struct Consumable
+{}
 pub struct Monster
 {}
-#[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy,PartialEq, Eq)]
 pub struct WantsToUseItem
 {
     pub item : Entity,
+    pub target: Option<Point>
 }
 pub struct BlocksTiles
 {}

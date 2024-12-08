@@ -75,8 +75,6 @@ pub fn inventory_input(state : &mut State, ctx:&BTerm) -> ProgramState
         Some(key) => match key
         {
             //CHANGE THIS TO USE  bracket_lib::terminal::letter_to_option() 
-        
-
             _ => {}
         }
     }
@@ -84,10 +82,6 @@ pub fn inventory_input(state : &mut State, ctx:&BTerm) -> ProgramState
     ProgramState::Inventory
 }
 
-pub fn use_item(item_inv_pos :i32)
-{
-
-}
 
 
 /// TODO: cleanup this absolute fucking mess holy shit wtf

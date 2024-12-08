@@ -1,5 +1,7 @@
 use bracket_lib::terminal::*;
 use bracket_lib::color;
+use crate::menus::inventory_state;
+use crate::FoV;
 use crate::ItemContainer;
 use crate::Renderable;
 use crate::{Player, Statistics,Name,Item};
@@ -34,11 +36,9 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
             items_to_search.push(*i);
         }
     }
+     
      let mut items = Vec::new();
-    // for (_id,(_item, name,graphic)) in state.world.query_mut::<(&Item,&Name,&Renderable)>().into_iter().filter(|x| x.0 == Option::expect(state.player_ent, "Couldn't find player!"))
-    // {
-    //     items.push((name,graphic));
-    // }
+
     for item in items_to_search
     {
         let item_info = state.world.query_one_mut::<&Name>(item).expect("Couldn't find item name for displaying inventory!");
@@ -57,4 +57,62 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
         y+=2;
         index += 1;
     }
+}
+
+
+pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32) 
+    -> (inventory_state, Option<Point>)
+{
+    ctx.print_color(5,0,RGB::named(YELLOW), RGB::named(BLACK), "SELECT TARGET:");
+    
+    let mut available_cells = Vec::new();
+    let visible = state.world.get::<&FoV>(state.player_ent
+        .expect("Can't find player ent for ranged targetting gui!"));
+    match visible
+    {
+        Ok(ref vis) =>
+        {
+            for idx in vis.visible_tiles.iter()
+            {
+                let distance =
+                 bracket_lib::pathfinding::DistanceAlg::Pythagoras.distance2d(state.player_pos, *idx);
+                 if distance <= range as f32
+                 {
+                    ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
+                    available_cells.push(idx);
+                }
+            }
+        }
+
+        Err(_) => { return (inventory_state::Cancel,None);}
+    }
+
+    let mouse_pos = ctx.mouse_pos;
+    let mut is_valid_target = false;
+
+    for idx in available_cells
+    {
+        if idx.x == mouse_pos.0 && idx.y == mouse_pos.1
+        {
+            is_valid_target = true;
+        }  
+    }
+    if is_valid_target
+    {
+        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(GREEN));
+        if ctx.left_click
+        {
+            return (inventory_state::Selected,Some(Point::new(mouse_pos.0, mouse_pos.1)) );
+        }
+    }
+    else
+    {
+        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(RED));
+        if ctx.left_click
+        {
+            return (inventory_state::Cancel, None);
+        }
+    }
+
+    (inventory_state::None, None)
 }

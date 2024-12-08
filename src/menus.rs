@@ -2,7 +2,7 @@ use bracket_lib::prelude::BTerm;
 use bracket_lib::terminal::console;
 use hecs::Entity;
 
-use crate::{ItemContainer, State, WantsToUseItem};
+use crate::{ItemContainer, ProgramState, RangedTargetting, State, WantsToUseItem};
 
 pub struct InventoryMenu
 {}
@@ -11,6 +11,7 @@ pub enum inventory_state
     Cancel,
     Selected,
     None,
+	TargetedItem {item : Entity, range: i32}
 }
 impl InventoryMenu
 {
@@ -46,11 +47,28 @@ impl InventoryMenu
 				{
 					Some(selected_item) =>
 					{
-						state.world.insert_one(state.player_ent
-							.expect("Couldn't find player to insert WantsToUseItem component!"),
-							 WantsToUseItem {item: selected_item})
-							 .expect("Couldn't insert WantsToUseItem onto player!");
-						return inventory_state::Selected;
+						let is_ranged = 
+						state.world.get::<&RangedTargetting>(
+							Option::expect(item_target, "Couldn't find item target!"));
+						match is_ranged
+						{
+							Ok(ref ranged) =>
+							 {
+								return inventory_state::TargetedItem { item: item_target
+									.expect("Couldn't find item target!")
+									, range: ranged.range };
+							 }
+							Err(_) =>
+							{
+								std::mem::drop(is_ranged);
+								state.world.insert_one(state.player_ent
+									.expect("Couldn't find player to insert WantsToUseItem component!"),
+									 WantsToUseItem {item: selected_item, target: None})
+									 .expect("Couldn't insert WantsToUseItem onto player!");
+								return inventory_state::Selected;
+							}
+						}
+						
 					}
 					None =>
 					{
@@ -64,7 +82,7 @@ impl InventoryMenu
             None => {return inventory_state::None;}
         }
 
-        inventory_state::None
+        //inventory_state::None
     }
 
 }

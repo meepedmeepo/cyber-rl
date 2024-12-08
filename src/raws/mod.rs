@@ -1,6 +1,13 @@
 use std::{collections::HashMap, fs};
-
 use serde::Deserialize;
+mod rawmaster;
+pub use rawmaster::*;
+use std::sync::Mutex;
+//makes it safe to use RawMaster as a global static singleton.
+lazy_static! {
+    pub static ref RAWS : Mutex<RawMaster> = Mutex::new(RawMaster::empty());
+}
+
 
 #[derive(Deserialize, Debug)]
 pub struct Raws

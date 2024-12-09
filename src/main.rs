@@ -28,6 +28,7 @@ mod menus;
 mod item_use_system;
 pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
+pub mod gamelog;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;

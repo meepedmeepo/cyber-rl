@@ -86,8 +86,8 @@ pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32)
 
         Err(_) => { return (inventory_state::Cancel,None);}
     }
-
-    let mouse_pos = ctx.mouse_pos;
+    //the function version of Bterm.mouse_pos is required to actually get the position!
+    let mouse_pos = ctx.mouse_pos();
     let mut is_valid_target = false;
 
     for idx in available_cells
@@ -99,7 +99,7 @@ pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32)
     }
     if is_valid_target
     {
-        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(GREEN));
+        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(CYAN));
         if ctx.left_click
         {
             return (inventory_state::Selected,Some(Point::new(mouse_pos.0, mouse_pos.1)) );

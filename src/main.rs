@@ -236,6 +236,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
 fn game_init ( state: &mut State)
 {
+    
     //Spawn player object
     let xy = state.map.rooms[0].center();
     state.player_pos = xy;

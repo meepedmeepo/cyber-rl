@@ -43,7 +43,6 @@ pub fn run(state : &mut State)
     {
 
         //This denotes that the entities stats are dirty and needs the component will be replaced at the end of the loop
-        let mut is_dirty = false;
 
 
         //gets targets
@@ -61,7 +60,13 @@ pub fn run(state : &mut State)
                     //Single targeted
                     None => 
                     {
-                       targets[index] = state.map.get_mob_entities_at_position(state, target_point);
+                       targets.push( Vec::new());
+                       
+                       for i in state.map.get_mob_entities_at_position(state, target_point).iter()
+                       {
+                            targets[index].push(*i);
+                       }
+                       
                     }
                 }
             }
@@ -69,7 +74,7 @@ pub fn run(state : &mut State)
             //Self targeted
             None =>
             { 
-                targets[index] = Vec::new();
+                targets.push(Vec::new());
                 targets[index].push(ents.0);
             }
         }
@@ -107,57 +112,49 @@ pub fn run(state : &mut State)
         {
             for target in targets[index].iter()
             {
-                ents.2.hp = min(ents.2.hp + healing.healing_amount, ents.2.max_hp);
+                let (stats, name) = state.world.query_one_mut::<(&mut Statistics,&Name)>(*target).expect("Couldn't find stats for target to heal!");
+                stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
 
-                state.game_log.add_log(format!("{} used {} and healed for {}!"
-                ,ents.3, item_info[index].0, healing.healing_amount));
+                if item_info[index].4.is_none()
+                {
+                    state.game_log.add_log(format!("{} used {} and healed for {} hp!"
+                        ,name.name.clone(), item_info[index].0, healing.healing_amount));
 
-                bracket_lib::terminal::console::log(format!("{} used {} and healed for {}!"
-                ,ents.3, item_info[index].0, healing.healing_amount));
+                    bracket_lib::terminal::console::log(format!("{} used {} and healed for {} hp!"
+                        ,name.name.clone(), item_info[index].0, healing.healing_amount));
+                }
+                else 
+                {
+                    
+                    state.game_log.add_log(format!("{} used {} on {}, and healed for them for {} hp!"
+                        ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
 
-                is_dirty = true;
+                    bracket_lib::terminal::console::log(format!("{} used {} on {}, and healed for them for {} hp!"
+                        ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
+                }
             }
         }
         None => {}
         }
 
+        //Applies damage effects
+        match item_info[index].3
+        {
+            Some(dmg) => 
+            {
+                for target in targets[index].iter()
+                {
+                    
+                }
+            }
 
+            None => {}
+        }
 
     //end of loop for run function in theory
         index+=1;
-    }
-
-
-
-
-    for ents in entities_to_use_items.iter_mut()
+    
     {
-        let mut is_dirty = false;
-        {
-        let mut query = 
-        state.world.query_one::<(Option<&HealingEffect>,&Name)>
-        (ents.1).unwrap();
-
-
-    let (effect,name) = query.get().unwrap();
-    match effect
-    {
-        Some(healing) => 
-        {
-            ents.2.hp = min(ents.2.hp + healing.healing_amount, ents.2.max_hp);
-
-            state.game_log.add_log(format!("{} used {} and healed for {}!"
-            ,ents.3,name.name, healing.healing_amount));
-
-            bracket_lib::terminal::console::log(format!("{} used {} and healed for {}!"
-            ,ents.3,name.name, healing.healing_amount));
-
-            is_dirty = true;
-        }
-        None => {}
-    }
-    std::mem::drop(query);
-
     //let (damage,name) =
      //state.world.get::<(&DamageEffect, &Name)>(ents.1);
     let mut query = state.world.query_one::<(Option<&DamageEffect>, &Name)>(ents.1).unwrap();
@@ -203,20 +200,16 @@ pub fn run(state : &mut State)
      }
     }
 
-    if is_dirty
+    
+    
+    
+    //despawns item if it is a consumable that has been used
+    if ents.5 == true
     {
-        state.world.insert_one(ents.0, ents.2)
-        .expect("Couldn't change stats for entity after using item!");
+        state.world.despawn(ents.1).expect("Couldn't despawn item entity!");
     }
-    }
-    for ents in entities_to_use_items.iter()
-    {
-        if ents.5 == true
-        {
-            state.world.despawn(ents.1).expect("Couldn't despawn item entity!");
-        }
-    }
+    
 
 
 
-}
+}}

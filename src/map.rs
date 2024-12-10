@@ -2,7 +2,7 @@
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
-use crate::State;
+use crate::{State, Statistics};
 
 
 pub const MAPWIDTH : i32 = 80;
@@ -103,6 +103,19 @@ impl Map
         {
             tile_contents.clear();
         }
+    }
+
+   pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Vec<Entity>
+    {
+        let mut mobs = Vec::new();
+        for ent in self.tile_contents[Map::xy_id(position.x, position.y)].iter()
+        {
+            if state.world.get::<&Statistics>(*ent).is_ok()
+            {
+               mobs.push(*ent);
+            }
+        }
+        mobs
     }
 
 }

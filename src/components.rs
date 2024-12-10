@@ -28,7 +28,13 @@ impl Renderable
     }
 }
 
-#[derive(Clone,PartialEq,Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct AoE
+{
+    radius: i32,
+}
+
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct RangedTargetting
 {
     pub range : i32,

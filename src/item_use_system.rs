@@ -1,7 +1,7 @@
 use std::cmp::min;
 
 use crate::damage_system::DamageSystem;
-use crate::{DamageEffect, HealingEffect, ItemContainer, Map, Name, Position, State, Statistics, WantsToUseItem};
+use crate::{AoE, DamageEffect, HealingEffect, ItemContainer, Map, Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType
@@ -18,6 +18,7 @@ pub fn run(state : &mut State)
 
     let mut item_info = Vec::new();
 
+    let mut targets: Vec<Vec<hecs::Entity>> = Vec::new();
 
     for (_id, (item_use_tag,_pos,stats,name)) in 
     state.world.query_mut::<(&WantsToUseItem,&Position,&Statistics,&Name)>()
@@ -27,50 +28,107 @@ pub fn run(state : &mut State)
 
     for ents in entities_to_use_items.iter()
     {
-        let query = state.world.query_one_mut::<(&Name, Option<&Consumable>,Option<&HealingEffect>, Option<&DamageEffect>)>(ents.1).expect("couldn't get item properties");
-        let (name,consumable,healing,damage) = query;
+        let query = state.world.query_one_mut::<(&Name, Option<&Consumable>,Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>(ents.1).expect("couldn't get item properties");
+        let (name,consumable,healing,damage, aoe) = query;
 
-        item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4));
+        item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied()));
         
     }
 
-    //removes used item from container and then removes the WantsToUseItem component from that entity afterwards
+    //rewrite of main function to all be in one loop
+
+
+    let mut index = 0;
     for ents in entities_to_use_items.iter_mut()
     {
-        let mut items = state.world.get::<&ItemContainer>(ents.0)
-        .expect("Couldn't get item container from entity!")
-        .items.clone();
-        
-        let is_consumable = state.world.get::<&Consumable>(ents.1);
-        match is_consumable
+
+        //This denotes that the entities stats are dirty and needs the component will be replaced at the end of the loop
+        let mut is_dirty = false;
+
+
+        //gets targets
+        match ents.4
         {
-            Ok(_) => 
+            Some(target_point) =>
             {
-                items.remove(items.iter().position(|x| *x == ents.1)
-                .expect("Couldn't find item in ItemContainer of entity!"));
+                match item_info[index].5
+                {
+                    Some(aoe) =>
+                    {
+                        panic!("AoE not implemented");
+                    }
 
-                std::mem::drop(is_consumable);
-
-                state.world.insert_one(ents.0, ItemContainer {items: items})
-                .expect("Couldn't find entity to insert item!");
-
-                state.world.remove_one::<WantsToUseItem>(ents.0)
-                .expect("Can't find entity to remove WantsToUseItem component");
-                
-                ents.5 = true;
+                    //Single targeted
+                    None => 
+                    {
+                       targets[index] = state.map.get_mob_entities_at_position(state, target_point);
+                    }
+                }
             }
-            Err(_) =>
-            {
-                std::mem::drop(is_consumable);
-                state.world.remove_one::<WantsToUseItem>(ents.0)
-                .expect("Can't find entity to remove WantsToUseItem component");
+
+            //Self targeted
+            None =>
+            { 
+                targets[index] = Vec::new();
+                targets[index].push(ents.0);
             }
         }
         
-        
+        /// Removing item and wants to use item tags
+        match item_info[index].1
+        {
+            Some(consumable) =>
+             {
+                let mut items = state.world.get::<&ItemContainer>(ents.0)
+                    .expect("Couldn't get item container from entity!")
+                    .items.clone();
 
+                items.remove(items.iter().position(|x| *x == ents.1)
+                    .expect("Couldn't find item in ItemContainer of entity!"));
+
+
+                state.world.insert_one(ents.0, ItemContainer {items: items})
+                    .expect("Couldn't find entity to insert item!");
+
+                
+
+             }
+
+            None => {}
+        }
         
+        state.world.remove_one::<WantsToUseItem>(ents.0)
+                    .expect("Can't find entity to remove WantsToUseItem component");
+
+        //Applies healing effects
+        match item_info[index].2
+        {
+            Some(healing) => 
+        {
+            for target in targets[index].iter()
+            {
+                ents.2.hp = min(ents.2.hp + healing.healing_amount, ents.2.max_hp);
+
+                state.game_log.add_log(format!("{} used {} and healed for {}!"
+                ,ents.3, item_info[index].0, healing.healing_amount));
+
+                bracket_lib::terminal::console::log(format!("{} used {} and healed for {}!"
+                ,ents.3, item_info[index].0, healing.healing_amount));
+
+                is_dirty = true;
+            }
+        }
+        None => {}
+        }
+
+
+
+    //end of loop for run function in theory
+        index+=1;
     }
+
+
+
 
     for ents in entities_to_use_items.iter_mut()
     {

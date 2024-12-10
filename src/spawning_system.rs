@@ -1,4 +1,5 @@
-use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State};
+use crate::raws::{SpawnType, RAWS};
+use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::terminal::Point;
 
@@ -25,4 +26,20 @@ pub fn spawn_damage_item(state : &mut State)
     Renderable::new('%', bracket_lib::color::RGB::from_f32(0.5, 0., 0.5), bracket_lib::color::RGB::from_f32(0., 0., 0.), 2),
     Item{}, Consumable{},RangedTargetting {range: 3}, DamageEffect{damage_amount: 10}));
 
+}
+
+pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32)
+{
+    let  item_res = 
+    RawMaster::spawn_named_item(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
+     &spawn.1, SpawnType::AtPosition{ x, y});
+     match item_res
+    {
+        Some(mut item) => 
+        {
+            state.world.spawn(item.build());
+        }
+
+        None => {bracket_lib::terminal::console::log(format!("Can't find entity named {}",&spawn.1));}     
+    }
 }

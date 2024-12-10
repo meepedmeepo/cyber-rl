@@ -15,6 +15,7 @@ pub struct Raws
     pub items : Vec<Item>,
    // pub mobs : Vec<Mob>
 }
+
 #[derive(Deserialize, Debug)]
 pub struct Item
 {
@@ -31,16 +32,18 @@ pub struct Renderable
     pub bg : String,
     pub order : i32
 }
+
 #[derive(Deserialize, Debug)]
 pub struct Consumable
 {
     pub effects : HashMap<String,String>
 }
 
-
-fn run()
+pub fn run()
 {
-let data = fs::read_to_string("./raws/spawns.json").expect("Unable to read spawns.json");
+let data = fs::read_to_string(std::path::Path::new("./src/raws/spawns.json")).expect("Unable to read spawns.json");
     println!("{}", data);
     let decoder : Raws = serde_json::from_str(&data).expect("Unable to parse JSON");
+    bracket_lib::terminal::console::log(format!("{:?}", decoder));
+    RAWS.lock().unwrap().load(decoder);
 }

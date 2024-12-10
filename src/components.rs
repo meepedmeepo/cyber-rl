@@ -1,6 +1,33 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+
+pub struct Renderable
+{
+   pub glyph : char,
+   pub fg : bracket_lib::color::RGB,
+    pub bg : bracket_lib::color::RGB,
+    pub order : i32,
+}
+#[derive(Clone)]
+pub struct Name
+{
+    pub name : String,
+}
+impl Renderable
+{
+   pub fn new(glyph: char,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
+    {
+        Renderable
+        {
+            glyph,
+            fg,
+            bg,
+            order
+        }
+    }
+}
+
 #[derive(Clone,PartialEq,Eq, PartialOrd, Ord)]
 pub struct RangedTargetting
 {

@@ -7,6 +7,7 @@ use gamelog::GameLog;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
+use raws::RAWS;
 use std::cmp::*;
 use map::*;
 mod map;
@@ -45,32 +46,8 @@ pub struct State
     player_ent :Option<Entity>,
     game_log : GameLog,
 }
-#[derive(Clone, Copy)]
-pub struct Renderable
-{
-    glyph : char,
-    fg : RGB,
-    bg : RGB,
-    order : i32,
-}
-#[derive(Clone)]
-pub struct Name
-{
-    name : String,
-}
-impl Renderable
-{
-    fn new(glyph: char,fg : RGB, bg: RGB,order : i32) -> Renderable
-    {
-        Renderable
-        {
-            glyph,
-            fg,
-            bg,
-            order
-        }
-    }
-}
+
+
 #[derive(PartialEq,Copy,Clone)]
 pub enum ProgramState
 {
@@ -243,9 +220,12 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
 fn game_init ( state: &mut State)
 {
+    raws::run();
     
+    //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
     let xy = state.map.rooms[0].center();
+    
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
     Renderable::new('@',
@@ -260,6 +240,7 @@ fn game_init ( state: &mut State)
     spawning_system::spawn_healing_item(state);
     spawning_system::spawn_damage_item(state);
     let mut i = 1;
+    spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2);
     //Spawn test purple goblin enemies in every room apart from the starting room.
     for room in state.map.rooms.iter().skip(1)
     {

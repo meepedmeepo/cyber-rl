@@ -4,15 +4,34 @@ use crate::damage_system::DamageSystem;
 use crate::{DamageEffect, HealingEffect, ItemContainer, Map, Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
 
+enum TargetType
+{
+    SelfAimed,
+    AoE,
+    Single,
 
+}
 
 pub fn run(state : &mut State)
 {
     let mut entities_to_use_items = Vec::new();
+
+    let mut item_info = Vec::new();
+
+
     for (_id, (item_use_tag,_pos,stats,name)) in 
     state.world.query_mut::<(&WantsToUseItem,&Position,&Statistics,&Name)>()
     {
         entities_to_use_items.push((_id, item_use_tag.item, *stats, name.name.clone(),item_use_tag.target, false));
+    }
+
+    for ents in entities_to_use_items.iter()
+    {
+        let query = state.world.query_one_mut::<(&Name, Option<&Consumable>,Option<&HealingEffect>, Option<&DamageEffect>)>(ents.1).expect("couldn't get item properties");
+        let (name,consumable,healing,damage) = query;
+
+        item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4));
+        
     }
 
     //removes used item from container and then removes the WantsToUseItem component from that entity afterwards

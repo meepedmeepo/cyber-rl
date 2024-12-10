@@ -69,6 +69,9 @@ pub fn run(state : &mut State)
         {
             ents.2.hp = min(ents.2.hp + healing.healing_amount, ents.2.max_hp);
 
+            state.game_log.add_log(format!("{} used {} and healed for {}!"
+            ,ents.3,name.name, healing.healing_amount));
+
             bracket_lib::terminal::console::log(format!("{} used {} and healed for {}!"
             ,ents.3,name.name, healing.healing_amount));
 
@@ -78,12 +81,13 @@ pub fn run(state : &mut State)
     }
     std::mem::drop(query);
 
-    let damage =
-     state.world.get::<&DamageEffect>(ents.1);
-
+    //let (damage,name) =
+     //state.world.get::<(&DamageEffect, &Name)>(ents.1);
+    let mut query = state.world.query_one::<(Option<&DamageEffect>, &Name)>(ents.1).unwrap();
+    let (damage,name) = query.get().unwrap();
      match damage
      {
-        Ok(ref dmg) =>
+        Some(ref dmg) =>
         {
             match ents.4
             {
@@ -91,8 +95,9 @@ pub fn run(state : &mut State)
                 {
                     
                     let dmg_num = dmg.damage_amount;
-                    std::mem::drop(damage);
-    
+                    
+                    state.game_log.add_log(format!("{} uses {}",ents.3,name.name));
+
                     let mut ents_to_dmg = Vec::new();
                     for ent in state.map.tile_contents[Map::xy_id(target.x, target.y)].iter()
                     {
@@ -101,6 +106,7 @@ pub fn run(state : &mut State)
                             ents_to_dmg.push((*ent,dmg_num));
                         }
                     }
+                    std::mem::drop(query);
                     for ent in ents_to_dmg
                     {
                         DamageSystem::mark_for_damage(state, ent.0, ent.1);
@@ -110,12 +116,13 @@ pub fn run(state : &mut State)
                 None => 
                 {
                     let dmg_num = dmg.damage_amount;
-                    std::mem::drop(damage);
+                    state.game_log.add_log(format!("{} uses {}",ents.3,name.name));
+                    std::mem::drop(query);
                     DamageSystem::mark_for_damage(state, ents.0, dmg_num);
                 }
             }
         }
-        Err(_) => {}
+        None => {}
      }
     }
 

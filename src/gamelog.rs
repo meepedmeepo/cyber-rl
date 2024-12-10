@@ -20,13 +20,13 @@ impl GameLog
 
     pub fn add_log(&mut self, msg: String)
     {
-        self.entries.push(msg);
-        self.index+=1;
+        self.entries.push(". ".to_string() + &msg);
+        //self.index+=1;
     }
 
     pub fn view_log(&self,num_entries: usize) -> Vec<String>
     {
-       self.entries.iter().skip(self.index).take(num_entries ).map(|s|s.clone()).collect::<Vec<String>>()
+       self.entries.iter().rev().skip(self.index).take(num_entries ).map(|s|s.clone()).collect::<Vec<String>>()
     }
 
 

@@ -27,6 +27,7 @@ impl ClearDeadSystem
                     }
                     None => 
                     {
+                        state.game_log.add_log(format!("The {} dies!",name.name));
                         console::log(format!("The {} dies!",name.name));
                         entities_to_despawn.push(_id);
                     }

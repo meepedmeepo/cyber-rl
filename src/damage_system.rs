@@ -40,6 +40,7 @@ impl DamageSystem
             for dmg in dmg_to_take.damage_to_take.iter()
             {
                 stats.hp -= dmg;
+                state.game_log.add_log(format!("{} took {} damage!",name.name,dmg));
                 console::log(format!("{} took {} damage!",name.name,dmg));
             }
         }

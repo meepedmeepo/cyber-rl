@@ -1,5 +1,6 @@
 use bracket_lib::terminal::*;
 use bracket_lib::color;
+use crate::gamelog;
 use crate::menus::inventory_state;
 use crate::FoV;
 use crate::ItemContainer;
@@ -10,7 +11,7 @@ use std::cmp::{max,min};
 
 pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
 {
-    ctx.draw_box(0, 42, 79, 7,
+    ctx.draw_box(0, 42, 80, 7,
          bracket_lib::color::WHITE, bracket_lib::color::BLACK);
     for (_id,(_player,stats)) in
      state.world.query_mut::<(&Player,&Statistics)>()
@@ -19,6 +20,22 @@ pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
         ctx.print_color(16, 44, color::WHITE, color::BLACK, &health);
         ctx.draw_bar_horizontal(28, 44, 51, stats.hp, stats.max_hp,
              color::RED, color::BLACK);
+    }
+}
+
+pub fn draw_gamelog(state : &State,ctx: &mut BTerm)
+{
+    ctx.draw_box(82, 0, 27, 49, RGB::named(WHITE), RGB::named(BLACK));
+    let mut y = 3;
+    for log in state.game_log.view_log(30)
+    {
+        if !log.is_empty()
+        {
+            ctx.print(83, y, log);
+            y+=2;
+            if y > 48
+            {break;}
+        }
     }
 }
 

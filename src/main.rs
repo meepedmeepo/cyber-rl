@@ -3,6 +3,7 @@ use bracket_lib::prelude::*;
 use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
+use gamelog::GameLog;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
@@ -42,6 +43,7 @@ pub struct State
     current_state: ProgramState,
     player_pos: Point,
     player_ent :Option<Entity>,
+    game_log : GameLog,
 }
 #[derive(Clone, Copy)]
 pub struct Renderable
@@ -119,6 +121,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_gamelog(self, ctx);
                 //gui::draw_inventory(self, ctx);
             }
 
@@ -155,6 +158,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_gamelog(self, ctx);
                 gui::draw_inventory(self, ctx);
             }
             ProgramState::Targeting { range, item } =>
@@ -163,6 +167,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_gamelog(self, ctx);
                 let (inv_state,point) = gui::_ranged_target(self, ctx, range);
                 match inv_state
                 {
@@ -232,6 +237,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     draw_map(ctx, &state.map);
     render_system(state, ctx);
     gui::draw_ui(state, ctx);
+    gui::draw_gamelog(state, ctx);
     //state.current_state = ProgramState::Paused;
 }
 
@@ -293,7 +299,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 
 fn main() ->BError {
     //println!("Hello, world!");
-    let context = BTermBuilder::simple80x50()
+    let context = BTermBuilder::simple(110,50)?
     .with_title("Rust-like")
     .build()?;
 
@@ -309,6 +315,7 @@ fn main() ->BError {
         current_state : ProgramState::PlayerTurn,
         player_pos : Point::zero(),
         player_ent: None,
+        game_log : GameLog::new(),
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

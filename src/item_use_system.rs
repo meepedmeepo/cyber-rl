@@ -1,6 +1,6 @@
 use std::cmp::min;
 
-use crate::damage_system::DamageSystem;
+use crate::damage_system::{self, DamageSystem};
 use crate::{AoE, DamageEffect, HealingEffect, ItemContainer, Map, Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
 
@@ -144,7 +144,21 @@ pub fn run(state : &mut State)
             {
                 for target in targets[index].iter()
                 {
+                    let  name = state.world.query_one_mut::<(&Name)>(*target).expect("Couldn't find entity to mark for damage").name.clone();
+                    match item_info[index].4
+                    {
+                        Some(_) => 
+                        {
+                            state.game_log.add_log(format!("{} uses {} on {}",ents.3, item_info[index].0.clone(), name));
+                        }
+
+                        None => 
+                        {
+                            state.game_log.add_log(format!("{} uses {} on themselves!", name, item_info[index].0.clone()));
+                        }
+                    }
                     
+                    DamageSystem::mark_for_damage(state, *target, dmg.damage_amount);
                 }
             }
 
@@ -154,51 +168,10 @@ pub fn run(state : &mut State)
     //end of loop for run function in theory
         index+=1;
     
-    {
+    
     //let (damage,name) =
      //state.world.get::<(&DamageEffect, &Name)>(ents.1);
-    let mut query = state.world.query_one::<(Option<&DamageEffect>, &Name)>(ents.1).unwrap();
-    let (damage,name) = query.get().unwrap();
-     match damage
-     {
-        Some(ref dmg) =>
-        {
-            match ents.4
-            {
-                Some(target) =>
-                {
-                    
-                    let dmg_num = dmg.damage_amount;
-                    
-                    state.game_log.add_log(format!("{} uses {}",ents.3,name.name));
-
-                    let mut ents_to_dmg = Vec::new();
-                    for ent in state.map.tile_contents[Map::xy_id(target.x, target.y)].iter()
-                    {
-                        if state.world.get::<&Statistics>(*ent).is_ok()
-                        {
-                            ents_to_dmg.push((*ent,dmg_num));
-                        }
-                    }
-                    std::mem::drop(query);
-                    for ent in ents_to_dmg
-                    {
-                        DamageSystem::mark_for_damage(state, ent.0, ent.1);
-                    }
-                   // 
-                }
-                None => 
-                {
-                    let dmg_num = dmg.damage_amount;
-                    state.game_log.add_log(format!("{} uses {}",ents.3,name.name));
-                    std::mem::drop(query);
-                    DamageSystem::mark_for_damage(state, ents.0, dmg_num);
-                }
-            }
-        }
-        None => {}
-     }
-    }
+   
 
     
     

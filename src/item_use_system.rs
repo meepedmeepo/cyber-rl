@@ -149,12 +149,14 @@ pub fn run(state : &mut State)
                     {
                         Some(_) => 
                         {
-                            state.game_log.add_log(format!("{} uses {} on {}",ents.3, item_info[index].0.clone(), name));
+                            state.game_log.add_log(format!("  on {}!", name));
+                            state.game_log.add_log(format!("{} uses {} ",ents.3, item_info[index].0.clone(),));
                         }
 
                         None => 
                         {
-                            state.game_log.add_log(format!("{} uses {} on themselves!", name, item_info[index].0.clone()));
+                            state.game_log.add_log(format!("  on themselves!"));
+                            state.game_log.add_log(format!("{} uses {}\n", name, item_info[index].0.clone()));
                         }
                     }
                     

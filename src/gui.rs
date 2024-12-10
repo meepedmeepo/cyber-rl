@@ -11,27 +11,27 @@ use std::cmp::{max,min};
 
 pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
 {
-    ctx.draw_box(0, 42, 80, 7,
+    ctx.draw_box(0, 42, 76, 7,
          bracket_lib::color::WHITE, bracket_lib::color::BLACK);
     for (_id,(_player,stats)) in
      state.world.query_mut::<(&Player,&Statistics)>()
     {
         let health = format!("HP: {} / {} ",stats.hp,stats.max_hp);
         ctx.print_color(16, 44, color::WHITE, color::BLACK, &health);
-        ctx.draw_bar_horizontal(28, 44, 51, stats.hp, stats.max_hp,
+        ctx.draw_bar_horizontal(28, 44, 45, stats.hp, stats.max_hp,
              color::RED, color::BLACK);
     }
 }
 
 pub fn draw_gamelog(state : &State,ctx: &mut BTerm)
 {
-    ctx.draw_box(82, 0, 27, 49, RGB::named(WHITE), RGB::named(BLACK));
+    ctx.draw_box(78, 0, 31, 49, RGB::named(WHITE), RGB::named(BLACK));
     let mut y = 3;
     for log in state.game_log.view_log(30)
     {
         if !log.is_empty()
         {
-            ctx.print(83, y, log);
+            ctx.print(80, y, log);
             y+=2;
             if y > 48
             {break;}

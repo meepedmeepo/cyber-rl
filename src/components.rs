@@ -31,7 +31,7 @@ impl Renderable
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct AoE
 {
-    radius: i32,
+   pub radius: i32,
 }
 
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]

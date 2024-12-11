@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Raws};
-use crate::{components, DamageEffect, HealingEffect, Name, Position, RangedTargetting};
+use crate::{components, AoE, DamageEffect, HealingEffect, Name, Position, RangedTargetting};
 
 pub enum SpawnType 
 {
@@ -85,6 +85,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                     }
                     "ranged" => {eb.add(RangedTargetting{range: effect.1.parse::<i32>().unwrap()});}
                     "damage" => {eb.add(DamageEffect{damage_amount: effect.1.parse::<i32>().unwrap()});}
+                    "aoe" => {eb.add(AoE{radius: effect.1.parse::<i32>().unwrap()});}
                     _ =>{bracket_lib::terminal::console::log(format!("Warning: consumable effect {} not implemented.", effect_name));}
                 }
             }

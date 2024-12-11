@@ -54,7 +54,19 @@ pub fn run(state : &mut State)
                 {
                     Some(aoe) =>
                     {
-                        panic!("AoE not implemented");
+                        //panic!("AoE not implemented");
+
+                        let fov = bracket_lib::prelude::field_of_view(target_point, aoe.radius, &state.map);
+
+                        targets.push(Vec::new());
+
+                        for point in fov.iter()
+                        {
+                            for i in state.map.get_mob_entities_at_position(state, *point)
+                            {
+                                targets[index].push(i);
+                            }
+                        }
                     }
 
                     //Single targeted

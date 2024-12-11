@@ -240,7 +240,9 @@ fn game_init ( state: &mut State)
     spawning_system::spawn_healing_item(state);
     spawning_system::spawn_damage_item(state);
     let mut i = 1;
+    
     spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2);
+    spawning_system::spawn_entity(state, &(&1, &"Fireball Scroll".to_string()), xy.x-1, xy.y);
     //Spawn test purple goblin enemies in every room apart from the starting room.
     for room in state.map.rooms.iter().skip(1)
     {

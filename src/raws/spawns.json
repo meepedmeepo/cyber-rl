@@ -28,6 +28,23 @@
                     "damage" : "20"
                 }
             }
+        },
+
+        {
+            "name" : "Fireball Scroll",
+            "renderable": {
+                "glyph" : ")",
+                "fg" : "#880808",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "consumable" : {
+                "effects" : { 
+                    "ranged" : "8",
+                    "aoe" : "4",
+                    "damage" : "10"
+                }
+            }
         }
     ]
     }

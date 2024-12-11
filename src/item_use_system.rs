@@ -1,7 +1,6 @@
 use std::cmp::min;
-
-use crate::damage_system::{self, DamageSystem};
-use crate::{AoE, DamageEffect, HealingEffect, ItemContainer, Map, Name, Position, State, Statistics, WantsToUseItem};
+use crate::damage_system::DamageSystem;
+use crate::{AoE, DamageEffect, HealingEffect, ItemContainer,  Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType

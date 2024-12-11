@@ -3,7 +3,11 @@ use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting,
 use crate::components::Consumable;
 use bracket_lib::terminal::Point;
 
-
+pub enum EntityType
+{
+    Item,
+    Mob
+}
 
 pub fn spawn_healing_item(state : &mut State) 
 {
@@ -28,18 +32,55 @@ pub fn spawn_damage_item(state : &mut State)
 
 }
 
-pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32)
+
+
+pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, ent_type : EntityType)
 {
-    let  item_res = 
-    RawMaster::spawn_named_item(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
-     &spawn.1, SpawnType::AtPosition{ x, y});
-     match item_res
+    match ent_type
     {
-        Some(mut item) => 
+        EntityType::Item =>
         {
-            state.world.spawn(item.build());
+            let  item_res = 
+                RawMaster::spawn_named_item(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
+            &spawn.1, SpawnType::AtPosition{ x, y});
+            match item_res
+            {
+                Some(mut item) => 
+                {
+                    state.world.spawn(item.build());
+                }
+
+                None => 
+                {
+                    bracket_lib::terminal::console::log(
+                    format!("Can't find item entity named {}",&spawn.1));
+                }     
+        }
         }
 
-        None => {bracket_lib::terminal::console::log(format!("Can't find entity named {}",&spawn.1));}     
+        EntityType::Mob =>
+        {
+            let  mob_res = 
+                RawMaster::spawn_named_mob(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
+            &spawn.1, SpawnType::AtPosition{ x, y});
+            match mob_res
+            {
+                Some(mut mob) => 
+                {
+                    state.world.spawn(mob.build());
+                }
+
+                None => 
+                {
+                    bracket_lib::terminal::console::log(
+                    format!("Can't find mob entity named {}",&spawn.1));
+                } 
+            }
+
+
+
+
     }
+    
+}
 }

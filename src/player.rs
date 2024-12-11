@@ -25,6 +25,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
             VirtualKeyCode::I => return ProgramState::Inventory,
+            VirtualKeyCode::Space => return ProgramState::PlayerTurn,
             VirtualKeyCode::G => 
             {
                 let mut item : Option<Entity> = None;

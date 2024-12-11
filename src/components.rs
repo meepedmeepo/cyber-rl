@@ -95,7 +95,6 @@ pub struct Statistics
     pub hp : i32,
     pub strength: i32,
     pub defence : i32,
-
 }
 
 pub struct FoV

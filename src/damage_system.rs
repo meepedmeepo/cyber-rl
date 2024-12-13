@@ -29,6 +29,7 @@ impl DamageSystem
             }
         }
     }
+    
    pub fn run(state : &mut State)
     {
         let mut dmg_comps_to_remove : Vec<Entity> = Vec::new();

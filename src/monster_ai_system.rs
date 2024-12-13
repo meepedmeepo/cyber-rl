@@ -20,6 +20,7 @@ impl MonsterAI
                     //console::log(&format!("{} shouts curses!",name.name));
                     //AttackSystem::add_attack(_id, , state);
                     console::log(format!("{} swings at you wildly!",name.name));
+                    state.game_log.add_log(format!("{} swings at you wildly!",name.name));
                     attacking_monsters.push((_id,stats.strength));
                 }
 
@@ -37,8 +38,8 @@ impl MonsterAI
                     fov.dirty = true;
                 }
             }
-
-        }   
+        }
+           
         for (attacker,_dmg) in attacking_monsters.iter()
         {
             match state.player_ent

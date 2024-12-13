@@ -12,7 +12,7 @@ pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
 {
-    Floor,Wall,
+    Floor, Wall, DownStairs,
 }
 
 pub struct Map
@@ -159,6 +159,12 @@ match tile
         glyph = '#';
         fg = RGB::from_f32(0.1,1.,0.);
     }//ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
+    TileType::DownStairs =>
+    {
+        glyph = '>';
+        fg = RGB::named(GREY);
+
+    }
 }
 if !map.visible_tiles[Map::xy_id(x, y)]
 {
@@ -212,6 +218,13 @@ impl Map
            if state.map.check_map_validity()
            {
             console::log(format!("Successfully generated map after {} tries!",i));
+
+            let pos = state.map.rooms[state.map.rooms.len()-1].center();
+
+            let idx = Map::xy_id(pos.x, pos.y);
+
+            state.map.map[idx] = TileType::DownStairs;
+
             return;
            }
            else 

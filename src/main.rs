@@ -139,6 +139,7 @@ impl GameState for State{
                 gui::draw_gamelog(self, ctx);
                 gui::draw_inventory(self, ctx);
             }
+
             ProgramState::Targeting { range, item } =>
             {
                 ctx.cls();
@@ -159,15 +160,11 @@ impl GameState for State{
                              WantsToUseItem{item:item, target: Some(point)})
                              .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
                             self.current_state = ProgramState::PlayerTurn;
-
                         }
-                    
                     }
                     inventory_state::None => {}
 
                     _ => {}
-
-                    
                 }
             }
             ProgramState::GameOver =>
@@ -206,6 +203,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     {
         MonsterAI::run(state);
     }
+
     item_use_system::run(state);
     AttackSystem::run(state);
     DamageSystem::run(state);
@@ -242,7 +240,7 @@ fn game_init ( state: &mut State)
     spawning_system::spawn_damage_item(state);
     let mut i = 1;
     let pos2 = state.map.rooms[0].center();
-    spawning_system::spawn_entity(state, &(&0, &"Orc".to_string()), pos2.x+1, pos2.y, EntityType::Mob);
+    //spawning_system::spawn_entity(state, &(&0, &"Orc".to_string()), pos2.x+1, pos2.y, EntityType::Mob);
     spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
     spawning_system::spawn_entity(state, &(&1, &"Fireball Scroll".to_string()), xy.x-1, xy.y,EntityType::Item);
     //Spawn test purple goblin enemies in every room apart from the starting room.

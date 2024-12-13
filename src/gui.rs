@@ -80,6 +80,17 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
 pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32) 
     -> (inventory_state, Option<Point>)
 {
+    match ctx.key
+    {
+        Some(key) =>
+        {
+            if key == VirtualKeyCode::Escape
+            {
+                return (inventory_state::Cancel,None);
+            }
+        }
+        None =>{}
+    }
     ctx.print_color(5,0,RGB::named(YELLOW), RGB::named(BLACK), "SELECT TARGET:");
     
     let mut available_cells = Vec::new();

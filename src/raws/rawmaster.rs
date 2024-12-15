@@ -58,6 +58,16 @@ fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) 
     eb
 }
 
+pub fn get_item_name_list(&self)-> Vec<String>
+{
+    self.item_index.keys().map(|key| key.clone()).collect()
+}
+
+pub fn get_mob_name_list(&self)-> Vec<String>
+{
+    self.mob_index.keys().map(|key| key.clone()).collect()
+}
+
 fn add_position_comp(entity_builder: EntityBuilder, x : i32, y: i32) -> EntityBuilder
 {
     let mut eb = entity_builder;

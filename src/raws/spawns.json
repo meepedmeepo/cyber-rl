@@ -63,9 +63,49 @@
         "blocks_tiles" : true,
 
         "stats" : {
-            "max_hp": 50,
-            "hp": 50,
-            "power": 8,
+            "max_hp": 30,
+            "hp": 30,
+            "power": 5,
+            "defence": 5
+        }
+    },
+    {
+        "name" : "Goblin",
+        "renderable": {
+                "glyph" : "g",
+                "fg" : "#00FF00",
+                "bg" : "#000000",
+                "order" : 3
+            },
+        
+        "vision_range" : 4,
+        
+        "blocks_tiles" : true,
+
+        "stats" : {
+            "max_hp": 20,
+            "hp": 20,
+            "power": 2,
+            "defence": 5
+        }
+    },
+    {
+        "name" : "Kobold",
+        "renderable": {
+                "glyph" : "k",
+                "fg" : "#FFFF00",
+                "bg" : "#000000",
+                "order" : 3
+            },
+        
+        "vision_range" : 6,
+        
+        "blocks_tiles" : true,
+
+        "stats" : {
+            "max_hp": 15,
+            "hp": 15,
+            "power": 3,
             "defence": 5
         }
     }

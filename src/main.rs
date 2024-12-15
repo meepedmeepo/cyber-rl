@@ -9,9 +9,8 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use spawning_system::EntityType;
 use std::cmp::*;
-use std::thread::spawn;
 use map::*;
-mod map;
+pub mod map;
 mod components;
 use components::*;
 mod visibility_system;
@@ -133,6 +132,7 @@ impl GameState for State{
                         self.current_state = ProgramState::Targeting { range: range, item: item };
                     }
                 }
+
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
@@ -167,6 +167,7 @@ impl GameState for State{
                     _ => {}
                 }
             }
+
             ProgramState::GameOver =>
             {
                 ctx.cls();
@@ -236,24 +237,18 @@ fn game_init ( state: &mut State)
     , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
     ,ItemContainer{items: Vec::new()}
     , Player{})));
+
+    spawning_system::room_spawns(state);
+
     spawning_system::spawn_healing_item(state);
     spawning_system::spawn_damage_item(state);
     let mut i = 1;
     let pos2 = state.map.rooms[0].center();
-    //spawning_system::spawn_entity(state, &(&0, &"Orc".to_string()), pos2.x+1, pos2.y, EntityType::Mob);
+
     spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
     spawning_system::spawn_entity(state, &(&1, &"Fireball Scroll".to_string()), xy.x-1, xy.y,EntityType::Item);
-    //Spawn test purple goblin enemies in every room apart from the starting room.
-    for room in state.map.rooms.iter().skip(1)
-    {
-    let pos = room.center();
-    {
-    state.world.spawn((Position::new(pos.x, pos.y),
-    Renderable::new('g', RGB::from_f32(1., 0., 1.), RGB::from_f32(0.,0.,0.),3),
-    FoV::new(5),Monster{},BlocksTiles {},Statistics{max_hp:12,hp:12,defence: 5,strength: 2},Name{name: format!("Goblin {}",i)}));
-    i += 1;
-    }
-}
+
+// }
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
@@ -280,7 +275,8 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 }
 
 
-fn main() ->BError {
+fn main() ->BError 
+{
     //println!("Hello, world!");
     let context = BTermBuilder::simple(110,50)?
     .with_title("Rust-like")
@@ -303,6 +299,7 @@ fn main() ->BError {
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
     Map::generate_map_checked(&mut gs);
+    
     game_init(&mut gs);
     main_loop(context,gs)
 }

@@ -2,7 +2,7 @@
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
-use crate::{State, Statistics};
+use crate::{spawning_system, State, Statistics};
 
 
 pub const MAPWIDTH : i32 = 80;
@@ -234,6 +234,8 @@ impl Map
            }
         }
     }
+
+
 pub fn create_room_map(state : &mut State) -> Map
 {
     let mut  map = vec![TileType::Wall; MAPSIZE];
@@ -292,7 +294,7 @@ pub fn create_map_corridors(&mut self)
         //let mut target : Point;
         let mut rooms : Vec<Rect> = Vec::new();
         rooms = self.generate_simple_corridors(  &mut rooms);
-        rooms = self.generate_simple_corridors( &mut rooms);
+        //rooms = self.generate_simple_corridors( &mut rooms);
     
         self.apply_rooms(&mut rooms);
 

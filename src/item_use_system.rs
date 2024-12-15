@@ -123,7 +123,10 @@ pub fn run(state : &mut State)
         {
             for target in targets[index].iter()
             {
-                let (stats, name) = state.world.query_one_mut::<(&mut Statistics,&Name)>(*target).expect("Couldn't find stats for target to heal!");
+                let (stats, name) = 
+                state.world.query_one_mut::<(&mut Statistics,&Name)>(*target)
+                .expect("Couldn't find stats for target to heal!");
+                
                 stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
 
                 if item_info[index].4.is_none()
@@ -135,8 +138,7 @@ pub fn run(state : &mut State)
                         ,name.name.clone(), item_info[index].0, healing.healing_amount));
                 }
                 else 
-                {
-                    
+                { 
                     state.game_log.add_log(format!("{} used {} on {}, and healed for them for {} hp!"
                         ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
 
@@ -180,14 +182,6 @@ pub fn run(state : &mut State)
 
     //end of loop for run function in theory
         index+=1;
-    
-    
-    //let (damage,name) =
-     //state.world.get::<(&DamageEffect, &Name)>(ents.1);
-   
-
-    
-    
     
     //despawns item if it is a consumable that has been used
     if ents.5 == true

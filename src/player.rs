@@ -68,23 +68,6 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 }
 
 
-pub fn inventory_input(state : &mut State, ctx:&BTerm) -> ProgramState
-{
-    match ctx.key
-    {
-        None => {return ProgramState::Inventory;}
-        Some(key) => match key
-        {
-            //CHANGE THIS TO USE  bracket_lib::terminal::letter_to_option() 
-            _ => {}
-        }
-    }
-
-    ProgramState::Inventory
-}
-
-
-
 /// TODO: cleanup this absolute fucking mess holy shit wtf
 pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
 {

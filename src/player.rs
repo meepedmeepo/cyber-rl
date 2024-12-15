@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{Item, WantsToPickupItem};
+use crate::{go_down_stairs, Item, TileType, WantsToPickupItem};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position,Statistics};
 use std::cmp::{min,max};
@@ -26,6 +26,19 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::S => try_move(state,0,1),
             VirtualKeyCode::I => return ProgramState::Inventory,
             VirtualKeyCode::Space => return ProgramState::PlayerTurn,
+            VirtualKeyCode::Period => 
+            {
+                let idx = Map::xy_id(state.player_pos.x, state.player_pos.y);
+                if state.map.map[idx] == TileType::DownStairs
+                {
+                    go_down_stairs(state);
+                    return ProgramState::PlayerTurn;
+                }
+                else
+                { 
+                    return ProgramState::AwaitingInput;
+                }
+            }
             VirtualKeyCode::G => 
             {
                 let mut item : Option<Entity> = None;

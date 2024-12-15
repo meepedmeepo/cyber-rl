@@ -9,6 +9,7 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use spawning_system::EntityType;
 use std::cmp::*;
+use std::ops::Deref;
 use map::*;
 pub mod map;
 mod components;
@@ -81,7 +82,73 @@ impl Position
     }
 }
 
+pub fn go_down_stairs(state: &mut State)
+{
+    cleanup_ECS(state);
+    Map::generate_map_checked(state);
+    state.player_pos = state.map.rooms[0].center();
 
+    for (_id,(_player, pos , fov)) 
+        in state.world.query_mut::<(&Player,&mut Position, &mut FoV)>()
+    {
+        pos.x = state.player_pos.x;
+        pos.y = state.player_pos.y;
+
+        fov.visible_tiles.clear();
+        fov.dirty = true;
+    }
+
+    spawning_system::room_spawns(state);
+
+    let msg = format!("You traversed the stairs downwards to the next layer of the dungeon");
+
+    console::log(msg.clone());
+
+    state.game_log.add_log(msg);
+
+    state.current_state = ProgramState::PlayerTurn;
+
+}
+
+fn cleanup_ECS(state: &mut State)
+{
+    let mut entities_to_delete = Vec::new();
+    for entity in state.world.iter()
+    {
+        let mut should_delete = true;
+
+        if entity.entity() == state.player_ent.expect("Couldn't find player entity in cleanup ECS!")
+        {
+            should_delete = false;
+        }
+
+        if entity.get::<&InContainer>()
+        .is_some_and(|cont| 
+            cont.owner == state.player_ent.expect("Couldn't find player entity in cleanup ECS!"))
+        {
+            should_delete = false;
+        }
+
+        if entity.get::<&Equipped>()
+        .is_some_and(|eq| 
+            eq.owner == state.player_ent.expect("Couldn't find player entity in cleanup ECS!"))
+        {
+            should_delete = false;
+        }
+
+
+        if should_delete
+        {
+            entities_to_delete.push(entity.entity());
+        }
+    }
+
+    for entity in entities_to_delete
+    {
+        state.world.despawn(entity)
+        .expect("Can't delete entity that has been marked for removal when cleaning up ECS!");
+    }
+}
 
 impl GameState for State{
     fn tick(&mut self, ctx: &mut BTerm) {
@@ -238,6 +305,16 @@ fn game_init ( state: &mut State)
     , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
     , Player{})));
 
+    state.world.spawn((Position::new(xy.x-2, xy.y), Renderable
+    {glyph : ']',fg: RGB::named(WHITE), bg: RGB::named(BLACK), order: 2}
+    , Name{name: "helmet cringe".to_string()},
+    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 2}
+    ));
+    state.world.spawn((Position::new(xy.x-2, xy.y+1), Renderable
+    {glyph : ']',fg: RGB::named(BLUE), bg: RGB::named(BLACK), order: 2}
+    , Name{name: "helmet cringest".to_string()},
+    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 2}
+    ));
     spawning_system::room_spawns(state);
 
     spawning_system::spawn_healing_item(state);

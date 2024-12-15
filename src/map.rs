@@ -152,7 +152,7 @@ match tile
     TileType::Floor =>
     {
         glyph = '.';
-        fg = RGB::from_f32(0.5, 0.5, 0.5);
+        fg = RGB::from_f32(0.85, 0.85, 0.85);
     }// ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
     TileType::Wall => 
     {
@@ -201,7 +201,7 @@ impl Map
     {
         //let distance = DistanceAlg::Pythagoras.distance2d(p1,p2);
         let path = a_star_search(Map::xy_id(p1.x, p1.y), Map::xy_id(p2.x, p2.y), self);
-        if path.success
+        if path.success && path.steps.len() > 2
         {
             return true;
         }
@@ -252,7 +252,6 @@ pub fn create_room_map(state : &mut State) -> Map
             if room.intersect(r)
             {
                 intersects = true;
-                break;
             }
         }
         if !intersects

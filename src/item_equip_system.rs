@@ -27,7 +27,7 @@ pub fn run(state : &mut State)
     for (index, info) 
         in entities_to_equip_items.iter().enumerate()
     {
-        //Creates list of items that will need to be unequipped as they take ipthe same slot as the new item that will
+        //Creates list of items that will need to be unequipped as they take up the same slot as the new item that will
         //be equipped.
         let mut items_to_unequip = Vec::new();
         for (id,(equipped, _item)) in state.world.query::<(&Equipped, &Item)>()
@@ -40,7 +40,7 @@ pub fn run(state : &mut State)
         //Unequips items and adds them back to inventory 
         for (item, owner) in items_to_unequip.iter()
         {
-            state.world.remove_one::<&Equipped>(*item)
+            state.world.remove_one::<Equipped>(*item)
                 .expect("Couldn't remove Equipped component from item to be unequipped");
 
             state.world.insert_one(*item, InContainer {owner : *owner})
@@ -49,8 +49,11 @@ pub fn run(state : &mut State)
 
         state.world.insert_one(info.1.item, Equipped {owner : info.0, slot : info.1.slot })
             .expect("Couldn't equip selected item!");
+
+        state.world.remove_one::<InContainer>(info.1.item)
+            .expect("Couldn't remove InContainer from newly equiped item! ");
         
-        state.world.remove_one::<&WantsToEquipItem>(info.0)
+        state.world.remove_one::<WantsToEquipItem>(info.0)
             .expect("Couldn't remove WantsToEquipItem component from entity!");
 
         state.game_log.add_log(format!("{} equipped {}!",info.2,info.3));

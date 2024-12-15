@@ -3,7 +3,7 @@ use bracket_lib::color;
 use crate::gamelog;
 use crate::menus::inventory_state;
 use crate::FoV;
-use crate::ItemContainer;
+use crate::InContainer;
 use crate::Renderable;
 use crate::{Player, Statistics,Name,Item};
 use super::State;
@@ -42,24 +42,13 @@ pub fn draw_gamelog(state : &State,ctx: &mut BTerm)
 
 pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
 {
-    let mut items_to_search = Vec::new();
-    {
-        let itemlist = 
-        state.world.query_one_mut::<&ItemContainer>
-        (Option::expect(state.player_ent, "Couldn't find player"))
-        .expect("Couldn't find item container on player!");
-        for i in itemlist.items.iter()
-        {
-            items_to_search.push(*i);
-        }
-    }
-     
-     let mut items = Vec::new();
+    let mut items = Vec::new();
 
-    for item in items_to_search
+    for (_id,(_item, _in_container,name)) in state.world.query::<(&Item, &InContainer,&Name)>()
+        .iter().filter(|ent| ent.1.1.owner == state.player_ent
+        .expect("Couldn't find player entity to query inventory"))
     {
-        let item_info = state.world.query_one_mut::<&Name>(item).expect("Couldn't find item name for displaying inventory!");
-        items.push(item_info.clone());
+        items.push(name.clone());
     }
 
 

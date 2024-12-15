@@ -48,7 +48,8 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 {
                     Some(i) =>
                     {
-                        state.world.insert_one(Option::expect(state.player_ent, "Couldn't find player entity to insert WantsToPickupItem component!"), WantsToPickupItem{item: i})
+                        state.world.insert_one(Option::expect(state.player_ent, "Couldn't find player entity to insert WantsToPickupItem component!"),
+                         WantsToPickupItem{item: i})
                         .expect("Couldn't insert WantsToPickupItem component onto the player");
                         return ProgramState::AwaitingInput;
                     }

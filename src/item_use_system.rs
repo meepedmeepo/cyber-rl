@@ -1,6 +1,6 @@
 use std::cmp::min;
 use crate::damage_system::DamageSystem;
-use crate::{AoE, DamageEffect, HealingEffect, ItemContainer,  Name, Position, State, Statistics, WantsToUseItem};
+use crate::{AoE, DamageEffect, HealingEffect,   Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType
@@ -90,29 +90,8 @@ pub fn run(state : &mut State)
             }
         }
         
-        /// Removing item and wants to use item tags
-        match item_info[index].1
-        {
-            Some(consumable) =>
-             {
-                let mut items = state.world.get::<&ItemContainer>(ents.0)
-                    .expect("Couldn't get item container from entity!")
-                    .items.clone();
-
-                items.remove(items.iter().position(|x| *x == ents.1)
-                    .expect("Couldn't find item in ItemContainer of entity!"));
-
-
-                state.world.insert_one(ents.0, ItemContainer {items: items})
-                    .expect("Couldn't find entity to insert item!");
-
-                
-
-             }
-
-            None => {}
-        }
-        
+       
+        //Removes wants to use item tag
         state.world.remove_one::<WantsToUseItem>(ents.0)
                     .expect("Can't find entity to remove WantsToUseItem component");
 
@@ -180,14 +159,22 @@ pub fn run(state : &mut State)
             None => {}
         }
 
-    //end of loop for run function in theory
-        index+=1;
     
-    //despawns item if it is a consumable that has been used
-    if ents.5 == true
-    {
-        state.world.despawn(ents.1).expect("Couldn't despawn item entity!");
-    }
+    
+     // Removing item if it was a consumable
+     match item_info[index].1
+     {
+         Some(_consumable) =>
+          {
+            state.world.despawn(ents.1).expect("Couldn't despawn consumable item from inventory!");
+          }
+
+         None => {}
+     }
+
+
+     //end of loop for run function in theory
+     index+=1;
     
 
 

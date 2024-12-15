@@ -1,6 +1,45 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct WantsToEquipItem
+{
+    pub item : Entity,
+    pub slot : EquipmentSlot,
+}
+
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub enum EquipmentSlot
+{
+    Head,
+    Body,
+    Legs,
+    Boots,
+    Hands,
+    MainHand,
+    OffHand
+}
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Equipped
+{
+    pub owner : Entity,
+    pub slot : EquipmentSlot,
+}
+
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct Equippable
+{
+    pub slot : EquipmentSlot,
+    pub power_bonus : i32,
+    pub defence_bonus : i32,
+}
+
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct InContainer
+{
+    pub owner : Entity,
+}
 
 pub struct Renderable
 {
@@ -9,11 +48,13 @@ pub struct Renderable
     pub bg : bracket_lib::color::RGB,
     pub order : i32,
 }
+
 #[derive(Clone)]
 pub struct Name
 {
     pub name : String,
 }
+
 impl Renderable
 {
    pub fn new(glyph: char,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
@@ -53,11 +94,7 @@ pub struct HealingEffect
 {
    pub healing_amount: i32,
 }
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ItemContainer
-{
-    pub items : Vec<Entity>,
-}
+
 #[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
 pub struct WantsToPickupItem
 {

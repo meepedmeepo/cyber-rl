@@ -28,6 +28,7 @@ mod item_pickup_system;
 use player::*;
 mod menus;
 mod item_use_system;
+mod item_equip_system;
 pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
 pub mod gamelog;
@@ -204,7 +205,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     {
         MonsterAI::run(state);
     }
-
+    item_equip_system::run(state);
     item_use_system::run(state);
     AttackSystem::run(state);
     DamageSystem::run(state);
@@ -235,7 +236,6 @@ fn game_init ( state: &mut State)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
     , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
-    ,ItemContainer{items: Vec::new()}
     , Player{})));
 
     spawning_system::room_spawns(state);

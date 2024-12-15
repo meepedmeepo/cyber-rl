@@ -2,7 +2,7 @@ use bracket_lib::prelude::BTerm;
 use bracket_lib::terminal::console;
 use hecs::Entity;
 
-use crate::{ItemContainer, ProgramState, RangedTargetting, State, WantsToUseItem};
+use crate::{Equippable, InContainer, Item, Name, ProgramState, RangedTargetting, State, WantsToEquipItem, WantsToUseItem};
 
 pub struct InventoryMenu
 {}
@@ -11,7 +11,7 @@ pub enum inventory_state
     Cancel,
     Selected,
     None,
-	TargetedItem {item : Entity, range: i32}
+	TargetedItem {item : Entity, range: i32},
 }
 impl InventoryMenu
 {
@@ -29,11 +29,18 @@ impl InventoryMenu
 				{
 				let mut item_target : Option<Entity> = None;
                 //TODO: add
-				let item_list = 
-				state.world.query_one_mut::<&ItemContainer>(state.player_ent
-					.expect("Couldn't find player to query inventory!"))
-					.expect("Couldn't find player ItemContainer to query inventory!");
-				match item_list.items.get(bracket_lib::terminal::letter_to_option(key) as usize)
+				// let item_list = 
+				// state.world.query_one_mut::<&ItemContainer>(state.player_ent
+				// 	.expect("Couldn't find player to query inventory!"))
+				// 	.expect("Couldn't find player ItemContainer to query inventory!");
+				let mut item_list = Vec::new();
+				for (_id,(_item, _in_container, _name)) in state.world.query::<(&Item, &InContainer,&Name)>()
+        			.iter().filter(|ent| ent.1.1.owner == state.player_ent
+        			.expect("Couldn't find player entity to query inventory"))
+				{
+					item_list.push(_id);
+				}
+				match item_list.get(bracket_lib::terminal::letter_to_option(key) as usize)
 				{
 					Some(p) => { item_target = Some(*p); }
 
@@ -61,11 +68,35 @@ impl InventoryMenu
 							Err(_) =>
 							{
 								std::mem::drop(is_ranged);
-								state.world.insert_one(state.player_ent
-									.expect("Couldn't find player to insert WantsToUseItem component!"),
-									 WantsToUseItem {item: selected_item, target: None})
-									 .expect("Couldn't insert WantsToUseItem onto player!");
-								return inventory_state::Selected;
+								let is_equippable = 
+									state.world.get::<&Equippable>(selected_item);
+								match is_equippable
+								{
+									Ok(ref equip) =>
+									{
+										let slot = equip.slot;
+										
+										std::mem::drop(is_equippable);
+
+										state.world.insert_one(state.player_ent
+											.expect("Couldn't find player to insert WantsToEquipItem component"),
+										 	WantsToEquipItem{item : selected_item, slot : slot})
+											.expect("Couldn't insert WantsToEquipItem onto player entity!");
+										
+										return inventory_state::Selected;
+									}
+									Err(_) =>
+									{
+										std::mem::drop(is_equippable);
+
+										state.world.insert_one(state.player_ent
+											.expect("Couldn't find player to insert WantsToUseItem component!"),
+											 WantsToUseItem {item: selected_item, target: None})
+											 .expect("Couldn't insert WantsToUseItem onto player!");
+										return inventory_state::Selected;
+									}
+								}
+								
 							}
 						}
 						

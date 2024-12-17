@@ -71,7 +71,16 @@ impl Renderable
         }
     }
 }
-
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct PowerBonus
+{
+    bonus : i32
+}
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct DefenceBonus
+{
+    bonus : i32
+}
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct AoE
 {

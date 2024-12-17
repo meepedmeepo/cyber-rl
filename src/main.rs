@@ -86,6 +86,9 @@ pub fn go_down_stairs(state: &mut State)
     cleanup_ECS(state);
     Map::generate_map_checked(state);
     state.player_pos = state.map.rooms[0].center();
+    let roompos = state.map.rooms.last().expect("Room list is empty!").center();
+    let idx = Map::xy_id(roompos.x, roompos.y);
+    state.map.map[idx] = TileType::DownStairs;
 
     for (_id,(_player, pos , fov)) 
         in state.world.query_mut::<(&Player,&mut Position, &mut FoV)>()
@@ -109,6 +112,7 @@ pub fn go_down_stairs(state: &mut State)
 
 }
 
+#[allow(non_snake_case)]
 fn cleanup_ECS(state: &mut State)
 {
     let mut entities_to_delete = Vec::new();
@@ -301,7 +305,7 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Statistics{max_hp: 40,hp: 40, strength :5, defence : 5}
+    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5}
     , Player{})));
 
     state.world.spawn((Position::new(xy.x-2, xy.y), Renderable

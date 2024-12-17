@@ -9,7 +9,6 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use spawning_system::EntityType;
 use std::cmp::*;
-use std::ops::Deref;
 use map::*;
 pub mod map;
 mod components;

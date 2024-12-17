@@ -9,6 +9,7 @@ pub struct WantsToEquipItem
 }
 
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+#[allow(dead_code)]
 pub enum EquipmentSlot
 {
     Head,
@@ -34,6 +35,8 @@ pub struct Equippable
     pub power_bonus : i32,
     pub defence_bonus : i32,
 }
+
+
 
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct InContainer

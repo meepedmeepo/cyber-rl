@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, AoE, BlocksTiles, DamageEffect, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
+use crate::{components, AoE, BlocksTiles, CombatStats, DamageEffect, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
 
 pub enum SpawnType 
 {
@@ -89,7 +89,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
         defence: stats.defence
 
     });
-    
+    eb.add(CombatStats::new(stats.power, stats.defence));
     eb
 }
 

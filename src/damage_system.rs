@@ -1,5 +1,7 @@
 use hecs::Entity;
 use bracket_lib::terminal::console;
+use crate::CombatStats;
+
 use super::{State,TakeDamage,Statistics,Name};
 
 
@@ -33,16 +35,17 @@ impl DamageSystem
    pub fn run(state : &mut State)
     {
         let mut dmg_comps_to_remove : Vec<Entity> = Vec::new();
-        for  (id,(dmg_to_take,stats,name))
-         in state.world.query_mut::<(&TakeDamage,&mut Statistics, &Name)>()
+        for  (id,(dmg_to_take,stats,name,cstats))
+         in state.world.query_mut::<(&TakeDamage,&mut Statistics, &Name, &CombatStats)>()
         {
             //console::log("aaaaaaaaaaaaaaa");
             dmg_comps_to_remove.push(id);
             for dmg in dmg_to_take.damage_to_take.iter()
             {
-                stats.hp -= dmg;
-                state.game_log.add_log(format!("{} took {} damage!",name.name,dmg));
-                console::log(format!("{} took {} damage!",name.name,dmg));
+                let adjusted_dmg = std::cmp::max(1,dmg-cstats.defence.total);
+                stats.hp -= adjusted_dmg;
+                state.game_log.add_log(format!("{} took {} damage!",name.name,adjusted_dmg));
+                console::log(format!("{} took {} damage!",name.name,adjusted_dmg));
             }
         }
 

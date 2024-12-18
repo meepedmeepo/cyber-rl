@@ -1,6 +1,6 @@
 use bracket_lib::terminal::console;
 use hecs::{World, Entity};
-use crate::{damage_system::DamageSystem, Statistics};
+use crate::{damage_system::DamageSystem, CombatStats, Statistics};
 
 use super::{State, Attack, Name, TakeDamage};
 pub struct AttackSystem
@@ -22,10 +22,10 @@ impl AttackSystem
         let mut defenders_to_damage : Vec<(Entity,i32)> = Vec::new();
         
         for (_id,(attack,_name, stats)) 
-        in state.world.query::<(&mut Attack,&Name,&Statistics)>().iter()
+        in state.world.query::<(&mut Attack,&Name,&CombatStats)>().iter()
         {
             attackers.push(_id);
-            defenders_to_damage.push((attack.target,stats.strength));
+            defenders_to_damage.push((attack.target,stats.power.total));
         }
 
         for (target,dmg) in defenders_to_damage

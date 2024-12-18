@@ -309,7 +309,7 @@ fn game_init ( state: &mut State)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
     , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5},
-    CombatStats::new(9, 5)
+    CombatStats::new(9, 0)
     , Player{})));
 
     state.world.spawn((Position::new(xy.x-2, xy.y), Renderable

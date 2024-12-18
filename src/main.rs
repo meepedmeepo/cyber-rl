@@ -9,7 +9,6 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use spawning_system::EntityType;
 use std::cmp::*;
-use std::ops::Deref;
 use map::*;
 pub mod map;
 mod components;
@@ -33,6 +32,7 @@ mod item_equip_system;
 pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
 pub mod gamelog;
+mod calculate_attribute_system;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -278,6 +278,8 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     }
     item_equip_system::run(state);
     item_use_system::run(state);
+    calculate_attribute_system::run(state);
+
     AttackSystem::run(state);
     DamageSystem::run(state);
     ClearDeadSystem::run(state);
@@ -306,7 +308,8 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5}
+    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5},
+    CombatStats::new(9, 5)
     , Player{})));
 
     state.world.spawn((Position::new(xy.x-2, xy.y), Renderable
@@ -317,7 +320,7 @@ fn game_init ( state: &mut State)
     state.world.spawn((Position::new(xy.x-2, xy.y+1), Renderable
     {glyph : ']',fg: RGB::named(BLUE), bg: RGB::named(BLACK), order: 2}
     , Name{name: "helmet cringest".to_string()},
-    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 2}
+    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 8}
     ));
     spawning_system::room_spawns(state);
 

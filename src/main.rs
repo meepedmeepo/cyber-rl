@@ -7,6 +7,8 @@ use gamelog::GameLog;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
+use particles::particle_system;
+use particles::ParticleBuilder;
 use spawning_system::EntityType;
 use std::cmp::*;
 use map::*;
@@ -33,6 +35,7 @@ pub mod raws;
 use crate::{MAPHEIGHT,MAPWIDTH};
 pub mod gamelog;
 mod calculate_attribute_system;
+mod particles;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -47,6 +50,7 @@ pub struct State
     player_pos: Point,
     player_ent :Option<Entity>,
     game_log : GameLog,
+    particle_builder : ParticleBuilder,
 }
 
 
@@ -63,7 +67,7 @@ pub enum ProgramState
     Targeting { range: i32, item : Entity, }
 }
 
-
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position
 {
  x: i32,
@@ -339,6 +343,12 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 {
     //queries the ECS to get a list of entities to render, collects them into a vec,
     //and then reverse orders them by the order member of the renderable struct
+
+    //runs spawns particles from builder requests and cleans up dead particles before rendering
+    //entities
+    particle_system::spawn_system(state);
+    particle_system::update(state, ctx);
+
     let mut entities_to_render  = 
     state.world.query_mut::<(&Position,&Renderable)>()
     .into_iter()
@@ -379,6 +389,7 @@ fn main() ->BError
         player_pos : Point::zero(),
         player_ent: None,
         game_log : GameLog::new(),
+        particle_builder : ParticleBuilder::new(),
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

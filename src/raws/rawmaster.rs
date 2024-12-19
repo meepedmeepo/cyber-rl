@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{borrow::Borrow, collections::HashMap, string};
 
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, AoE, BlocksTiles, CombatStats, DamageEffect, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
+use crate::{components, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
 
 pub enum SpawnType 
 {
@@ -183,9 +183,34 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                     _ =>{bracket_lib::terminal::console::log
                         (format!("Warning: consumable effect {} not implemented.", effect_name));}
                 }
+
+                
             }
             
         }
+        if let Some(equipment) = &item_template.equippable
+                {
+                    let slot: EquipmentSlot;
+                    let slotname = equipment.slot.as_str();
+                    match slotname
+                    {
+                        "head" => {slot = EquipmentSlot::Head},
+                        "hands" => {slot = EquipmentSlot::Hands},
+                        "boots" => {slot = EquipmentSlot::Boots},
+                        "body" => {slot = EquipmentSlot::Body},
+                        "legs" => {slot = EquipmentSlot::Legs},
+                        "mainhand" => {slot = EquipmentSlot::MainHand}
+                        "offhand" => {slot = EquipmentSlot::OffHand},
+                        _ => {panic!("Equipment slot incorrect in json!");}
+                    }
+                    eb.add(Equippable
+                        {
+                            slot: slot,
+                            power_bonus: equipment.power,
+                            defence_bonus: equipment.defence,
+                        });
+
+                }
 
         return Some(Box::new(eb) );
     }

@@ -45,6 +45,20 @@
                     "damage" : "10"
                 }
             }
+        },
+        {
+            "name" : "Rusty Sword",
+            "renderable": {
+                "glyph" : "/",
+                "fg" : "#FFfFFF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "mainhand",
+                "power": 2,
+                "defence" : 0
+            }
         }
     ],
 

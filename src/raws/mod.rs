@@ -22,9 +22,16 @@ pub struct Item
 {
     pub name :String,
     pub renderable : Option<Renderable>,
-    pub consumable : Option<Consumable>
+    pub consumable : Option<Consumable>,
+    pub equippable: Option<EquipmentStats>,
 }
-
+#[derive(Deserialize, Debug)]
+pub struct EquipmentStats
+{
+    pub slot: String,
+    pub power: i32,
+    pub defence: i32
+}
 #[derive(Deserialize, Debug)]
 pub struct Mob
 {

@@ -1,4 +1,7 @@
 use std::cmp::min;
+use bracket_lib::color::{BLACK, DARKGREEN, DARKRED, GREEN, GREEN3, RED, RGB, WHITE, WHITESMOKE};
+use bracket_lib::prelude::Point;
+
 use crate::damage_system::DamageSystem;
 use crate::{AoE, DamageEffect, HealingEffect,   Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
@@ -41,9 +44,7 @@ pub fn run(state : &mut State)
     for ents in entities_to_use_items.iter_mut()
     {
 
-        //This denotes that the entities stats are dirty and needs the component will be replaced at the end of the loop
-
-
+        let mut particle_area: Vec<Point> = Vec::new();
         //gets targets
         match ents.4
         {
@@ -61,6 +62,8 @@ pub fn run(state : &mut State)
 
                         for point in fov.iter()
                         {
+                            particle_area.push(*point);
+
                             for i in state.map.get_mob_entities_at_position(state, *point)
                             {
                                 targets[index].push(i);
@@ -102,11 +105,14 @@ pub fn run(state : &mut State)
         {
             for target in targets[index].iter()
             {
-                let (stats, name) = 
-                state.world.query_one_mut::<(&mut Statistics,&Name)>(*target)
+                let (stats, name, pos) = 
+                state.world.query_one_mut::<(&mut Statistics,&Name, &Position)>(*target)
                 .expect("Couldn't find stats for target to heal!");
                 
                 stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
+
+                state.particle_builder.request(pos.x, pos.y,
+                    RGB::named(WHITESMOKE), RGB::named(GREEN3), '!', 200.);
 
                 if item_info[index].4.is_none()
                 {
@@ -134,9 +140,15 @@ pub fn run(state : &mut State)
         {
             Some(dmg) => 
             {
+                for point in particle_area.iter()
+                    {
+                        state.particle_builder.request(point.x, point.y,
+                            RGB::named(DARKRED), RGB::named(WHITE), '!', 150.);
+                    }
                 for target in targets[index].iter()
                 {
-                    let  name = state.world.query_one_mut::<(&Name)>(*target).expect("Couldn't find entity to mark for damage").name.clone();
+                    
+                    let  name = state.world.query_one_mut::<&Name>(*target).expect("Couldn't find entity to mark for damage").name.clone();
                     match item_info[index].4
                     {
                         Some(_) => 

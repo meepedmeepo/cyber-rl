@@ -30,7 +30,11 @@ pub fn run(state : &mut State)
 
     for ents in entities_to_use_items.iter()
     {
-        let query = state.world.query_one_mut::<(&Name, Option<&Consumable>,Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>(ents.1).expect("couldn't get item properties");
+        let query = 
+            state.world.query_one_mut::<(&Name, Option<&Consumable>,
+            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>
+            (ents.1).expect("couldn't get item properties");
+
         let (name,consumable,healing,damage, aoe) = query;
 
         item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied()));
@@ -127,7 +131,8 @@ pub fn run(state : &mut State)
                     state.game_log.add_log(format!("{} used {} on {}, and healed for them for {} hp!"
                         ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
 
-                    bracket_lib::terminal::console::log(format!("{} used {} on {}, and healed for them for {} hp!"
+                    bracket_lib::terminal::console::log(
+                        format!("{} used {} on {}, and healed for them for {} hp!"
                         ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
                 }
             }
@@ -141,10 +146,11 @@ pub fn run(state : &mut State)
             Some(dmg) => 
             {
                 for point in particle_area.iter()
-                    {
-                        state.particle_builder.request(point.x, point.y,
-                            RGB::named(DARKRED), RGB::named(WHITE), '!', 150.);
-                    }
+                {
+                    state.particle_builder.request(point.x, point.y,
+                        RGB::named(DARKRED), RGB::named(WHITE), '!', 150.);
+                }
+
                 for target in targets[index].iter()
                 {
                     
@@ -171,8 +177,6 @@ pub fn run(state : &mut State)
             None => {}
         }
 
-    
-    
      // Removing item if it was a consumable
      match item_info[index].1
      {

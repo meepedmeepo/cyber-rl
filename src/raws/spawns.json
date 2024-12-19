@@ -50,7 +50,7 @@
             "name" : "Rusty Sword",
             "renderable": {
                 "glyph" : "/",
-                "fg" : "#FFfFFF",
+                "fg" : "#FFFFFF",
                 "bg" : "#000000",
                 "order" : 2
             },
@@ -58,6 +58,90 @@
                 "slot" : "mainhand",
                 "power": 2,
                 "defence" : 0
+            }
+        },
+        {
+            "name" : "Leather Breastplate",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "body",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Leather Leggings",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "legs",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Leather Boots",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "boots",
+                "power": 0,
+                "defence" : 1
+            }
+        },
+        {
+            "name" : "Leather Gauntlets",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "hands",
+                "power": 0,
+                "defence" : 1
+            }
+        },
+        {
+            "name" : "Wooden Shield",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "offhand",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Iron Longsword",
+            "renderable": {
+                "glyph" : "/",
+                "fg" : "#b50023",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "mainhand",
+                "power": 5,
+                "defence" : 2
             }
         }
     ],

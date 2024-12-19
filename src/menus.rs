@@ -28,18 +28,16 @@ impl InventoryMenu
 				_ =>
 				{
 				let mut item_target : Option<Entity> = None;
-                //TODO: add
-				// let item_list = 
-				// state.world.query_one_mut::<&ItemContainer>(state.player_ent
-				// 	.expect("Couldn't find player to query inventory!"))
-				// 	.expect("Couldn't find player ItemContainer to query inventory!");
 				let mut item_list = Vec::new();
-				for (_id,(_item, _in_container, _name)) in state.world.query::<(&Item, &InContainer,&Name)>()
+
+				for (_id,(_item, _in_container, _name)) in
+					state.world.query::<(&Item, &InContainer,&Name)>()
         			.iter().filter(|ent| ent.1.1.owner == state.player_ent
         			.expect("Couldn't find player entity to query inventory"))
 				{
 					item_list.push(_id);
 				}
+
 				match item_list.get(bracket_lib::terminal::letter_to_option(key) as usize)
 				{
 					Some(p) => { item_target = Some(*p); }

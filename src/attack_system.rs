@@ -40,7 +40,7 @@ impl AttackSystem
                 .expect("Couldn't remove Attack component from the attacker");
 
             state.particle_builder.request(pos.x, pos.y,
-                 RGB::named(WHITE), RGB::named(BLACK), '/', 50.);
+                 RGB::named(WHITE), RGB::named(BLACK), '/', 50., None);
         }
     }
 

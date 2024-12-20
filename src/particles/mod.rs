@@ -1,4 +1,5 @@
 use bracket_lib::color::RGB;
+use hecs::Entity;
 pub mod particle_system;
 
 
@@ -15,12 +16,18 @@ pub struct ParticleRequest
     fg : RGB,
     bg : RGB,
     glyph : char,
-    lifetime: f32
+    lifetime: f32,
+    target: Option<Entity>
 }
 
 pub struct ParticleBuilder
 {
     requests : Vec<ParticleRequest>
+}
+
+struct ParticleFollowEntity
+{
+    pub target : Entity,
 }
 
 impl ParticleBuilder
@@ -30,8 +37,10 @@ impl ParticleBuilder
         ParticleBuilder{requests : Vec::new()}
     }
 
-    pub fn request(&mut self, x:i32, y : i32, fg : RGB, bg : RGB, glyph : char, lifetime : f32)
+    pub fn request(&mut self, x:i32, y : i32, fg : RGB, bg : RGB, glyph : char,
+         lifetime : f32, follow_target : Option<Entity>)
     {
-        self.requests.push(ParticleRequest {x,y,fg, bg, glyph, lifetime});
+        self.requests.push(ParticleRequest {x,y,fg, bg, glyph, lifetime, target : follow_target});
     }
+
 }

@@ -116,7 +116,8 @@ pub fn run(state : &mut State)
                 stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
 
                 state.particle_builder.request(pos.x, pos.y,
-                    RGB::named(WHITESMOKE), RGB::named(GREEN3), '!', 200.);
+                    RGB::named(WHITESMOKE), RGB::named(GREEN3),
+                     '!', 200., Some(*target));
 
                 if item_info[index].4.is_none()
                 {
@@ -148,7 +149,7 @@ pub fn run(state : &mut State)
                 for point in particle_area.iter()
                 {
                     state.particle_builder.request(point.x, point.y,
-                        RGB::named(DARKRED), RGB::named(WHITE), '!', 150.);
+                        RGB::named(DARKRED), RGB::named(WHITE), '!', 150., None);
                 }
 
                 for target in targets[index].iter()

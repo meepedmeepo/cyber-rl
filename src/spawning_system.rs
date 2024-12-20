@@ -1,5 +1,5 @@
 use crate::raws::{SpawnType, RAWS};
-use crate::Map;
+use crate::{Map, TileType};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::Rect;
@@ -22,6 +22,7 @@ pub fn spawn_healing_item(state : &mut State)
     Item{}, Consumable{}, HealingEffect{healing_amount: 15}));
 
 }
+
 pub fn spawn_damage_item(state : &mut State) 
 {
    let mut pos = state.map.rooms[0].center();
@@ -81,13 +82,10 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
                     format!("Can't find mob entity named {}",&spawn.1));
                 } 
             }
-
-
-
-
     }
     
 }
+
 }
 
 pub fn room_spawns( state : &mut State)
@@ -98,6 +96,7 @@ pub fn room_spawns( state : &mut State)
         spawn_room(state, *room);
     }
 }
+
 pub fn spawn_room(state : &mut State, room : Rect)
 {
     //let mob_names = &RAWS.lock().unwrap().get_mob_name_list();
@@ -115,23 +114,28 @@ pub fn spawn_room(state : &mut State, room : Rect)
     
     if res < 3
     {return;}
-    else if res > 2 && res < 5
+    else if res >= 2 && res < 5
     {
         num_mobs = state.rng.roll_dice(1,4)
     }
     else if res == 5 || res == 6
     {
-        num_items = state.rng.roll_dice(1, 2);
+        num_items = state.rng.roll_dice(1, 3);
     }
 
     while num_items > 0
     {
         let posO = room.point_set();
         let pos = posO.iter().next().unwrap();
-        let num = state.rng.random_slice_index(item_names.as_slice()).unwrap();
-        spawn_entity(state, &(&0,&item_names[num]), pos.x, pos.y, EntityType::Item);
+        let idx = Map::xy_id(pos.x, pos.y);
+        
+        if state.map.map[idx] != TileType::Wall
+        {
+            let num = state.rng.random_slice_index(item_names.as_slice()).unwrap();
+            spawn_entity(state, &(&0,&item_names[num]), pos.x, pos.y, EntityType::Item);
 
-        num_items-=1;
+            num_items-=1;
+        }
     }
 
     while num_mobs > 0
@@ -143,7 +147,7 @@ pub fn spawn_room(state : &mut State, room : Rect)
         {
             let idx = Map::xy_id(pos.x, pos.y);
 
-            if !state.map.blocked[idx]
+            if !state.map.blocked[idx] && state.map.map[idx] != TileType::Wall
             {
                 let num = state.rng.random_slice_index(mob_names.as_slice()).unwrap();
                 spawn_entity(state, &(&0,&mob_names[num]), pos.x, pos.y, EntityType::Mob);

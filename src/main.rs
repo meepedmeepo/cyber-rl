@@ -11,8 +11,8 @@ use particles::particle_system;
 use particles::ParticleBuilder;
 use spawning_system::EntityType;
 use std::cmp::*;
-use map::*;
-pub mod map;
+use maps::*;
+pub mod maps;
 mod components;
 use components::*;
 mod visibility_system;
@@ -32,7 +32,7 @@ mod menus;
 mod item_use_system;
 mod item_equip_system;
 pub mod raws;
-use crate::{MAPHEIGHT,MAPWIDTH};
+use maps::map::*;
 pub mod gamelog;
 mod calculate_attribute_system;
 mod particles;
@@ -89,7 +89,8 @@ impl Position
 pub fn go_down_stairs(state: &mut State)
 {
     cleanup_ECS(state);
-    Map::generate_map_checked(state);
+    //Map::generate_map_checked(state);
+    state.map = simple_map::SimpleMapBuilder::build(state.map.depth+1);
     state.player_pos = state.map.rooms[0].center();
     let roompos = state.map.rooms.last().expect("Room list is empty!").center();
     let idx = Map::xy_id(roompos.x, roompos.y);
@@ -382,7 +383,7 @@ fn main() ->BError
         ,revealed_tiles : vec![false;MAPSIZE]
         ,visible_tiles : vec![false;MAPSIZE]
         ,blocked : vec![false;MAPSIZE]
-        ,tile_contents : vec![Vec::new(); MAPSIZE]
+        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0
         },
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::PlayerTurn,
@@ -393,7 +394,8 @@ fn main() ->BError
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
-    Map::generate_map_checked(&mut gs);
+    //Map::generate_map_checked(&mut gs);
+    gs.map = simple_map::SimpleMapBuilder::build(0);
     
     game_init(&mut gs);
     main_loop(context,gs)

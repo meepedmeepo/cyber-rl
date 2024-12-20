@@ -1,9 +1,11 @@
-use crate::raws::{SpawnType, RAWS};
+use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
 use crate::{Map, TileType};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::Rect;
 use bracket_lib::terminal::Point;
+
+use super::randomtable::RandomTable;
 
 pub enum EntityType
 {
@@ -95,6 +97,11 @@ pub fn room_spawns( state : &mut State)
     {
         spawn_room(state, *room);
     }
+}
+
+fn room_table(state : &mut State) -> RandomTable
+{
+    get_spawn_table_for_depth(&RAWS.lock().unwrap(), state.map.depth)
 }
 
 pub fn spawn_room(state : &mut State, room : Rect)

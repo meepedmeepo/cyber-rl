@@ -2,6 +2,8 @@ use std::{collections::HashMap, fs};
 use serde::Deserialize;
 mod rawmaster;
 pub use rawmaster::*;
+mod spawn_table_structs;
+use spawn_table_structs::*;
 use std::sync::Mutex;
 use crate::lazy_static::LazyStatic;
 //makes it safe to use RawMaster as a global static singleton.
@@ -14,7 +16,8 @@ lazy_static! {
 pub struct Raws
 {
     pub items : Vec<Item>,
-    pub mobs : Vec<Mob>
+    pub mobs : Vec<Mob>,
+    pub spawn_table : Vec<SpawnTableEntry>
 }
 
 #[derive(Deserialize, Debug)]

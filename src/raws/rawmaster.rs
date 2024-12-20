@@ -1,9 +1,9 @@
-use std::{borrow::Borrow, collections::HashMap, string};
+use std::{borrow::Borrow, clone, collections::HashMap, string};
 
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
+use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
 
 pub enum SpawnType 
 {
@@ -23,9 +23,9 @@ pub fn empty() -> RawMaster
 {
     RawMaster
     {
-        raws : Raws{items : Vec::new(), mobs: Vec::new(),},
+        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new()},
         item_index : HashMap::new(),
-        mob_index: HashMap::new(),
+        mob_index: HashMap::new()
     }
 }
 
@@ -218,4 +218,28 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
     None
  }
     
+}
+
+pub fn get_spawn_table_for_depth(raws : &RawMaster, depth : i32) -> RandomTable
+{
+    use super::SpawnTableEntry;
+
+
+    let available_options : Vec<&SpawnTableEntry> = raws.raws.spawn_table
+        .iter()
+        .filter(|a| depth >= a.min_depth && depth <= a.max_depth)
+        .collect();
+
+    let mut rt = RandomTable::new();
+    for i in available_options.iter()
+    {
+        let mut weight = i.weight;
+        if i.add_map_depth_to_weight.is_some()
+        {
+            weight += depth;
+        }
+        rt = rt.add(i.name.clone(), weight)
+    }
+
+    rt
 }

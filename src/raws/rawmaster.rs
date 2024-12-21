@@ -8,6 +8,8 @@ use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats,
 pub enum SpawnType 
 {
     AtPosition { x: i32, y: i32 },
+    Equipped{target: Entity},
+    InBackpack
 }
 pub struct RawMaster
 {
@@ -112,6 +114,7 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
             {
                 eb = RawMaster::add_position_comp(eb, x, y);
             }
+            _ =>{}
         }
 
         let stats = &mob_template.stats;
@@ -151,6 +154,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
             {
                 eb.add(Position{x: x, y: y});
             }
+            _ => {}
         }
 
         //adds renderable component

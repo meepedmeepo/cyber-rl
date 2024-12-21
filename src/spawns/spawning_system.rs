@@ -1,11 +1,13 @@
+use core::panic;
 use std::collections::HashSet;
 
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
-use crate::{Map, TileType};
+use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
-use bracket_lib::prelude::Rect;
+use bracket_lib::prelude::{console, Rect};
 use bracket_lib::terminal::Point;
+use hecs::Entity;
 
 use super::randomtable::RandomTable;
 
@@ -41,7 +43,67 @@ pub fn spawn_damage_item(state : &mut State)
 
 }
 
+/// TODO: add checks for if there is already an item equipped in that slot
+pub fn spawn_item_equipped(state : &mut State, item_name: &String, target: Entity)
+{
 
+    let mut item_builder = 
+        RawMaster::spawn_named_item(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
+         &item_name, SpawnType::Equipped { target });
+
+    let mut slot : Option<EquipmentSlot> = None;
+    match item_builder
+    {
+        Some(mut build_box) => 
+        {
+            let query = build_box.get::<&Equippable>();
+            match query
+            {
+                Some(equippable) =>
+                {
+                    slot = Some(equippable.slot);
+
+                    build_box.add(Equipped {owner: target,
+                         slot: slot.expect("Couldn't get slot")});
+
+                    state.world.spawn(build_box.build());
+                }
+
+                None =>
+                {
+                    panic!("Can't spawn and equip item {} as it isn't equippable", build_box.get::<&Name>()
+                        .expect("Can't get item name!").name)
+                }
+            }
+        }
+
+        None => 
+        {
+            panic!("No entity builder found!");
+        }
+    }
+}
+
+pub fn spawn_item_in_backpack(state : &mut State, item_name: &String, owner: Entity)
+{
+    let mut item_builder =
+        RawMaster::spawn_named_item( &RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
+        &item_name, SpawnType::InBackpack);
+
+    match item_builder
+    {
+        Some(mut builder) => 
+        {
+            builder.add(InContainer{owner});
+            let ent = state.world.spawn(builder.build());
+        }
+        None => 
+        {
+            console::log(format!("Could spawn {} in backpack as no item with that name exists!",
+            item_name))
+        }
+    }
+}
 
 pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, ent_type : EntityType)
 {

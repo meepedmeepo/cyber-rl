@@ -11,8 +11,10 @@ use std::cmp::{max,min};
 
 pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
 {
-    ctx.draw_box(0, 42, 76, 7,
+    ctx.draw_box_double(0, 42, 76, 7,
          bracket_lib::color::WHITE, bracket_lib::color::BLACK);
+    let fps = format!("FPS: {}",ctx.fps);
+    ctx.print_color(2, 44, color::YELLOW, color::BLACK, &fps);
     for (_id,(_player,stats)) in
      state.world.query_mut::<(&Player,&Statistics)>()
     {
@@ -20,18 +22,22 @@ pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
         ctx.print_color(16, 44, color::WHITE, color::BLACK, &health);
         ctx.draw_bar_horizontal(28, 44, 45, stats.hp, stats.max_hp,
              color::RED, color::BLACK);
+        
     }
 }
 
 pub fn draw_gamelog(state : &State,ctx: &mut BTerm)
 {
-    ctx.draw_box(78, 0, 31, 49, RGB::named(WHITE), RGB::named(BLACK));
+    ctx.draw_box_double(78, -1, 32, 50, RGB::named(WHITE), RGB::named(BLACK));
     let mut y = 3;
+    
+    let depth = format!("Depth: {}",state.map.depth);
+    ctx.print_color(82, 1, color::YELLOW, color::BLACK, &depth);
     for log in state.game_log.view_log(30)
     {
         if !log.is_empty()
         {
-            ctx.print(80, y, log);
+            ctx.print(79, y, log);
             y+=2;
             if y > 48
             {break;}

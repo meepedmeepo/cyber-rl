@@ -7,10 +7,12 @@ use gamelog::GameLog;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
-use spawning_system::EntityType;
+use particles::particle_system;
+use particles::ParticleBuilder;
+use spawns::spawning_system::EntityType;
 use std::cmp::*;
-use map::*;
-pub mod map;
+use maps::*;
+pub mod maps;
 mod components;
 use components::*;
 mod visibility_system;
@@ -22,7 +24,6 @@ mod attack_system;
 mod damage_system;
 mod clear_dead_system;
 mod gui;
-mod spawning_system;
 mod player;
 mod item_pickup_system;
 use player::*;
@@ -30,8 +31,13 @@ mod menus;
 mod item_use_system;
 mod item_equip_system;
 pub mod raws;
-use crate::{MAPHEIGHT,MAPWIDTH};
+use maps::map::*;
 pub mod gamelog;
+mod calculate_attribute_system;
+mod particles;
+mod spawns;
+use spawns::*;
+use spawns::spawning_system;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -46,6 +52,7 @@ pub struct State
     player_pos: Point,
     player_ent :Option<Entity>,
     game_log : GameLog,
+    particle_builder : ParticleBuilder,
 }
 
 
@@ -62,7 +69,7 @@ pub enum ProgramState
     Targeting { range: i32, item : Entity, }
 }
 
-
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position
 {
  x: i32,
@@ -84,7 +91,8 @@ impl Position
 pub fn go_down_stairs(state: &mut State)
 {
     cleanup_ECS(state);
-    Map::generate_map_checked(state);
+    //Map::generate_map_checked(state);
+    state.map = simple_map::SimpleMapBuilder::build(state.map.depth+1);
     state.player_pos = state.map.rooms[0].center();
     let roompos = state.map.rooms.last().expect("Room list is empty!").center();
     let idx = Map::xy_id(roompos.x, roompos.y);
@@ -277,6 +285,8 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     }
     item_equip_system::run(state);
     item_use_system::run(state);
+    calculate_attribute_system::run(state);
+
     AttackSystem::run(state);
     DamageSystem::run(state);
     ClearDeadSystem::run(state);
@@ -293,6 +303,7 @@ fn game_init ( state: &mut State)
 {
     raws::run();
     
+    state.map = simple_map::SimpleMapBuilder::build(0);
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
     let xy = state.map.rooms[0].center();
@@ -305,7 +316,9 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5}
+    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5},
+    CombatStats::new(9, 0)
+
     , Player{})));
 
     state.world.spawn((Position::new(xy.x-2, xy.y), Renderable
@@ -316,7 +329,7 @@ fn game_init ( state: &mut State)
     state.world.spawn((Position::new(xy.x-2, xy.y+1), Renderable
     {glyph : ']',fg: RGB::named(BLUE), bg: RGB::named(BLACK), order: 2}
     , Name{name: "helmet cringest".to_string()},
-    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 2}
+    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 8}
     ));
     spawning_system::room_spawns(state);
 
@@ -335,6 +348,12 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 {
     //queries the ECS to get a list of entities to render, collects them into a vec,
     //and then reverse orders them by the order member of the renderable struct
+
+    //runs spawns particles from builder requests and cleans up dead particles before rendering
+    //entities
+    particle_system::spawn_system(state);
+    particle_system::update(state, ctx);
+
     let mut entities_to_render  = 
     state.world.query_mut::<(&Position,&Renderable)>()
     .into_iter()
@@ -358,8 +377,9 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 fn main() ->BError 
 {
     //println!("Hello, world!");
-    let context = BTermBuilder::simple(110,50)?
+    let mut context = BTermBuilder::simple(110,50)?
     .with_title("Rust-like")
+    .with_fps_cap(60.)
     .build()?;
 
     let mut gs: State = State{
@@ -368,17 +388,19 @@ fn main() ->BError
         ,revealed_tiles : vec![false;MAPSIZE]
         ,visible_tiles : vec![false;MAPSIZE]
         ,blocked : vec![false;MAPSIZE]
-        ,tile_contents : vec![Vec::new(); MAPSIZE]
+        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0
         },
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::PlayerTurn,
         player_pos : Point::zero(),
         player_ent: None,
         game_log : GameLog::new(),
+        particle_builder : ParticleBuilder::new(),
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
-    Map::generate_map_checked(&mut gs);
+    //Map::generate_map_checked(&mut gs);
+    context.with_post_scanlines(true);
     
     game_init(&mut gs);
     main_loop(context,gs)

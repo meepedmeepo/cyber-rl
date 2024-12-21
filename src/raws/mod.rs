@@ -2,6 +2,8 @@ use std::{collections::HashMap, fs};
 use serde::Deserialize;
 mod rawmaster;
 pub use rawmaster::*;
+mod spawn_table_structs;
+use spawn_table_structs::*;
 use std::sync::Mutex;
 use crate::lazy_static::LazyStatic;
 //makes it safe to use RawMaster as a global static singleton.
@@ -14,7 +16,8 @@ lazy_static! {
 pub struct Raws
 {
     pub items : Vec<Item>,
-    pub mobs : Vec<Mob>
+    pub mobs : Vec<Mob>,
+    pub spawn_table : Vec<SpawnTableEntry>
 }
 
 #[derive(Deserialize, Debug)]
@@ -22,9 +25,16 @@ pub struct Item
 {
     pub name :String,
     pub renderable : Option<Renderable>,
-    pub consumable : Option<Consumable>
+    pub consumable : Option<Consumable>,
+    pub equippable: Option<EquipmentStats>,
 }
-
+#[derive(Deserialize, Debug)]
+pub struct EquipmentStats
+{
+    pub slot: String,
+    pub power: i32,
+    pub defence: i32
+}
 #[derive(Deserialize, Debug)]
 pub struct Mob
 {
@@ -61,7 +71,8 @@ pub struct Consumable
 
 pub fn run()
 {
-let data = fs::read_to_string(std::path::Path::new("./src/raws/spawns.json")).expect("Unable to read spawns.json");
+    let data = fs::read_to_string(std::path::Path::new("./src/raws/spawns.json"))
+        .expect("Unable to read spawns.json");
     println!("{}", data);
     let decoder : Raws = serde_json::from_str(&data).expect("Unable to parse JSON");
     bracket_lib::terminal::console::log(format!("{:?}", decoder));

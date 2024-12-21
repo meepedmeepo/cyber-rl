@@ -2,13 +2,32 @@
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
-use crate::{spawning_system, State, Statistics};
+use crate::{State, Statistics};
 
 
 pub const MAPWIDTH : i32 = 80;
 pub const MAPHEIGHT : i32 = 42;
 pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
 //use crate::rect;
+
+pub fn new(new_depth : i32) -> Map
+{
+    Map
+    {
+        map : vec![TileType::Wall; MAPSIZE],
+        rooms : Vec::new(),
+ 
+        revealed_tiles : vec![false; MAPSIZE],
+        visible_tiles : vec![false; MAPSIZE],
+        blocked : vec![false; MAPSIZE],
+        tile_contents : vec![Vec::new(); MAPSIZE],
+        depth: new_depth,
+        
+    }
+}
+
+
+
 #[derive(PartialEq,Clone, Copy)]
 pub enum TileType
 {
@@ -23,6 +42,7 @@ pub struct Map
     pub visible_tiles: Vec<bool>,
     pub blocked: Vec<bool>,
     pub tile_contents: Vec<Vec<Entity>>,
+    pub depth : i32,
 }
 
 impl BaseMap for Map
@@ -80,7 +100,7 @@ impl Map
             revealed_tiles : vec![false;MAPSIZE],
             visible_tiles: vec![false;MAPSIZE],
             blocked : vec![false;MAPSIZE],
-            tile_contents : vec![Vec::new(); MAPSIZE] ,
+            tile_contents : vec![Vec::new(); MAPSIZE] , depth: 0
         }
 
     }

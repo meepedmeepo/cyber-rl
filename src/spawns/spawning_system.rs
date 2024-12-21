@@ -1,10 +1,16 @@
-use crate::raws::{SpawnType, RAWS};
-use crate::Map;
+use std::collections::HashSet;
+
+use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
+use crate::{Map, TileType};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::Rect;
 use bracket_lib::terminal::Point;
 
+use super::randomtable::RandomTable;
+
+
+pub const MAXMOBS : i32 = 8;
 pub enum EntityType
 {
     Item,
@@ -22,6 +28,7 @@ pub fn spawn_healing_item(state : &mut State)
     Item{}, Consumable{}, HealingEffect{healing_amount: 15}));
 
 }
+
 pub fn spawn_damage_item(state : &mut State) 
 {
    let mut pos = state.map.rooms[0].center();
@@ -81,13 +88,10 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
                     format!("Can't find mob entity named {}",&spawn.1));
                 } 
             }
-
-
-
-
     }
     
 }
+
 }
 
 pub fn room_spawns( state : &mut State)
@@ -95,10 +99,16 @@ pub fn room_spawns( state : &mut State)
     let rooms = state.map.rooms.clone();
     for room in rooms.iter().skip(1)
     {
-        spawn_room(state, *room);
+        spawn_room(state, *room, state.map.depth);
     }
 }
-pub fn spawn_room(state : &mut State, room : Rect)
+
+fn room_table(state : &mut State) -> RandomTable
+{
+    get_spawn_table_for_depth(&RAWS.lock().unwrap(), state.map.depth)
+}
+
+pub fn spawn_room(state : &mut State, room : Rect, depth :i32)
 {
     //let mob_names = &RAWS.lock().unwrap().get_mob_name_list();
 
@@ -110,54 +120,48 @@ pub fn spawn_room(state : &mut State, room : Rect)
     std::mem::drop(itemguard);
     let mut num_mobs = 0;
     let mut num_items = 0;
+    let mut ent_type  = EntityType::Mob;
 
-    let res = state.rng.roll_dice(1, 6);
+    let table = room_table(state);
     
-    if res < 3
-    {return;}
-    else if res > 2 && res < 5
-    {
-        num_mobs = state.rng.roll_dice(1,4)
-    }
-    else if res == 5 || res == 6
-    {
-        num_items = state.rng.roll_dice(1, 2);
-    }
+    let mut attempts = 20;
 
-    while num_items > 0
+    let mut num_spawns = state.rng.range(0, MAXMOBS+1);
+
+    let mut spawn_points : HashSet<usize> = HashSet::new();
+
+    
+    while attempts > 0 && num_spawns > 0
     {
-        let posO = room.point_set();
-        let pos = posO.iter().next().unwrap();
-        let num = state.rng.random_slice_index(item_names.as_slice()).unwrap();
-        spawn_entity(state, &(&0,&item_names[num]), pos.x, pos.y, EntityType::Item);
-
-        num_items-=1;
-    }
-
-    while num_mobs > 0
-    {
-        let pos_set = room.point_set();
-
-        let mut attempts = 20;
-        for pos in pos_set.iter()
+        let name = table.roll(&mut state.rng);
+        
+        if mob_names.contains(&name)
         {
-            let idx = Map::xy_id(pos.x, pos.y);
+            ent_type = EntityType::Mob;
+        } else if item_names.contains(&name)
+        {
+            ent_type = EntityType::Item;
+        }
+        else
+        {
+            panic!("{} is not a valid item or mob name so can't be spawned", name);    
+        }
 
-            if !state.map.blocked[idx]
+        let pos_set = room.point_set();
+        let point = pos_set.iter().next().unwrap();
+        let pos = Map::xy_id(point.x, point.y);
+        if !spawn_points.contains(&pos) && state.map.map[pos] != TileType::Wall
+        {
+            spawn_entity(state, &(&0, &name), point.x, point.y, ent_type);
+            spawn_points.insert(pos);
+            num_spawns -= 1;
+        }
+        else 
+        {
             {
-                let num = state.rng.random_slice_index(mob_names.as_slice()).unwrap();
-                spawn_entity(state, &(&0,&mob_names[num]), pos.x, pos.y, EntityType::Mob);
-                num_mobs-=1;
-                break;
-            }
-
-            attempts -= 1;
-            if attempts < 1
-            {
-                break;
+                attempts -= 1;
             }
         }
     }
-
 
 }

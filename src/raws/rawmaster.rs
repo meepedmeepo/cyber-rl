@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{borrow::Borrow, clone, collections::HashMap, string};
 
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, AoE, BlocksTiles, DamageEffect, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
+use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
 
 pub enum SpawnType 
 {
@@ -23,9 +23,9 @@ pub fn empty() -> RawMaster
 {
     RawMaster
     {
-        raws : Raws{items : Vec::new(), mobs: Vec::new(),},
+        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new()},
         item_index : HashMap::new(),
-        mob_index: HashMap::new(),
+        mob_index: HashMap::new()
     }
 }
 
@@ -89,7 +89,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
         defence: stats.defence
 
     });
-    
+    eb.add(CombatStats::new(stats.power, stats.defence));
     eb
 }
 
@@ -183,9 +183,34 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                     _ =>{bracket_lib::terminal::console::log
                         (format!("Warning: consumable effect {} not implemented.", effect_name));}
                 }
+
+                
             }
             
         }
+        if let Some(equipment) = &item_template.equippable
+                {
+                    let slot: EquipmentSlot;
+                    let slotname = equipment.slot.as_str();
+                    match slotname
+                    {
+                        "head" => {slot = EquipmentSlot::Head},
+                        "hands" => {slot = EquipmentSlot::Hands},
+                        "boots" => {slot = EquipmentSlot::Boots},
+                        "body" => {slot = EquipmentSlot::Body},
+                        "legs" => {slot = EquipmentSlot::Legs},
+                        "mainhand" => {slot = EquipmentSlot::MainHand}
+                        "offhand" => {slot = EquipmentSlot::OffHand},
+                        _ => {panic!("Equipment slot incorrect in json!");}
+                    }
+                    eb.add(Equippable
+                        {
+                            slot: slot,
+                            power_bonus: equipment.power,
+                            defence_bonus: equipment.defence,
+                        });
+
+                }
 
         return Some(Box::new(eb) );
     }
@@ -193,4 +218,28 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
     None
  }
     
+}
+
+pub fn get_spawn_table_for_depth(raws : &RawMaster, depth : i32) -> RandomTable
+{
+    use super::SpawnTableEntry;
+
+
+    let available_options : Vec<&SpawnTableEntry> = raws.raws.spawn_table
+        .iter()
+        .filter(|a| depth >= a.min_depth && depth <= a.max_depth)
+        .collect();
+
+    let mut rt = RandomTable::new();
+    for i in available_options.iter()
+    {
+        let mut weight = i.weight;
+        if i.add_map_depth_to_weight.is_some()
+        {
+            weight += depth;
+        }
+        rt = rt.add(i.name.clone(), weight)
+    }
+
+    rt
 }

@@ -1,4 +1,7 @@
 use std::cmp::min;
+use bracket_lib::color::{BLACK, DARKGREEN, DARKRED, GREEN, GREEN3, RED, RGB, WHITE, WHITESMOKE};
+use bracket_lib::prelude::Point;
+
 use crate::damage_system::DamageSystem;
 use crate::{AoE, DamageEffect, HealingEffect,   Name, Position, State, Statistics, WantsToUseItem};
 use crate::components::Consumable;
@@ -27,7 +30,11 @@ pub fn run(state : &mut State)
 
     for ents in entities_to_use_items.iter()
     {
-        let query = state.world.query_one_mut::<(&Name, Option<&Consumable>,Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>(ents.1).expect("couldn't get item properties");
+        let query = 
+            state.world.query_one_mut::<(&Name, Option<&Consumable>,
+            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>
+            (ents.1).expect("couldn't get item properties");
+
         let (name,consumable,healing,damage, aoe) = query;
 
         item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied()));
@@ -41,9 +48,7 @@ pub fn run(state : &mut State)
     for ents in entities_to_use_items.iter_mut()
     {
 
-        //This denotes that the entities stats are dirty and needs the component will be replaced at the end of the loop
-
-
+        let mut particle_area: Vec<Point> = Vec::new();
         //gets targets
         match ents.4
         {
@@ -61,6 +66,8 @@ pub fn run(state : &mut State)
 
                         for point in fov.iter()
                         {
+                            particle_area.push(*point);
+
                             for i in state.map.get_mob_entities_at_position(state, *point)
                             {
                                 targets[index].push(i);
@@ -102,11 +109,15 @@ pub fn run(state : &mut State)
         {
             for target in targets[index].iter()
             {
-                let (stats, name) = 
-                state.world.query_one_mut::<(&mut Statistics,&Name)>(*target)
+                let (stats, name, pos) = 
+                state.world.query_one_mut::<(&mut Statistics,&Name, &Position)>(*target)
                 .expect("Couldn't find stats for target to heal!");
                 
                 stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
+
+                state.particle_builder.request(pos.x, pos.y,
+                    RGB::named(WHITESMOKE), RGB::named(GREEN3),
+                     '!', 200., Some(*target));
 
                 if item_info[index].4.is_none()
                 {
@@ -121,7 +132,8 @@ pub fn run(state : &mut State)
                     state.game_log.add_log(format!("{} used {} on {}, and healed for them for {} hp!"
                         ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
 
-                    bracket_lib::terminal::console::log(format!("{} used {} on {}, and healed for them for {} hp!"
+                    bracket_lib::terminal::console::log(
+                        format!("{} used {} on {}, and healed for them for {} hp!"
                         ,ents.3.clone(), item_info[index].0, name.name.clone() ,healing.healing_amount));
                 }
             }
@@ -134,9 +146,16 @@ pub fn run(state : &mut State)
         {
             Some(dmg) => 
             {
+                for point in particle_area.iter()
+                {
+                    state.particle_builder.request(point.x, point.y,
+                        RGB::named(DARKRED), RGB::named(WHITE), '!', 150., None);
+                }
+
                 for target in targets[index].iter()
                 {
-                    let  name = state.world.query_one_mut::<(&Name)>(*target).expect("Couldn't find entity to mark for damage").name.clone();
+                    
+                    let  name = state.world.query_one_mut::<&Name>(*target).expect("Couldn't find entity to mark for damage").name.clone();
                     match item_info[index].4
                     {
                         Some(_) => 
@@ -159,8 +178,6 @@ pub fn run(state : &mut State)
             None => {}
         }
 
-    
-    
      // Removing item if it was a consumable
      match item_info[index].1
      {

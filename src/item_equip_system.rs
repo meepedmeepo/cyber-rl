@@ -2,7 +2,7 @@ use std::iter;
 
 use bracket_lib::prelude::console;
 
-use crate::{Equipped, InContainer, Item, Name, State, WantsToEquipItem};
+use crate::{CombatStats, Equipped, InContainer, Item, Name, State, WantsToEquipItem};
 
 
 pub fn run(state : &mut State)
@@ -49,6 +49,10 @@ pub fn run(state : &mut State)
 
         state.world.insert_one(info.1.item, Equipped {owner : info.0, slot : info.1.slot })
             .expect("Couldn't equip selected item!");
+
+        state.world.query_one_mut::<&mut CombatStats>(info.0)
+            .expect("Couldn't get entity combatstatss")
+            .power.dirty = true;
 
         state.world.remove_one::<InContainer>(info.1.item)
             .expect("Couldn't remove InContainer from newly equiped item! ");

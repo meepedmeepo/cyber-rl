@@ -45,6 +45,104 @@
                     "damage" : "10"
                 }
             }
+        },
+        {
+            "name" : "Rusty Sword",
+            "renderable": {
+                "glyph" : "/",
+                "fg" : "#FFFFFF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "mainhand",
+                "power": 2,
+                "defence" : 0
+            }
+        },
+        {
+            "name" : "Leather Breastplate",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "body",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Leather Leggings",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "legs",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Leather Boots",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "boots",
+                "power": 0,
+                "defence" : 1
+            }
+        },
+        {
+            "name" : "Leather Gauntlets",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "hands",
+                "power": 0,
+                "defence" : 1
+            }
+        },
+        {
+            "name" : "Wooden Shield",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#72442a",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "offhand",
+                "power": 0,
+                "defence" : 2
+            }
+        },
+        {
+            "name" : "Iron Longsword",
+            "renderable": {
+                "glyph" : "/",
+                "fg" : "#b50023",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "equippable" : {
+                "slot" : "mainhand",
+                "power": 5,
+                "defence" : 2
+            }
         }
     ],
 
@@ -109,5 +207,22 @@
             "defence": 5
         }
     }
+    ],
+
+    "spawn_table" : [
+
+        { "name" : "Kobold", "weight" : 25, "min_depth" : 0, "max_depth" : 3 },
+        { "name" : "Orc", "weight" : 5, "min_depth" : 1, "max_depth" : 100, "add_map_depth_to_weight" : true},
+        { "name" : "Goblin", "weight" : 15, "min_depth" : 0, "max_depth" : 15 },
+        { "name" : "Health Potion", "weight" : 8, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+        { "name" : "Magic Missile Scroll", "weight" : 6, "min_depth" : 0, "max_depth" : 100 },
+        { "name" : "Fireball Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true},
+        { "name" : "Rusty Sword", "weight" : 4, "min_depth" : 0, "max_depth" : 5 },
+        { "name" : "Leather Breastplate", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
+        { "name" : "Leather Leggings", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
+        { "name" : "Leather Gauntlets", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
+        { "name" : "Leather Boots", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
+        { "name" : "Wooden Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 15 },
+        { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_map_depth_to_weight" : true }
     ]
     }

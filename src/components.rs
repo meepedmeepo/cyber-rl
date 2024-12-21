@@ -7,7 +7,58 @@ pub struct WantsToEquipItem
     pub item : Entity,
     pub slot : EquipmentSlot,
 }
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct Attribute
+{
+   pub base : i32,
+   pub bonuses : i32,
+   pub total : i32,
+   pub dirty : bool,
+}
 
+impl Attribute
+{
+    pub fn new(base : i32) -> Attribute
+    {
+        Attribute
+        {
+            base : base,
+            bonuses: 0,
+            total: base,
+            dirty: true,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+pub struct CombatStats
+{
+    pub power : Attribute,
+    pub defence : Attribute
+}
+impl CombatStats
+{
+    pub fn is_dirty(&self)-> bool
+    {
+        if self.power.dirty || self.defence.dirty
+        {
+            return true;
+        }
+        else 
+        {
+            false
+        }
+    }
+
+    pub fn new(power : i32, defence : i32) -> CombatStats
+    {
+        CombatStats
+        {
+            power : Attribute::new(power),
+            defence : Attribute::new(defence),
+        }
+    }
+}
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 #[allow(dead_code)]
 pub enum EquipmentSlot

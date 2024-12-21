@@ -1,5 +1,7 @@
 use hecs::Entity;
-use bracket_lib::terminal::console;
+use bracket_lib::{color::{RED, RGB, WHITE}, terminal::console};
+use crate::{CombatStats, Position};
+
 use super::{State,TakeDamage,Statistics,Name};
 
 
@@ -32,23 +34,27 @@ impl DamageSystem
     
    pub fn run(state : &mut State)
     {
-        let mut dmg_comps_to_remove : Vec<Entity> = Vec::new();
-        for  (id,(dmg_to_take,stats,name))
-         in state.world.query_mut::<(&TakeDamage,&mut Statistics, &Name)>()
+        let mut dmg_comps_to_remove : Vec<(Entity, Position)> = Vec::new();
+        for  (id,(dmg_to_take,stats,name,cstats, pos))
+         in state.world.query_mut::<(&TakeDamage,&mut Statistics, &Name, &CombatStats, &Position)>()
         {
             //console::log("aaaaaaaaaaaaaaa");
-            dmg_comps_to_remove.push(id);
+            dmg_comps_to_remove.push((id, *pos));
             for dmg in dmg_to_take.damage_to_take.iter()
             {
-                stats.hp -= dmg;
-                state.game_log.add_log(format!("{} took {} damage!",name.name,dmg));
-                console::log(format!("{} took {} damage!",name.name,dmg));
+                let adjusted_dmg = std::cmp::max(1,dmg-cstats.defence.total);
+                stats.hp -= adjusted_dmg;
+                state.game_log.add_log(format!("{} took {} damage!",name.name,adjusted_dmg));
+                console::log(format!("{} took {} damage!",name.name,adjusted_dmg));
             }
         }
 
-        for  dmg_comp in dmg_comps_to_remove.iter()
+        for  (dmg_comp, pos) in dmg_comps_to_remove.iter()
         {
             state.world.remove_one::<TakeDamage>(*dmg_comp).expect("Couldn't remove damage comp from entity!");
+
+            state.particle_builder.request(pos.x, pos.y, RGB::named(WHITE), RGB::named(RED),
+             '!', 200., Some(*dmg_comp));
         }
     }
 }

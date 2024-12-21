@@ -207,5 +207,25 @@
             "defence": 5
         }
     }
+    ],
+
+    "spawn_table" : [
+
+        { "name" : "Kobold", "weight" : 25, "min_depth" : 0, "max_depth" : 3 },
+        { "name" : "Orc", "weight" : 5, "min_depth" : 1, "max_depth" : 100, "add_max_depth_to_weight" : true},
+        { "name" : "Goblin", "weight" : 15, "min_depth" : 0, "max_depth" : 15 },
+        { "name" : "Health Potion", "weight" : 8, "min_depth" : 0, "max_depth" : 100, "add_max_depth_to_weight" : true },
+        { "name" : "Magic Missile Scroll", "weight" : 6, "min_depth" : 0, "max_depth" : 100 },
+        { "name" : "Fireball Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100, "add_max_depth_to_weight" : true},
+        { "name" : "Rusty Sword", "weight" : 4, "min_depth" : 0, "max_depth" : 5 },
+        { "name" : "Leather Breastplate", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
+        { "name" : "Leather Leggings", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
+        { "name" : "Leather Gauntlets", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
+        { "name" : "Leather Boots", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
+        { "name" : "Wooden Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 15 },
+        { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_max_depth_to_weight" : true }
+        
+
+
     ]
     }

@@ -1,3 +1,5 @@
+use bracket_lib::prelude::console;
+
 
 
 pub struct RandomEntry
@@ -37,14 +39,15 @@ impl RandomTable
 
     pub fn roll(&self, rng: &mut bracket_lib::random::RandomNumberGenerator) -> String
     {
-        if self.total_weight == 0 {return "none".to_string();}
+        if self.total_weight == 0 {return "zero weight".to_string();}
         
         let mut roll = rng.roll_dice(1, self.total_weight)-1;
+        //console::log(roll);
         let mut index :usize = 0;
 
-        while roll > 0
+        while roll >= 0
         {
-            if roll < self.entries[index].weight
+            if roll <= self.entries[index].weight
             {
                 return self.entries[index].name.clone();
             }

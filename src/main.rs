@@ -9,6 +9,7 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use particles::particle_system;
 use particles::ParticleBuilder;
+use spawns::spawning_system::EntityType;
 use std::cmp::*;
 use maps::*;
 pub mod maps;
@@ -36,7 +37,7 @@ mod calculate_attribute_system;
 mod particles;
 mod spawns;
 use spawns::*;
-use spawns::spawning_system::*;
+use spawns::spawning_system;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -302,6 +303,7 @@ fn game_init ( state: &mut State)
 {
     raws::run();
     
+    state.map = simple_map::SimpleMapBuilder::build(0);
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
     let xy = state.map.rooms[0].center();
@@ -396,7 +398,7 @@ fn main() ->BError
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
     //Map::generate_map_checked(&mut gs);
-    gs.map = simple_map::SimpleMapBuilder::build(0);
+    
     
     game_init(&mut gs);
     main_loop(context,gs)

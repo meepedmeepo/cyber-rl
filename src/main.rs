@@ -376,8 +376,9 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 fn main() ->BError 
 {
     //println!("Hello, world!");
-    let context = BTermBuilder::simple(110,50)?
+    let mut context = BTermBuilder::simple(110,50)?
     .with_title("Rust-like")
+    .with_fps_cap(60.)
     .build()?;
 
     let mut gs: State = State{
@@ -398,7 +399,7 @@ fn main() ->BError
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
     //Map::generate_map_checked(&mut gs);
-    
+    context.with_post_scanlines(true);
     
     game_init(&mut gs);
     main_loop(context,gs)

@@ -1,7 +1,9 @@
+use bracket_lib::prelude::field_of_view;
 use bracket_lib::terminal::*;
 use bracket_lib::color;
 use crate::gamelog;
 use crate::menus::inventory_state;
+use crate::AoE;
 use crate::FoV;
 use crate::InContainer;
 use crate::Renderable;
@@ -72,7 +74,7 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
 }
 
 
-pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32) 
+pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Option<i32>) 
     -> (inventory_state, Option<Point>)
 {
     match ctx.key
@@ -135,6 +137,23 @@ pub fn _ranged_target(state : &mut State, ctx: &mut BTerm, range : i32)
         {
             return (inventory_state::Cancel, None);
         }
+    }
+
+    match aoe
+    {
+        Some(radius) => 
+        {
+            let tiles = field_of_view(Point::from_tuple(mouse_pos),
+                radius, &state.map);
+            
+            for point in tiles.iter()
+            {
+                ctx.set_bg(point.x, point.y, YELLOW);
+            }
+            
+        }
+
+        None => {}
     }
 
     (inventory_state::None, None)

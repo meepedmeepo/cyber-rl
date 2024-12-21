@@ -66,7 +66,7 @@ pub enum ProgramState
     MonsterTurn,
     GameOver,
     Inventory,
-    Targeting { range: i32, item : Entity, }
+    Targeting { range: i32, item : Entity, aoe: Option<i32> }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -208,8 +208,20 @@ impl GameState for State{
                     inventory_state::None => {}
                     inventory_state::TargetedItem { item, range } =>
                     {
-                        self.current_state = ProgramState::Targeting { range: range, item: item };
+                        let query = self.world.get::<&AoE>(item);
+                        let mut aoe = None;
+                        match query
+                        {
+                            Ok(ref aoe_comp) =>
+                            {
+                                aoe = Some(aoe_comp.radius);
+                            }
+                            Err(_) => {}
+                        }
+                        
+                        self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
                     }
+                    _ =>{}
                 }
 
                 draw_map(ctx, &self.map);
@@ -219,14 +231,14 @@ impl GameState for State{
                 gui::draw_inventory(self, ctx);
             }
 
-            ProgramState::Targeting { range, item } =>
+            ProgramState::Targeting { range, item, aoe } =>
             {
                 ctx.cls();
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_gamelog(self, ctx);
-                let (inv_state,point) = gui::_ranged_target(self, ctx, range);
+                let (inv_state,point) = gui::ranged_target(self, ctx, range, aoe);
                 match inv_state
                 {
                     inventory_state::Cancel =>{ self.current_state = ProgramState::AwaitingInput;}

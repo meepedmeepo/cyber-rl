@@ -13,6 +13,8 @@ pub enum inventory_state
     None,
 	TargetedItem {item : Entity, range: i32},
 }
+
+
 impl InventoryMenu
 {
     pub fn menu_input(ctx : &BTerm, state : &mut State) -> inventory_state

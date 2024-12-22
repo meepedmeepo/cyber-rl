@@ -69,7 +69,8 @@ pub enum EquipmentSlot
     Boots,
     Hands,
     MainHand,
-    OffHand
+    OffHand,
+    Ranged
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]

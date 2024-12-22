@@ -205,6 +205,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                         "legs" => {slot = EquipmentSlot::Legs},
                         "mainhand" => {slot = EquipmentSlot::MainHand}
                         "offhand" => {slot = EquipmentSlot::OffHand},
+                        "ranged" => {slot = EquipmentSlot::Ranged}
                         _ => {panic!("Equipment slot incorrect in json!");}
                     }
                     eb.add(Equippable

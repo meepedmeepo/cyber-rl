@@ -38,6 +38,7 @@ mod particles;
 mod spawns;
 use spawns::*;
 use spawns::spawning_system;
+mod ranged_combat;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;

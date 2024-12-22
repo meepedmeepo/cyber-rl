@@ -49,7 +49,7 @@ pub fn spawn_item_equipped(state : &mut State, item_name: &String, target: Entit
 
     let mut item_builder = 
         RawMaster::spawn_named_item(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
-         &item_name, SpawnType::Equipped { target });
+        &item_name, SpawnType::Equipped { target });
 
     let mut slot : Option<EquipmentSlot> = None;
     match item_builder

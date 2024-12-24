@@ -67,7 +67,8 @@ pub enum ProgramState
     MonsterTurn,
     GameOver,
     Inventory,
-    Targeting { range: i32, item : Entity, aoe: Option<i32> }
+    Targeting { range: i32, item : Entity, aoe: Option<i32> },
+    RangedCombat {range: i32, }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

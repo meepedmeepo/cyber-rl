@@ -26,6 +26,13 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::S => try_move(state,0,1),
             VirtualKeyCode::I => return ProgramState::Inventory,
             VirtualKeyCode::Space => return ProgramState::PlayerTurn,
+            VirtualKeyCode::F => 
+            {
+                //return ProgramState::RangedCombat {  }
+
+                
+            
+            },
             VirtualKeyCode::Period => 
             {
                 let idx = Map::xy_id(state.player_pos.x, state.player_pos.y);

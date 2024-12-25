@@ -9,6 +9,8 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use particles::particle_system;
 use particles::ParticleBuilder;
+use ranged_combat::ranged_aim;
+use ranged_combat::ranged_aim::TargettingState;
 use spawns::spawning_system::EntityType;
 use std::cmp::*;
 use maps::*;
@@ -259,6 +261,29 @@ impl GameState for State{
 
                     _ => {}
                 }
+            }
+
+            ProgramState::RangedCombat { range } =>
+            {
+                ctx.cls();
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                gui::draw_gamelog(self, ctx);
+
+                let target_state = ranged_aim::aim_projectile(self, ctx, self.player_pos, range);
+
+                match target_state
+                {
+                    TargettingState::None => {}
+                    TargettingState::Cancel => {self.current_state = ProgramState::AwaitingInput;}
+
+                    TargettingState::Selected { path } =>
+                    {
+                        
+                    }
+                }
+
             }
 
             ProgramState::GameOver =>

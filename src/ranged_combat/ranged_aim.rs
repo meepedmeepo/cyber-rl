@@ -6,7 +6,7 @@ pub enum TargettingState
 {
     None,
     Cancel,
-    Selected {target: Point}
+    Selected {path: Vec<Point>}
 }
 
 
@@ -26,17 +26,19 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
     let point = Point::new(m_x, m_y);
     if available_cells.contains(&point)
     {
-        let _line = bracket_lib::geometry::Bresenham::new(start_pos, point )
-            .for_each(|pos| 
+        let _line = bracket_lib::geometry::Bresenham::new(start_pos, point );
+        _line.for_each(|pos| 
             {
                 ctx.set(pos.x, pos.y, BLACK, GREEN, '*');
             });
+           
         
         ctx.set_bg(point.x, point.y, GREEN);
 
         if ctx.left_click
         {
-            return TargettingState::Selected { target: point };
+            let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
+            return TargettingState::Selected { path:targets };
         }
     }
     else

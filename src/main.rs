@@ -70,8 +70,9 @@ pub enum ProgramState
     GameOver,
     Inventory,
     Targeting { range: i32, item : Entity, aoe: Option<i32> },
-    RangedCombat {range: i32, }
+    RangedCombat {range: i32, dmg: i32}
 }
+
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position
@@ -263,7 +264,7 @@ impl GameState for State{
                 }
             }
 
-            ProgramState::RangedCombat { range } =>
+            ProgramState::RangedCombat { range , dmg } =>
             {
                 ctx.cls();
                 draw_map(ctx, &self.map);
@@ -280,7 +281,17 @@ impl GameState for State{
 
                     TargettingState::Selected { path } =>
                     {
-                        
+                        //only handles the case that the missile targets one entity
+                        let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
+
+                        let target_entities = self.map.get_mob_entities_at_position(self, *target_point);
+
+                        for ent in target_entities.iter()
+                        {
+                            AttackSystem::add_attack(self.player_ent
+                                .expect("Couldn't find player to use their stats for targetting ranged attacks")
+                                , *ent, self);
+                        }
                     }
                 }
 
@@ -378,7 +389,7 @@ fn game_init ( state: &mut State)
     let pos2 = state.map.rooms[0].center();
 
     spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
-    spawning_system::spawn_entity(state, &(&1, &"Fireball Scroll".to_string()), xy.x-1, xy.y,EntityType::Item);
+    spawning_system::spawn_entity(state, &(&1, &"Wooden Bow".to_string()), xy.x-1, xy.y,EntityType::Item);
 
 // }
 }

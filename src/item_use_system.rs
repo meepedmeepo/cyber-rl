@@ -3,7 +3,7 @@ use bracket_lib::color::{BLACK, DARKGREEN, DARKRED, GREEN, GREEN3, RED, RGB, WHI
 use bracket_lib::prelude::Point;
 
 use crate::damage_system::DamageSystem;
-use crate::{AoE, DamageEffect, HealingEffect,   Name, Position, State, Statistics, WantsToUseItem};
+use crate::{AoE, DamageEffect, HealingEffect, Name, Position, State, Statistics, Usable, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType
@@ -32,10 +32,10 @@ pub fn run(state : &mut State)
     {
         let query = 
             state.world.query_one_mut::<(&Name, Option<&Consumable>,
-            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>)>
+            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>, &Usable)>
             (ents.1).expect("couldn't get item properties");
 
-        let (name,consumable,healing,damage, aoe) = query;
+        let (name,consumable,healing,damage, aoe, _u) = query;
 
         item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied()));
         

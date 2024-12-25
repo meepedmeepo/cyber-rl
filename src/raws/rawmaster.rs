@@ -3,7 +3,7 @@ use std::{borrow::Borrow, clone, collections::HashMap, string};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting};
+use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting, Usable};
 
 pub enum SpawnType 
 {
@@ -168,9 +168,15 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
 
         eb.add(components::Item{});
 
+        if let Some(range) = &item_template.ranged
+        {
+            eb.add(RangedTargetting{range: *range});
+        }
+
         if let Some(consumable) = &item_template.consumable
         {
             eb.add(components::Consumable {});
+            eb.add(Usable{});
             for effect in consumable.effects.iter()
             {
                 let effect_name = effect.0.as_str();

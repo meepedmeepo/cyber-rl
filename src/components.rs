@@ -1,6 +1,11 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+
+
+pub struct Usable
+{}
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct WantsToEquipItem
 {

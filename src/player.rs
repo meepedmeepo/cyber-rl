@@ -1,8 +1,8 @@
 use bracket_lib::prelude::*;
-use crate::{go_down_stairs, Item, TileType, WantsToPickupItem};
+use crate::{attack_system, go_down_stairs, CombatStats, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, TileType, WantsToPickupItem};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position,Statistics};
-use std::cmp::{min,max};
+use std::{clone, cmp::{max, min}};
 
 
 
@@ -28,9 +28,32 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::Space => return ProgramState::PlayerTurn,
             VirtualKeyCode::F => 
             {
-                //return ProgramState::RangedCombat {  }
 
-                
+                let query = state.world.query::<&Equipped>()
+                    .iter()
+                    .filter(|(ent,equip) | 
+                    equip.slot == EquipmentSlot::Ranged && *ent == state.player_ent
+                    .expect("Couldn't find player entity to fetch ranged stats for combat"))
+                    .map(|(ent, _eq)| ent)
+                    .collect::<Vec<_>>();
+
+                if query.len() < 1
+                {
+                    console::log("F pressed but no ranged weapon equipped!");
+                    return ProgramState::AwaitingInput;
+                }
+                else
+                {
+                    let dmg = 
+                        state.world.query_one_mut::<&CombatStats>(state.player_ent
+                        .expect("Couldn't get player ent for damage for ranged combat"))
+                        .expect("Couldn't get the Combat stats for player for ranged combat").power.total;
+
+                    let range = state.world.query_one_mut::<&RangedTargetting>(query[0])
+                            .expect("Couldn't get range of players ranged weapon for range combat").range;
+
+                    return ProgramState::RangedCombat { range, dmg  };
+                }
             
             },
             VirtualKeyCode::Period => 

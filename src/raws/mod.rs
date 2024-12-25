@@ -27,6 +27,7 @@ pub struct Item
     pub renderable : Option<Renderable>,
     pub consumable : Option<Consumable>,
     pub equippable: Option<EquipmentStats>,
+    pub ranged: Option<i32>,
 }
 #[derive(Deserialize, Debug)]
 pub struct EquipmentStats

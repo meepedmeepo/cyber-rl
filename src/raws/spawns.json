@@ -47,6 +47,21 @@
             }
         },
         {
+            "name" : "Wooden Bow",
+            "renderable": {
+                "glyph" : ")",
+                "fg" : "#880808",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "ranged": 6,
+            "equippable" : {
+                "slot" : "ranged",
+                "power" : 4,
+                "defence": 0
+            }
+        },
+        {
             "name" : "Rusty Sword",
             "renderable": {
                 "glyph" : "/",

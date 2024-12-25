@@ -1,4 +1,4 @@
-use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point}};
+use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
 
 use crate::{FoV, Map, Position, State};
 
@@ -6,12 +6,27 @@ pub enum TargettingState
 {
     None,
     Cancel,
-    Selected {path: Vec<Point>}
+    Selected {path: Vec<Point>, end: Point}
 }
 
 
 pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, range : i32) -> TargettingState
 {
+    match ctx.key
+    {
+        Some(key) =>
+        {
+            match key
+            {
+                VirtualKeyCode::Escape => 
+                {
+                    return TargettingState::Cancel;
+                }
+                _ => {}
+            }
+        },
+        None => {}
+    }
     let mut available_cells = Vec::new();
     let pos = state.player_pos;
     
@@ -27,7 +42,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
     if available_cells.contains(&point)
     {
         let _line = bracket_lib::geometry::Bresenham::new(start_pos, point );
-        _line.for_each(|pos| 
+        _line.skip(1).for_each(|pos| 
             {
                 ctx.set(pos.x, pos.y, BLACK, GREEN, '*');
             });
@@ -38,7 +53,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
         if ctx.left_click
         {
             let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
-            return TargettingState::Selected { path:targets };
+            return TargettingState::Selected { path:targets, end: point };
         }
     }
     else

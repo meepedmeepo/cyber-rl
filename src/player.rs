@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, CombatStats, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, TileType, WantsToPickupItem};
+use crate::{attack_system, go_down_stairs, CombatStats, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position,Statistics};
 use std::{clone, cmp::{max, min}};
@@ -31,8 +31,8 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
                 let query = state.world.query::<&Equipped>()
                     .iter()
-                    .filter(|(ent,equip) | 
-                    equip.slot == EquipmentSlot::Ranged && *ent == state.player_ent
+                    .filter(|(_ent,equip) | 
+                    equip.slot == EquipmentSlot::Ranged && equip.owner == state.player_ent
                     .expect("Couldn't find player entity to fetch ranged stats for combat"))
                     .map(|(ent, _eq)| ent)
                     .collect::<Vec<_>>();
@@ -49,7 +49,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                         .expect("Couldn't get player ent for damage for ranged combat"))
                         .expect("Couldn't get the Combat stats for player for ranged combat").power.total;
 
-                    let range = state.world.query_one_mut::<&RangedTargetting>(query[0])
+                    let range = state.world.query_one_mut::<&RangedWeapon>(query[0])
                             .expect("Couldn't get range of players ranged weapon for range combat").range;
 
                     return ProgramState::RangedCombat { range, dmg  };

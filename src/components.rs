@@ -2,7 +2,10 @@ use bracket_lib::prelude::Point;
 use hecs::Entity;
 
 
-
+pub struct RangedWeapon
+{
+    pub range: i32
+}
 pub struct Usable
 {}
 

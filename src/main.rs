@@ -279,12 +279,12 @@ impl GameState for State{
                     TargettingState::None => {}
                     TargettingState::Cancel => {self.current_state = ProgramState::AwaitingInput;}
 
-                    TargettingState::Selected { path } =>
+                    TargettingState::Selected { path, end  } =>
                     {
                         //only handles the case that the missile targets one entity
-                        let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
+                        //let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
 
-                        let target_entities = self.map.get_mob_entities_at_position(self, *target_point);
+                        let target_entities = self.map.get_mob_entities_at_position(self, end);
 
                         for ent in target_entities.iter()
                         {
@@ -292,6 +292,8 @@ impl GameState for State{
                                 .expect("Couldn't find player to use their stats for targetting ranged attacks")
                                 , *ent, self);
                         }
+
+                        self.current_state = ProgramState::PlayerTurn;
                     }
                 }
 

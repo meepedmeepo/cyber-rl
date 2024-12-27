@@ -57,7 +57,7 @@
             "ranged": 6,
             "equippable" : {
                 "slot" : "ranged",
-                "power" : 4,
+                "power" : 2,
                 "defence": 0
             }
         },
@@ -238,6 +238,7 @@
         { "name" : "Leather Gauntlets", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
         { "name" : "Leather Boots", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
         { "name" : "Wooden Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_map_depth_to_weight" : true }
+        { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_map_depth_to_weight" : true },
+        { "name" : "Wooden Bow", "weight" : 2, "min_depth" : 0, "max_depth" : 15 }
     ]
     }

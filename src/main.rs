@@ -9,6 +9,8 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use particles::particle_system;
 use particles::ParticleBuilder;
+use projectile::projectile_system;
+use projectile::ProjectileBuilder;
 use ranged_combat::ranged_aim;
 use ranged_combat::ranged_aim::TargettingState;
 use spawns::spawning_system::EntityType;
@@ -41,6 +43,8 @@ mod spawns;
 use spawns::*;
 use spawns::spawning_system;
 mod ranged_combat;
+mod projectile;
+
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -56,6 +60,7 @@ pub struct State
     player_ent :Option<Entity>,
     game_log : GameLog,
     particle_builder : ParticleBuilder,
+    projectile_builder : ProjectileBuilder
 }
 
 
@@ -279,19 +284,24 @@ impl GameState for State{
                     TargettingState::None => {}
                     TargettingState::Cancel => {self.current_state = ProgramState::AwaitingInput;}
 
-                    TargettingState::Selected { path, end  } =>
+                    TargettingState::Selected { mut path, end  } =>
                     {
                         //only handles the case that the missile targets one entity
                         //let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
+                        path.push(end);
+                        let dmg = self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
+                        
+                        self.projectile_builder.add_request(55., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
+                            '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
 
-                        let target_entities = self.map.get_mob_entities_at_position(self, end);
+                        // let target_entities = self.map.get_mob_entities_at_position(self, end);
 
-                        for ent in target_entities.iter()
-                        {
-                            AttackSystem::add_attack(self.player_ent
-                                .expect("Couldn't find player to use their stats for targetting ranged attacks")
-                                , *ent, self);
-                        }
+                        // for ent in target_entities.iter()
+                        // {
+                        //     AttackSystem::add_attack(self.player_ent
+                        //         .expect("Couldn't find player to use their stats for targetting ranged attacks")
+                        //         , *ent, self);
+                        // }
 
                         self.current_state = ProgramState::PlayerTurn;
                     }
@@ -405,6 +415,8 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     //entities
     particle_system::spawn_system(state);
     particle_system::update(state, ctx);
+    projectile_system::spawn_projectiles(state);
+    projectile_system::update_projectiles(state, ctx);
 
     let mut entities_to_render  = 
     state.world.query_mut::<(&Position,&Renderable)>()
@@ -448,6 +460,7 @@ fn main() ->BError
         player_ent: None,
         game_log : GameLog::new(),
         particle_builder : ParticleBuilder::new(),
+        projectile_builder : ProjectileBuilder::new()
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

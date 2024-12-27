@@ -32,7 +32,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 let query = state.world.query::<&Equipped>()
                     .iter()
                     .filter(|(_ent,equip) | 
-                    equip.slot == EquipmentSlot::Ranged && equip.owner == state.player_ent
+                        equip.slot == EquipmentSlot::Ranged && equip.owner == state.player_ent
                     .expect("Couldn't find player entity to fetch ranged stats for combat"))
                     .map(|(ent, _eq)| ent)
                     .collect::<Vec<_>>();
@@ -91,9 +91,10 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 {
                     Some(i) =>
                     {
-                        state.world.insert_one(Option::expect(state.player_ent, "Couldn't find player entity to insert WantsToPickupItem component!"),
-                         WantsToPickupItem{item: i})
-                        .expect("Couldn't insert WantsToPickupItem component onto the player");
+                        state.world.insert_one(Option::expect(state.player_ent
+                            , "Couldn't find player entity to insert WantsToPickupItem component!"),
+                  WantsToPickupItem{item: i})
+                            .expect("Couldn't insert WantsToPickupItem component onto the player");
                         return ProgramState::AwaitingInput;
                     }
                     None =>

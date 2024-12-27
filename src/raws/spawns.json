@@ -57,7 +57,7 @@
             "ranged": 6,
             "equippable" : {
                 "slot" : "ranged",
-                "power" : 2,
+                "power" : 2,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
                 "defence": 0
             }
         },

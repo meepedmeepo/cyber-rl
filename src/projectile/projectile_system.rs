@@ -14,7 +14,7 @@ pub fn spawn_projectiles(state : &mut State)
     {
         //let proj = 
             //Projectile{frame_time: projectile.frame_time, path: projectile.path.}
-        let mut path = projectile.path.clone();
+        let path = projectile.path.clone();
         //path.reverse();
 
         let mut projectile_path: Queue<Point> = queue![];

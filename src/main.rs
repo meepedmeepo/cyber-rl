@@ -44,7 +44,7 @@ use spawns::*;
 use spawns::spawning_system;
 mod ranged_combat;
 mod projectile;
-
+mod statistics;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -231,7 +231,6 @@ impl GameState for State{
                         
                         self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
                     }
-                    _ =>{}
                 }
 
                 draw_map(ctx, &self.map);
@@ -291,7 +290,7 @@ impl GameState for State{
                         path.push(end);
                         let dmg = self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
                         
-                        self.projectile_builder.add_request(55., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
+                        self.projectile_builder.add_request(30., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
 
                         // let target_entities = self.map.get_mob_entities_at_position(self, end);

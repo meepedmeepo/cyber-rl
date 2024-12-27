@@ -36,6 +36,11 @@ impl Attribute
             dirty: true,
         }
     }
+
+    pub fn get_modifier(&self) -> i32
+    {
+        (self.total - 10) % 2
+    }
 }
 
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]

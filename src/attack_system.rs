@@ -1,6 +1,6 @@
 use bracket_lib::{color::{BLACK, RGB, WHITE}, terminal::console};
 use hecs::{World, Entity};
-use crate::{damage_system::DamageSystem, statistics::{BaseStatistics, Pools}, EquipmentSlot, Equippable, Equipped, Position, Weapon, WeaponStat};
+use crate::{damage_system::DamageSystem, statistics::{BaseStatistics, Pools}, EquipmentSlot, Equippable, Equipped, Naturals, Position, Weapon, WeaponStat};
 
 use super::{State, Attack, Name, TakeDamage};
 pub struct AttackSystem
@@ -44,9 +44,37 @@ impl AttackSystem
                  .collect::<Vec<_>>();
             if weapons.len() < 1
             {
-                //TODO: IMPLEMENT NATURAL WEPS FOR NPCS AND UNARMED FOR PLAYER
-                weapons.push(Weapon{uses_statistic: WeaponStat::Strength,damage_die : 4
-                    , dmg_bonus : 2, to_hit_bonus: 0});
+                //TODO: fix this shitty implementation
+                let mut found_wep = false;
+                if attacker != 
+                    state.player_ent.expect("Couldn't find player to check if it is them who is attacking!")
+                {
+                    let nat_weps = 
+                        state.world.query_one_mut::<&Naturals>(attacker)
+                            .expect("MONSTERS SHOULD HAVE NATURALS EVEN IF LIST IS EMPTY").weapons.clone();
+                    if nat_weps.len() > 0
+                    {
+                        found_wep = true;
+
+                        if nat_weps.len() == 1
+                        {
+                            weapons.push(nat_weps[0]);
+                        }
+                        else {
+                        {
+                            let roll = state.rng.range(0, nat_weps.len());
+
+                            weapons.push(nat_weps[roll]);
+                        }
+                        }
+                    }
+
+                }
+                if !found_wep
+                {
+                    weapons.push(Weapon{uses_statistic: WeaponStat::Strength,damage_die : 4
+                        , dmg_bonus : 2, to_hit_bonus: 0});
+                }
             }
 
             let mut to_hit_bonus = 0;

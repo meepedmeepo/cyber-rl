@@ -226,8 +226,18 @@
             "max_hp": 20,
             "hp": 20,
             "power": 2,
-            "defence": 5
-        }
+            "defence": 5,
+            "dexterity" : 16
+        },
+        "naturals" : [
+            {
+                "statistic" : "dexterity",
+                "damage_die" : "1d6",
+                "to_hit_bonus" : 2
+            }
+            
+        ]
+        
     },
     {
         "name" : "Kobold",

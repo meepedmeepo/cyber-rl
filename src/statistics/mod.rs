@@ -7,31 +7,47 @@ pub enum StatisticEffect
 
 pub struct BaseStatistics
 {
-    strength : Attribute,
-    dexterity : Attribute,
-    toughness : Attribute,
-    intelligence : Attribute,
-    mental_fortitue : Attribute,
+    pub strength : Attribute,
+    pub dexterity : Attribute,
+    pub toughness : Attribute,
+    pub intelligence : Attribute,
+    pub mental_fortitude : Attribute,
 }
 
-pub struct DerivedStatistics
+pub struct Pools
 {
-    armour_class : Attribute,
-    max_hitpoints : i32,
-    //carry_capacity : Attribute,
-    //max_stamina : i32,
-    //max_mana : i32
+    pub hitpoints: StatPool,
+    pub exp: i32,
+    pub level : i32,
+    pub armour_class : i32
+    
 }
 
-impl DerivedStatistics
+pub struct StatPool
 {
-    pub fn new(stats : &BaseStatistics)-> DerivedStatistics
+    current_value: i32,
+    max_value: i32,
+}
+
+impl StatPool
+{
+    pub fn new(max_value: i32) -> StatPool
     {
-        DerivedStatistics
+        StatPool
         {
-            armour_class: Attribute::new(10 + stats.dexterity.get_modifier()),
-            max_hitpoints: 30 + stats.toughness.get_modifier()  
+            max_value: max_value,
+            current_value: max_value
         }
+    }
+
+    pub fn restore(&mut self, value: i32)
+    {
+        self.current_value = std::cmp::min(self.max_value, self.current_value + value);
+    }
+
+    pub fn damage(&mut self, value: i32)
+    {
+        self.current_value = std::cmp::max(0, self.current_value - value);
     }
 }
 

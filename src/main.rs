@@ -228,7 +228,6 @@ impl GameState for State{
                             }
                             Err(_) => {}
                         }
-                        
                         self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
                     }
                 }

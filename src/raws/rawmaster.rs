@@ -1,9 +1,10 @@
 use std::{borrow::Borrow, clone, collections::HashMap, string};
 
+use bracket_lib::random::DiceType;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, AoE, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Position, RangedTargetting, RangedWeapon, Usable};
+use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -79,19 +80,56 @@ fn add_position_comp(entity_builder: EntityBuilder, x : i32, y: i32) -> EntityBu
     eb
 }
 
+fn parse_weapon_comp(weapon : super::Weapon) -> components::Weapon
+{
+    let slotname = weapon.statistic.as_str(); 
+    let mut dmg_die: DiceType = DiceType::new(0, 0, 0);
+    let dmg_die_query = bracket_lib::random::parse_dice_string(&weapon.damage_die);
+    match dmg_die_query
+    {
+        Ok(die) =>
+        {
+            dmg_die = die;
+        }
+        Err(e) =>
+        {
+            panic!("Error: could parse damage dice string correctly! {0}",e);
+        }
+    }
+    let mut stat = WeaponStat::Strength;
+    match slotname
+    {
+        "strength" => {stat = WeaponStat::Strength;}
+        "dexterity" => {stat = WeaponStat::Dexterity;}
+        _ => {panic!("error that wasn't a valid weapon statistic!");}
+    }
+
+    components::Weapon {uses_statistic: stat,damage_die:dmg_die.die_type,
+         to_hit_bonus: weapon.to_hit_bonus, dmg_bonus : dmg_die.bonus}
+}
+
 fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> EntityBuilder
 {
     let mut eb = new_entity;
+    let str = stats.strength.unwrap_or(10);
+    let dex = stats.dexterity.unwrap_or(10);
+    let toughness = stats.toughness.unwrap_or(10);
+    let intelligence = stats.intelligence.unwrap_or(10);
+    let mental = stats.mental.unwrap_or(10);
+    let ac = stats.natural_ac.unwrap_or(10);
 
-    eb.add(components::Statistics
-    {
-        max_hp: stats.max_hp,
-        hp: stats.hp,
-        strength: stats.power,
-        defence: stats.defence
+    eb.add(statistics::BaseStatistics {
 
+        strength : Attribute::new(str),
+        dexterity : Attribute::new(dex),
+        toughness : Attribute::new(toughness),
+        intelligence : Attribute::new(intelligence),
+        mental_fortitude : Attribute::new(mental),
     });
-    eb.add(CombatStats::new(stats.power, stats.defence));
+
+    eb.add(Pools{hitpoints: StatPool::new(stats.max_hp),
+        exp : 0, level : 1, armour_class: ac});
+
     eb
 }
 
@@ -120,6 +158,15 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
         let stats = &mob_template.stats;
 
         eb = RawMaster::add_monster_stats_comp(eb, stats);
+
+        let mut weps = Vec::new();
+        let naturals = &mob_template.naturals.clone().unwrap_or(Vec::new());
+        for wep in naturals
+        {
+            weps.push(Self::parse_weapon_comp(wep.clone()));
+        }
+
+        eb.add(Naturals{weapons : weps.clone()});
 
         if mob_template.blocks_tiles
         {
@@ -199,7 +246,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
             
         }
         if let Some(equipment) = &item_template.equippable
-                {
+        {
                     let slot: EquipmentSlot;
                     let slotname = equipment.slot.as_str();
                     match slotname
@@ -221,7 +268,12 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                             defence_bonus: equipment.defence,
                         });
 
-                }
+        }
+        
+        if let Some(weapon) = &item_template.weapon
+        {
+            eb.add(Self::parse_weapon_comp(weapon.clone()));
+        }
 
         return Some(Box::new(eb) );
     }

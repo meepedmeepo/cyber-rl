@@ -27,8 +27,17 @@ pub struct Item
     pub renderable : Option<Renderable>,
     pub consumable : Option<Consumable>,
     pub equippable: Option<EquipmentStats>,
+    pub weapon: Option <Weapon>,
     pub ranged: Option<i32>,
 }
+#[derive(Debug, Deserialize, Clone)]
+pub struct Weapon
+{
+    pub statistic : String,
+    pub damage_die : String,
+    pub to_hit_bonus : i32
+}
+
 #[derive(Deserialize, Debug)]
 pub struct EquipmentStats
 {
@@ -44,6 +53,7 @@ pub struct Mob
     pub stats : MobStats,
     pub vision_range: i32,
     pub blocks_tiles: bool,
+    pub naturals: Option<Vec<Weapon>>
 }
 
 #[derive(Deserialize, Debug)]
@@ -53,6 +63,12 @@ pub struct MobStats
     pub hp: i32,
     pub power: i32,
     pub defence: i32,
+    pub strength : Option<i32>,
+    pub dexterity : Option<i32>,
+    pub toughness : Option<i32>,
+    pub intelligence : Option<i32>,
+    pub mental : Option<i32>,
+    pub natural_ac : Option<i32>
 }
 
 #[derive(Deserialize, Debug)]

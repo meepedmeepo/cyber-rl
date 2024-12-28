@@ -1,6 +1,27 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+#[derive(Clone, Copy)]
+pub enum WeaponStat
+{
+    Strength,
+    Dexterity
+}
+
+pub struct Naturals
+{
+    pub weapons : Vec<Weapon>
+}
+
+#[derive(Clone, Copy)]
+pub struct Weapon
+{
+   pub uses_statistic : WeaponStat,
+
+   pub damage_die : i32,
+   pub to_hit_bonus : i32,
+   pub dmg_bonus: i32,
+}
 
 pub struct RangedWeapon
 {
@@ -39,7 +60,7 @@ impl Attribute
 
     pub fn get_modifier(&self) -> i32
     {
-        (self.total - 10) % 2
+        (self.total - 10) / 2
     }
 }
 

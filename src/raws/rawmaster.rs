@@ -4,7 +4,7 @@ use bracket_lib::random::DiceType;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles,  DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
+use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -179,10 +179,14 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
 
         eb.add(Name{name: mob_template.name.clone()});
 
+
+
         let mut equip_list : Vec<String> = Vec::new();
         if let Some(equipment) = &mob_template.equipment
         {
             equip_list = equipment.clone();
+
+            eb.add(EquipmentDirty{});
         }
 
         return (Some((Box::new(eb))), equip_list);

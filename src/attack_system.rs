@@ -36,7 +36,7 @@ impl AttackSystem
             let pools = query.1.clone();
             std::mem::drop(query);
 
-            let weapons = state.world.query::<(&Equipped, &Weapon)>()
+            let mut weapons = state.world.query::<(&Equipped, &Weapon)>()
                 .iter()
                 .filter(|(_ent,(equip, _wep))|
                  equip.owner == attacker && equip.slot == EquipmentSlot::MainHand)
@@ -45,6 +45,8 @@ impl AttackSystem
             if weapons.len() < 1
             {
                 //TODO: IMPLEMENT NATURAL WEPS FOR NPCS AND UNARMED FOR PLAYER
+                weapons.push(Weapon{uses_statistic: WeaponStat::Strength,damage_die : 4
+                    , dmg_bonus : 2, to_hit_bonus: 0});
             }
 
             let mut to_hit_bonus = 0;

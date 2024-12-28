@@ -2,7 +2,7 @@ use core::panic;
 use std::collections::HashSet;
 
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
-use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType};
+use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::{console, Rect};
@@ -27,7 +27,7 @@ pub fn spawn_healing_item(state : &mut State)
     state.world.spawn((Position::new(pos.x, pos.y),
     Name{name : "Healing Potion".to_string()},
     Renderable::new('¡', bracket_lib::color::RGB::from_f32(1., 0., 1.), bracket_lib::color::RGB::from_f32(0., 0., 0.), 2),
-    Item{}, Consumable{}, HealingEffect{healing_amount: 15}));
+    Item{}, Consumable{}, HealingEffect{healing_amount: 15}, Usable{}));
 
 }
 
@@ -39,7 +39,7 @@ pub fn spawn_damage_item(state : &mut State)
     state.world.spawn((Position::new(pos.x, pos.y),
     Name{name : "Magic Missile".to_string()},
     Renderable::new('%', bracket_lib::color::RGB::from_f32(0.5, 0., 0.5), bracket_lib::color::RGB::from_f32(0., 0., 0.), 2),
-    Item{}, Consumable{},RangedTargetting {range: 3}, DamageEffect{damage_amount: 10}));
+    Item{}, Consumable{},RangedTargetting {range: 3}, DamageEffect{damage_amount: 10}, Usable{}));
 
 }
 

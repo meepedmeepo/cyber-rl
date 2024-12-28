@@ -14,6 +14,9 @@ use projectile::ProjectileBuilder;
 use ranged_combat::ranged_aim;
 use ranged_combat::ranged_aim::TargettingState;
 use spawns::spawning_system::EntityType;
+use statistics::BaseStatistics;
+use statistics::Pools;
+use statistics::StatPool;
 use std::cmp::*;
 use maps::*;
 pub mod maps;
@@ -381,21 +384,13 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Statistics{max_hp: 80,hp: 80, strength :9, defence : 5},
-    CombatStats::new(9, 0)
+    , Pools{hitpoints: StatPool::new(50), exp: 0,level: 0, armour_class: 10}
+    , BaseStatistics{strength: Attribute::new(14), dexterity: Attribute::new(14)
+        ,toughness: Attribute::new(12), intelligence: Attribute::new(12)
+        , mental_fortitude: Attribute::new(10)}
 
     , Player{})));
 
-    state.world.spawn((Position::new(xy.x-2, xy.y), Renderable
-    {glyph : ']',fg: RGB::named(WHITE), bg: RGB::named(BLACK), order: 2}
-    , Name{name: "helmet cringe".to_string()},
-    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 2}
-    ));
-    state.world.spawn((Position::new(xy.x-2, xy.y+1), Renderable
-    {glyph : ']',fg: RGB::named(BLUE), bg: RGB::named(BLACK), order: 2}
-    , Name{name: "helmet cringest".to_string()},
-    Item{}, Equippable{slot: EquipmentSlot::Head,power_bonus: 0, defence_bonus: 8}
-    ));
     spawning_system::room_spawns(state);
 
     spawning_system::spawn_healing_item(state);

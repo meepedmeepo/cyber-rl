@@ -2,7 +2,7 @@ use std::iter;
 
 use bracket_lib::prelude::console;
 
-use crate::{ Equipped, InContainer, Item, Name, State, WantsToEquipItem};
+use crate::{ EquipmentDirty, Equipped, InContainer, Item, Name, State, WantsToEquipItem};
 
 
 pub fn run(state : &mut State)
@@ -55,6 +55,9 @@ pub fn run(state : &mut State)
         
         state.world.remove_one::<WantsToEquipItem>(info.0)
             .expect("Couldn't remove WantsToEquipItem component from entity!");
+
+        state.world.insert_one(info.0, EquipmentDirty{})
+            .expect("Couldn't insert EquipmentDirty onto entity!");
 
         state.game_log.add_log(format!("{} equipped {}!",info.2,info.3));
 

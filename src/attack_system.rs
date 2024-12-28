@@ -82,7 +82,7 @@ impl AttackSystem
             }else 
             {
                 let atk_roll = natural_roll + to_hit_bonus;
-                if atk_roll >= pools.armour_class
+                if atk_roll >= pools.armour_class.total
                 {
                     hit = true;
                 }

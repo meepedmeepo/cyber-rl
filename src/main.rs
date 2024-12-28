@@ -297,7 +297,7 @@ impl GameState for State{
 
                         //self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
                         
-                        self.projectile_builder.add_request(30., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
+                        self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
 
                         // let target_entities = self.map.get_mob_entities_at_position(self, end);
@@ -384,7 +384,7 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Pools{hitpoints: StatPool::new(50), exp: 0,level: 0, armour_class: 10}
+    , Pools{hitpoints: StatPool::new(50), exp: 0,level: 0, armour_class: Attribute::new(10)}
     , BaseStatistics{strength: Attribute::new(14), dexterity: Attribute::new(14)
         ,toughness: Attribute::new(12), intelligence: Attribute::new(12)
         , mental_fortitude: Attribute::new(10)}

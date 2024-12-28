@@ -1,39 +1,35 @@
-use crate::{ Equippable, Equipped, State};
+use crate::{ statistics::Pools, EquipmentDirty, Equippable, Equipped, State, Wearable};
 
 
 
 pub fn run(state :&mut State)
 {
-    // let mut stats_to_calc = Vec::new();
-    // for (_id,(stats,cstats)) 
-    //     in state.world.query::<(&Statistics,&CombatStats)>().iter()
-    //     .filter(|ent| ent.1.1.is_dirty())
-    // {
-    //     stats_to_calc.push((_id,*cstats));
-    // }
+    let mut ents_to_recalculate = Vec::new();
+    for (ent, _eq) in state.world.query_mut::<&EquipmentDirty>()
+    {
+        ents_to_recalculate.push(ent);
+    }
 
-    // for (ent, cstats) in stats_to_calc.iter_mut()
-    // {
-    //     cstats.defence.bonuses = 0;
-    //     cstats.power.bonuses = 0;
+    for ent in ents_to_recalculate.iter()
+    {
+        let mut ac_bonus = 0;
+        let armour = state.world.query::<(&Equipped,&Wearable)>()
+            .iter().filter(|(_id,(eq, wearable))| eq.owner == *ent)
+            .for_each(|(_id,(eq, wearable))|
+        {
+            ac_bonus+= wearable.ac_bonus;
+        });
+        {
+        let pool =state.world.query_one_mut::<&mut Pools>(*ent).expect("Couldn't find Pools for entity to recalculate
+            equipment ac bonus");
+        
+        pool.armour_class.bonuses = ac_bonus;
 
-    //     for (_id, (_equipped,equippable)) 
-    //         in state.world.query::<(&Equipped,&Equippable)>()
-    //         .iter().filter(|item|item.1.0.owner == *ent)
-    //     {
-    //         cstats.defence.bonuses += equippable.defence_bonus;
-    //         cstats.power.bonuses += equippable.power_bonus;
-    //     }
+        pool.armour_class.total = pool.armour_class.base + pool.armour_class.bonuses;
+        }
 
-    //     cstats.defence.total = cstats.defence.base + cstats.defence.bonuses;
-    //     cstats.power.total = cstats.power.base + cstats.power.bonuses;
-    //     cstats.defence.dirty = false;
-    //     cstats.power.dirty = false;
-    // }
+        state.world.remove_one::<EquipmentDirty>(*ent)
+            .expect("Couldn't remove EquipmentDirty from entity");
 
-    // for (ent, cstats) in stats_to_calc.iter()
-    // {
-    //     state.world.insert_one(*ent, *cstats)
-    //         .expect("Couldn't insert new CombatStats component");
-    // }
+    }
 }

@@ -128,7 +128,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
     });
 
     eb.add(Pools{hitpoints: StatPool::new(stats.max_hp),
-        exp : 0, level : 1, armour_class: ac});
+        exp : 0, level : 1, armour_class: Attribute::new(ac)});
 
     eb
 }
@@ -214,6 +214,11 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
         eb.add(Name{name: item_template.name.clone()});
 
         eb.add(components::Item{});
+
+        if let Some(wearable) = &item_template.wearable
+        {
+            eb.add(components::Wearable{ac_bonus: wearable.ac_bonus});
+        }
 
         if let Some(range) = &item_template.ranged
         {

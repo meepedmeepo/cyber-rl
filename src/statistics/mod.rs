@@ -19,7 +19,7 @@ pub struct Pools
     pub hitpoints: StatPool,
     pub exp: i32,
     pub level : i32,
-    pub armour_class : i32
+    pub armour_class : Attribute
     
 }
 #[derive(Clone, Copy)]

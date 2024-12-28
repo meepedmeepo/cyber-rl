@@ -1,13 +1,20 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+
+pub struct EquipmentDirty {}
+
 #[derive(Clone, Copy)]
 pub enum WeaponStat
 {
     Strength,
     Dexterity
 }
-
+#[derive(Clone, Copy)]
+pub struct Wearable
+{
+    pub ac_bonus : i32,
+}
 pub struct Naturals
 {
     pub weapons : Vec<Weapon>

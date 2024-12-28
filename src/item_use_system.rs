@@ -3,7 +3,8 @@ use bracket_lib::color::{BLACK, DARKGREEN, DARKRED, GREEN, GREEN3, RED, RGB, WHI
 use bracket_lib::prelude::Point;
 
 use crate::damage_system::DamageSystem;
-use crate::{AoE, DamageEffect, HealingEffect, Name, Position, State, Statistics, Usable, WantsToUseItem};
+use crate::statistics::{BaseStatistics, Pools};
+use crate::{AoE, DamageEffect, HealingEffect, Name, Position, State,  Usable, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType
@@ -23,7 +24,7 @@ pub fn run(state : &mut State)
     let mut targets: Vec<Vec<hecs::Entity>> = Vec::new();
 
     for (_id, (item_use_tag,_pos,stats,name)) in 
-    state.world.query_mut::<(&WantsToUseItem,&Position,&Statistics,&Name)>()
+    state.world.query_mut::<(&WantsToUseItem,&Position,&BaseStatistics,&Name)>()
     {
         entities_to_use_items.push((_id, item_use_tag.item, *stats, name.name.clone(),item_use_tag.target, false));
     }
@@ -110,10 +111,10 @@ pub fn run(state : &mut State)
             for target in targets[index].iter()
             {
                 let (stats, name, pos) = 
-                state.world.query_one_mut::<(&mut Statistics,&Name, &Position)>(*target)
+                state.world.query_one_mut::<(&mut Pools,&Name, &Position)>(*target)
                 .expect("Couldn't find stats for target to heal!");
                 
-                stats.hp = min(stats.hp + healing.healing_amount, stats.max_hp);
+                stats.hitpoints.restore(healing.healing_amount);
 
                 state.particle_builder.request(pos.x, pos.y,
                     RGB::named(WHITESMOKE), RGB::named(GREEN3),

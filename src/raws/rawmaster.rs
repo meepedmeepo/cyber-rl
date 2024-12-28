@@ -4,7 +4,7 @@ use bracket_lib::random::DiceType;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, CombatStats, DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
+use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles,  DamageEffect, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -264,8 +264,6 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                     eb.add(Equippable
                         {
                             slot: slot,
-                            power_bonus: equipment.power,
-                            defence_bonus: equipment.defence,
                         });
 
         }

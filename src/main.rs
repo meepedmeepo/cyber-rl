@@ -287,7 +287,12 @@ impl GameState for State{
                         //only handles the case that the missile targets one entity
                         //let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
                         path.push(end);
-                        let dmg = self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
+                        let dmg = 4;
+
+                        
+                        //TODO:!!!!!!!!!!!!!!
+
+                        //self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
                         
                         self.projectile_builder.add_request(30., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );

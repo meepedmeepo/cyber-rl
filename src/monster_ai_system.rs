@@ -1,6 +1,6 @@
 use bracket_lib::prelude::{console, DistanceAlg,Point};
 use hecs::Entity;
-use crate::{ Monster, Statistics, MAPWIDTH};
+use crate::{ statistics::BaseStatistics, Monster, MAPWIDTH};
 use super::{Map,State,FoV,Name,Position,AttackSystem};
 
 pub struct MonsterAI{}
@@ -8,9 +8,9 @@ impl MonsterAI
 {
     pub fn run(state : &mut State)
     {
-        let mut attacking_monsters : Vec<(Entity,i32)> = Vec::new();
+        let mut attacking_monsters : Vec<(Entity)> = Vec::new();
         for (_id,(fov,name,position,_monster,stats)) 
-        in state.world.query_mut::<(&mut FoV,&Name,&mut Position,&Monster,&Statistics)>()  
+        in state.world.query_mut::<(&mut FoV,&Name,&mut Position,&Monster,&BaseStatistics)>()  
         {
             if fov.visible_tiles.contains(&state.player_pos)
             {
@@ -19,9 +19,9 @@ impl MonsterAI
                 {
                     //console::log(&format!("{} shouts curses!",name.name));
                     //AttackSystem::add_attack(_id, , state);
-                    console::log(format!("{} swings at you wildly!",name.name));
+                    //console::log(format!("{} swings at you wildly!",name.name));
                     state.game_log.add_log(format!("{} swings at you wildly!",name.name));
-                    attacking_monsters.push((_id,stats.strength));
+                    attacking_monsters.push(_id);
                 }
 
                 let path = bracket_lib::pathfinding::a_star_search
@@ -40,7 +40,7 @@ impl MonsterAI
             }
         }
            
-        for (attacker,_dmg) in attacking_monsters.iter()
+        for attacker in attacking_monsters.iter()
         {
             match state.player_ent
             {

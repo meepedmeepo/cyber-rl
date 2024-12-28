@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, CombatStats, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem};
+use crate::{attack_system, go_down_stairs, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem};
 
-use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position,Statistics};
+use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
 
 
@@ -44,10 +44,10 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 }
                 else
                 {
-                    let dmg = 
-                        state.world.query_one_mut::<&CombatStats>(state.player_ent
-                        .expect("Couldn't get player ent for damage for ranged combat"))
-                        .expect("Couldn't get the Combat stats for player for ranged combat").power.total;
+                    let dmg = 4;
+                        // state.world.query_one_mut::<&CombatStats>(state.player_ent
+                        // .expect("Couldn't get player ent for damage for ranged combat"))
+                        // .expect("Couldn't get the Combat stats for player for ranged combat").power.total;
 
                     let range = state.world.query_one_mut::<&RangedWeapon>(query[0])
                             .expect("Couldn't get range of players ranged weapon for range combat").range;
@@ -149,7 +149,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
                 //     target = entity;
                 //     console::log(&format!("I will stab thee now, {}!",name.name));
                 // }
-                let query = state.world.query_one_mut::<(&Statistics,
+                let query = state.world.query_one_mut::<(&Pools,
                 &Name)>(*potential_target);
                 match query
                 {

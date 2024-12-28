@@ -1,6 +1,6 @@
-use crate::ProgramState;
+use crate::{statistics::Pools, ProgramState};
 
-use super::{State,Name,Statistics,Player};
+use super::{State,Name, Player};
 use bracket_lib::terminal::console;
 use hecs::Entity;
 pub struct ClearDeadSystem
@@ -14,9 +14,9 @@ impl ClearDeadSystem
     {
         let mut entities_to_despawn : Vec<Entity> = Vec::new();
         for (_id,(stats,name,player))
-         in state.world.query_mut::<(&Statistics,&Name,Option<&Player>)>()
+         in state.world.query_mut::<(&Pools,&Name,Option<&Player>)>()
          {
-            if stats.hp <= 0
+            if stats.hitpoints.current_value <= 0
             {
                 match player
                 {

@@ -2,7 +2,8 @@
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
-use crate::{State, Statistics};
+use crate::statistics::Pools;
+use crate::State;
 
 
 pub const MAPWIDTH : i32 = 80;
@@ -130,7 +131,7 @@ impl Map
         let mut mobs = Vec::new();
         for ent in self.tile_contents[Map::xy_id(position.x, position.y)].iter()
         {
-            if state.world.get::<&Statistics>(*ent).is_ok()
+            if state.world.get::<&Pools>(*ent).is_ok()
             {
                mobs.push(*ent);
             }

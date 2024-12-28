@@ -4,7 +4,7 @@ pub enum StatisticEffect
 {
     Strength, Dexterity, Toughness, Intelligence, MentalFortitude, ArmourClass,
 }
-
+#[derive(Clone, Copy)]
 pub struct BaseStatistics
 {
     pub strength : Attribute,
@@ -13,7 +13,7 @@ pub struct BaseStatistics
     pub intelligence : Attribute,
     pub mental_fortitude : Attribute,
 }
-
+#[derive(Clone, Copy)]
 pub struct Pools
 {
     pub hitpoints: StatPool,
@@ -22,11 +22,11 @@ pub struct Pools
     pub armour_class : i32
     
 }
-
+#[derive(Clone, Copy)]
 pub struct StatPool
 {
-    current_value: i32,
-    max_value: i32,
+    pub current_value: i32,
+    pub max_value: i32,
 }
 
 impl StatPool

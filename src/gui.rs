@@ -3,11 +3,12 @@ use bracket_lib::terminal::*;
 use bracket_lib::color;
 use crate::gamelog;
 use crate::menus::inventory_state;
+use crate::statistics::Pools;
 use crate::AoE;
 use crate::FoV;
 use crate::InContainer;
 use crate::Renderable;
-use crate::{Player, Statistics,Name,Item};
+use crate::{Player, Name,Item};
 use super::State;
 use std::cmp::{max,min};
 
@@ -18,11 +19,11 @@ pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
     let fps = format!("FPS: {}",ctx.fps);
     ctx.print_color(2, 44, color::YELLOW, color::BLACK, &fps);
     for (_id,(_player,stats)) in
-     state.world.query_mut::<(&Player,&Statistics)>()
+     state.world.query_mut::<(&Player,&Pools)>()
     {
-        let health = format!("HP: {} / {} ",stats.hp,stats.max_hp);
+        let health = format!("HP: {} / {} ",stats.hitpoints.current_value,stats.hitpoints.max_value);
         ctx.print_color(16, 44, color::WHITE, color::BLACK, &health);
-        ctx.draw_bar_horizontal(28, 44, 45, stats.hp, stats.max_hp,
+        ctx.draw_bar_horizontal(28, 44, 45, stats.hitpoints.current_value, stats.hitpoints.max_value,
              color::RED, color::BLACK);
         
     }

@@ -64,35 +64,7 @@ impl Attribute
     }
 }
 
-#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
-pub struct CombatStats
-{
-    pub power : Attribute,
-    pub defence : Attribute
-}
-impl CombatStats
-{
-    pub fn is_dirty(&self)-> bool
-    {
-        if self.power.dirty || self.defence.dirty
-        {
-            return true;
-        }
-        else 
-        {
-            false
-        }
-    }
 
-    pub fn new(power : i32, defence : i32) -> CombatStats
-    {
-        CombatStats
-        {
-            power : Attribute::new(power),
-            defence : Attribute::new(defence),
-        }
-    }
-}
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 #[allow(dead_code)]
 pub enum EquipmentSlot
@@ -118,8 +90,6 @@ pub struct Equipped
 pub struct Equippable
 {
     pub slot : EquipmentSlot,
-    pub power_bonus : i32,
-    pub defence_bonus : i32,
 }
 
 
@@ -157,16 +127,7 @@ impl Renderable
         }
     }
 }
-#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
-pub struct PowerBonus
-{
-    bonus : i32
-}
-#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
-pub struct DefenceBonus
-{
-    bonus : i32
-}
+
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct AoE
 {
@@ -223,14 +184,7 @@ pub struct TakeDamage
 {
     pub damage_to_take : Vec<i32>,
 }
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Statistics
-{
-    pub max_hp : i32,
-    pub hp : i32,
-    pub strength: i32,
-    pub defence : i32,
-}
+
 
 pub struct FoV
 {

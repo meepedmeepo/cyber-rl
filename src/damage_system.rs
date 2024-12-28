@@ -1,8 +1,8 @@
 use hecs::Entity;
 use bracket_lib::{color::{RED, RGB, WHITE}, terminal::console};
-use crate::{CombatStats, Position};
+use crate::{statistics::Pools, Position};
 
-use super::{State,TakeDamage,Statistics,Name};
+use super::{State,TakeDamage,Name};
 
 
 
@@ -35,17 +35,17 @@ impl DamageSystem
    pub fn run(state : &mut State)
     {
         let mut dmg_comps_to_remove : Vec<(Entity, Position)> = Vec::new();
-        for  (id,(dmg_to_take,stats,name,cstats, pos))
-         in state.world.query_mut::<(&TakeDamage,&mut Statistics, &Name, &CombatStats, &Position)>()
+        for  (id,(dmg_to_take,stats,name, pos))
+         in state.world.query_mut::<(&TakeDamage,&mut Pools, &Name, &Position)>()
         {
             //console::log("aaaaaaaaaaaaaaa");
             dmg_comps_to_remove.push((id, *pos));
             for dmg in dmg_to_take.damage_to_take.iter()
             {
-                let adjusted_dmg = std::cmp::max(1,dmg-cstats.defence.total);
-                stats.hp -= adjusted_dmg;
-                state.game_log.add_log(format!("{} took {} damage!",name.name,adjusted_dmg));
-                console::log(format!("{} took {} damage!",name.name,adjusted_dmg));
+                //let adjusted_dmg = std::cmp::max(1,*dmg);
+                stats.hitpoints.damage(*dmg);
+                state.game_log.add_log(format!("{} took {} damage!",name.name, *dmg));
+                console::log(format!("{} took {} damage!",name.name, *dmg));
             }
         }
 

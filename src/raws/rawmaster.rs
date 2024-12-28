@@ -134,7 +134,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
 }
 
 pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilder,key : &str, pos : SpawnType)
--> Option<Box<EntityBuilder>>
+-> (Option<Box<EntityBuilder>>, Vec<String>)
 {
     if raws.mob_index.contains_key(key)
     {
@@ -179,11 +179,17 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
 
         eb.add(Name{name: mob_template.name.clone()});
 
-        return Some(Box::new(eb));
+        let mut equip_list : Vec<String> = Vec::new();
+        if let Some(equipment) = &mob_template.equipment
+        {
+            equip_list = equipment.clone();
+        }
+
+        return (Some((Box::new(eb))), equip_list);
     }
 
 
-    None
+    (None, Vec::new())
 }
 
 pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilder, key : &str, pos : SpawnType)

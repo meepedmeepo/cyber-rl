@@ -131,15 +131,18 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
 
         EntityType::Mob =>
         {
-            let  mob_res = 
+            let  (mob_res,equip_list) = 
                 RawMaster::spawn_named_mob(&RAWS.lock().unwrap(), hecs::EntityBuilder::new(),
             &spawn.1, SpawnType::AtPosition{ x, y});
             match mob_res
             {
                 Some(mut mob) => 
                 {
-                    state.world.spawn(mob.build());
-
+                    let mob_ent = state.world.spawn(mob.build());
+                    for eq in equip_list.iter()
+                    {
+                        spawn_item_equipped(state, eq, mob_ent);
+                    }
                     let idx = Map::xy_id(x, y);
                     state.map.blocked[idx] = true;
                 }

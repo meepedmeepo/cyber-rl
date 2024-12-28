@@ -58,7 +58,8 @@ pub struct Mob
     pub stats : MobStats,
     pub vision_range: i32,
     pub blocks_tiles: bool,
-    pub naturals: Option<Vec<Weapon>>
+    pub naturals: Option<Vec<Weapon>>,
+    pub equipment: Option<Vec<String>>
 }
 
 #[derive(Deserialize, Debug)]

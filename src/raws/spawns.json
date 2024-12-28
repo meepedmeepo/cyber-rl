@@ -232,7 +232,7 @@
         "naturals" : [
             {
                 "statistic" : "dexterity",
-                "damage_die" : "1d6",
+                "damage_die" : "1d4",
                 "to_hit_bonus" : 2
             }
             
@@ -257,7 +257,12 @@
             "hp": 15,
             "power": 3,
             "defence": 5
-        }
+        },
+        "equipment" : [
+            "Leather Breastplate",
+            "Rusty Sword",
+            "Wooden Shield"
+        ]
     }
     ],
 

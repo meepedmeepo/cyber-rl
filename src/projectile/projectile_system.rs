@@ -99,7 +99,7 @@ pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
             let stats = *query.1;
 
             let mut roll = state.rng.roll_dice(1, 20);
-            roll += stats.dexterity.total;
+            roll += stats.dexterity.get_modifier();
 
             if roll < 15
             {

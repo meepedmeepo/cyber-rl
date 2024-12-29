@@ -3,7 +3,7 @@ use queues::Queue;
 
 pub mod projectile_system;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ProjectileType
 {
     Beam,

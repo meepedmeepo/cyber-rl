@@ -1,7 +1,7 @@
-use bracket_lib::prelude::{BTerm, Point};
+use bracket_lib::prelude::{console, BTerm, Point};
 use queues::{queue, Queue, IsQueue};
 
-use crate::{damage_system::DamageSystem, Position, Renderable, State};
+use crate::{damage_system::DamageSystem, statistics::BaseStatistics, Position, Renderable, State, Name};
 
 use super::{Projectile, ProjectileType};
 
@@ -84,18 +84,42 @@ pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
             ProjectileType::Beam => {}
             ProjectileType::Missile =>
             {
-                if hits.len() > 0
-                {
-                    projectiles_to_despawn.push(*ent);
-                }
+                
 
             }
             _ => {}
         }
-
         for target in hits.iter()
         {
-            DamageSystem::mark_for_damage(state, *target, *dmg);
+            let query= 
+                state.world.query_one_mut::<(&Name, &BaseStatistics)>(*target)
+                .expect("Couldn't get name or stats of entity attempting to dodge missile!");
+
+            let name = query.0.clone();
+            let stats = *query.1;
+
+            let mut roll = state.rng.roll_dice(1, 20);
+            roll += stats.dexterity.total;
+
+            if roll < 15
+            {
+                DamageSystem::mark_for_damage(state, *target, *dmg);
+                
+                let msg = format!("{} was hit by missile",name.name.clone());
+                console::log(msg.clone());
+                state.game_log.add_log(msg);
+
+                if *proj_type == ProjectileType::Missile
+                {
+                    projectiles_to_despawn.push(*ent);
+                }
+            }
+            else
+            {
+                let msg = format!("{} dodged missile!", name.name.clone());
+                console::log(msg.clone());
+                state.game_log.add_log(msg);
+            }
         }
 
     }

@@ -417,12 +417,12 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     projectile_system::update_projectiles(state, ctx);
 
     let mut entities_to_render  = 
-    state.world.query_mut::<(&Position,&Renderable)>()
-    .into_iter()
-    .map(|ent|{(ent.1.0,ent.1.1)})
-    .collect::<Vec<_>>();
+        state.world.query_mut::<(&Position,&Renderable)>()
+        .into_iter()
+        .map(|ent|{(ent.1.0,ent.1.1)})
+        .collect::<Vec<_>>();
 
-    //todo test if this puts the lower order first like it should do
+    
     entities_to_render.sort_by_key(|a| a.1.order);
 
     for ent in entities_to_render

@@ -418,7 +418,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     //and then reverse orders them by the order member of the renderable struct
 
     //runs spawns particles from builder requests and cleans up dead particles before rendering
-    //entities
+    //entities/
     particle_system::spawn_system(state);
     particle_system::update(state, ctx);
     projectile_system::spawn_projectiles(state);

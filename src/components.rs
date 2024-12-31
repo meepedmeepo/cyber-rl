@@ -28,6 +28,7 @@ pub struct Weapon
    pub damage_die : i32,
    pub to_hit_bonus : i32,
    pub dmg_bonus: i32,
+   pub num_dmg_dice : i32
 }
 
 pub struct RangedWeapon

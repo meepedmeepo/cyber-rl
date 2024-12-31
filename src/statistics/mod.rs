@@ -5,11 +5,13 @@ mod leveling;
 mod skills;
 pub use leveling::*;
 pub use skills::*;
-pub enum StatisticEffect
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StatType
 {
-    Strength, Dexterity, Toughness, Intelligence, MentalFortitude, ArmourClass,
+    Strength, Dexterity, Toughness, Intelligence, MentalFortitude,
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BaseStatistics
 {
     pub strength : Attribute,
@@ -17,6 +19,20 @@ pub struct BaseStatistics
     pub toughness : Attribute,
     pub intelligence : Attribute,
     pub mental_fortitude : Attribute,
+}
+impl BaseStatistics
+{
+    pub fn get_stat(self, stat: StatType) -> Attribute
+    {
+        match stat
+        {
+            StatType::Strength => {return self.strength;}
+            StatType::Dexterity => {return self.dexterity;}
+            StatType::Intelligence => {return self.intelligence;}
+            StatType::Toughness => {return self.toughness;}
+            StatType::MentalFortitude => {return self.mental_fortitude;}
+        }
+    }
 }
 #[derive(Clone, Copy)]
 pub struct Pools

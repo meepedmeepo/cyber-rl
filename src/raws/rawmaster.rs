@@ -105,7 +105,7 @@ fn parse_weapon_comp(weapon : super::Weapon) -> components::Weapon
     }
 
     components::Weapon {uses_statistic: stat,damage_die:dmg_die.die_type,
-         to_hit_bonus: weapon.to_hit_bonus, dmg_bonus : dmg_die.bonus}
+         to_hit_bonus: weapon.to_hit_bonus, dmg_bonus : dmg_die.bonus, num_dmg_dice: dmg_die.n_dice}
 }
 
 fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> EntityBuilder

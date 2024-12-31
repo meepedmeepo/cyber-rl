@@ -56,9 +56,7 @@
             },
             "ranged": 6,
             "equippable" : {
-                "slot" : "ranged",
-                "power" : 2,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-                "defence": 0
+                "slot" : "ranged"
             }
         },
         {
@@ -70,9 +68,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "mainhand",
-                "power": 2,
-                "defence" : 0
+                "slot" : "mainhand"
             },
             "weapon" :{
                 "statistic": "strength",
@@ -90,9 +86,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "body",
-                "power": 0,
-                "defence" : 2
+                "slot" : "body"
             },
             "wearable" : {
                 "ac_bonus" : 1
@@ -107,9 +101,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "legs",
-                "power": 0,
-                "defence" : 2
+                "slot" : "legs"
             },
             "wearable" : {
                 "ac_bonus" : 1
@@ -124,9 +116,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "boots",
-                "power": 0,
-                "defence" : 1
+                "slot" : "boots"
             },
             "wearable" : {
                 "ac_bonus" : 1
@@ -141,9 +131,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "hands",
-                "power": 0,
-                "defence" : 1
+                "slot" : "hands"
             },
             "wearable" : {
                 "ac_bonus" : 1
@@ -158,9 +146,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "offhand",
-                "power": 0,
-                "defence" : 2
+                "slot" : "offhand"
             },
             "wearable" : {
                 "ac_bonus" : 1
@@ -175,9 +161,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "mainhand",
-                "power": 5,
-                "defence" : 2
+                "slot" : "mainhand"
             },
             "weapon" :{
                 "statistic": "strength",
@@ -195,9 +179,7 @@
                 "order" : 2
             },
             "equippable" : {
-                "slot" : "mainhand",
-                "power": 5,
-                "defence" : 2
+                "slot" : "mainhand"
             },
             "weapon" :{
                 "statistic": "dexterity",
@@ -224,9 +206,7 @@
 
         "stats" : {
             "max_hp": 30,
-            "hp": 30,
-            "power": 5,
-            "defence": 5
+            "hp": 30
         }
     },
     {
@@ -245,8 +225,6 @@
         "stats" : {
             "max_hp": 20,
             "hp": 20,
-            "power": 2,
-            "defence": 5,
             "dexterity" : 16
         },
         "naturals" : [
@@ -274,9 +252,7 @@
 
         "stats" : {
             "max_hp": 15,
-            "hp": 15,
-            "power": 3,
-            "defence": 5
+            "hp": 15
         },
         "equipment" : [
             "Leather Breastplate",
@@ -300,8 +276,6 @@
         "stats" : {
             "max_hp": 15,
             "hp": 15,
-            "power": 3,
-            "defence": 5,
             "dexterity" : 16,
             "strength" : 14
         },
@@ -328,8 +302,6 @@
         "stats" : {
             "max_hp": 50,
             "hp": 50,
-            "power": 2,
-            "defence": 5,
             "dexterity" : 4,
             "strength": 14,
             "intelligence" : 1,
@@ -351,13 +323,13 @@
 
     "spawn_table" : [
 
-        { "name" : "Kobold", "weight" : 25, "min_depth" : 0, "max_depth" : 3 },
+        { "name" : "Kobold", "weight" : 20, "min_depth" : 0, "max_depth" : 3 },
         { "name" : "Orc", "weight" : 5, "min_depth" : 1, "max_depth" : 100, "add_map_depth_to_weight" : true},
         { "name" : "Goblin", "weight" : 15, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Health Potion", "weight" : 8, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+        { "name" : "Health Potion", "weight" : 10, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
         { "name" : "Magic Missile Scroll", "weight" : 6, "min_depth" : 0, "max_depth" : 100 },
-        { "name" : "Fireball Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true},
-        { "name" : "Rusty Sword", "weight" : 4, "min_depth" : 0, "max_depth" : 5 },
+        { "name" : "Fireball Scroll", "weight" : 8, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true},
+        { "name" : "Rusty Sword", "weight" : 3, "min_depth" : 0, "max_depth" : 5 },
         { "name" : "Leather Breastplate", "weight" : 2, "min_depth" : 1, "max_depth" : 15 },
         { "name" : "Leather Leggings", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
         { "name" : "Leather Gauntlets", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },

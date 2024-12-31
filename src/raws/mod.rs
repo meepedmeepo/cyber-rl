@@ -47,8 +47,7 @@ pub struct Wearable
 pub struct EquipmentStats
 {
     pub slot: String,
-    pub power: i32,
-    pub defence: i32
+
 }
 #[derive(Deserialize, Debug)]
 pub struct Mob
@@ -67,8 +66,6 @@ pub struct MobStats
 {
     pub max_hp : i32,
     pub hp: i32,
-    pub power: i32,
-    pub defence: i32,
     pub strength : Option<i32>,
     pub dexterity : Option<i32>,
     pub toughness : Option<i32>,

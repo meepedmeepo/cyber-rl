@@ -432,7 +432,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 fn main() ->BError 
 {
     //println!("Hello, world!");
-    let mut context = BTermBuilder::simple(110,80)?
+    let mut context = BTermBuilder::vga(110,45)
     .with_title("Rust-like")
     .with_fps_cap(60.)
     .build()?;

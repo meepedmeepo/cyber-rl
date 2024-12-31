@@ -6,8 +6,8 @@ use crate::statistics::Pools;
 use crate::State;
 
 
-pub const MAPWIDTH : i32 = 80;
-pub const MAPHEIGHT : i32 = 42;
+pub const MAPWIDTH : i32 = 78;
+pub const MAPHEIGHT : i32 = 32;
 pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
 //use crate::rect;
 

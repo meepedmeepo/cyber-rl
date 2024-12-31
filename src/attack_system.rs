@@ -73,7 +73,7 @@ impl AttackSystem
                 if !found_wep
                 {
                     weapons.push(Weapon{uses_statistic: WeaponStat::Strength,damage_die : 4
-                        , dmg_bonus : 2, to_hit_bonus: 0});
+                        , dmg_bonus : 2, to_hit_bonus: 0, num_dmg_dice: 1});
                 }
             }
 
@@ -84,7 +84,7 @@ impl AttackSystem
             to_hit_bonus += weapons[0].to_hit_bonus;
             dmg_bonus += weapons[0].dmg_bonus;
             dmg_die += weapons[0].damage_die;
-
+            let n_dice = weapons[0].num_dmg_dice;
             match weapons[0].uses_statistic
             {
                 WeaponStat::Strength => 
@@ -118,13 +118,9 @@ impl AttackSystem
 
             if hit
             {
-                //TODO: allow for multiple damage dice to be rolled at a time by adding it to the weapon struct 
-                let dmg = state.rng.roll_dice(1, dmg_die) + dmg_bonus;
+                let dmg = state.rng.roll_dice(n_dice, dmg_die) + dmg_bonus;
                 DamageSystem::mark_for_damage(state, target, dmg);
             }
-
-            
-            //DamageSystem::mark_for_damage(state, target, dmg);
         }
 
 

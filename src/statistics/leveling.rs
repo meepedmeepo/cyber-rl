@@ -4,7 +4,7 @@ use crate::State;
 
 use super::{BaseStatistics, Pools};
 
-const LEVEL_SCALING_FACTOR: f32 = 0.3;
+const LEVEL_SCALING_FACTOR: f32 = 0.087;
 
 
 pub fn level_up(stats: &BaseStatistics, pools : &mut Pools

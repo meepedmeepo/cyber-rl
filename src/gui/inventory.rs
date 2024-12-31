@@ -15,17 +15,19 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
     {
         items.push(name.clone());
     }
-
-
-    let height = min(38,max(15,items.len()*3));
-    ctx.draw_box(22, 10, 35, height, bracket_lib::color::WHITE, bracket_lib::color::BLACK);
+   
+    let height = max(5, items.len()*3 + 1);
+    
+    
+    //let height = min(38,max(15,items.len()*3));
+    ctx.draw_box_double(22, 10, 35, height, bracket_lib::color::WHITE, bracket_lib::color::BLACK);
     ctx.print_centered_at(35, 11, "Inventory");
     let mut y = 13;
     let mut index : u8 = 97;
     for item in items.iter()
     {
         ctx.print_color(23, y,color::WHITE,color::BLACK, format!("{}.) {}",index as char,item.name.clone()));
-        y+=2;
+        y+=1;
         index += 1;
     }
 }

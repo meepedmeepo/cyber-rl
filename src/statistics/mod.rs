@@ -1,5 +1,8 @@
-use super::Attribute;
+use bracket_lib::random::DiceType;
 
+use super::Attribute;
+mod leveling;
+pub use leveling::*;
 pub enum StatisticEffect
 {
     Strength, Dexterity, Toughness, Intelligence, MentalFortitude, ArmourClass,
@@ -19,7 +22,8 @@ pub struct Pools
     pub hitpoints: StatPool,
     pub exp: i32,
     pub level : i32,
-    pub armour_class : Attribute
+    pub armour_class : Attribute,
+    pub hit_die : DiceType
     
 }
 #[derive(Clone, Copy)]

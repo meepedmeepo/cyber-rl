@@ -117,7 +117,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
     let intelligence = stats.intelligence.unwrap_or(10);
     let mental = stats.mental.unwrap_or(10);
     let ac = stats.natural_ac.unwrap_or(10);
-
+    let level = stats.level.unwrap_or(1);
     eb.add(statistics::BaseStatistics {
 
         strength : Attribute::new(str),
@@ -128,7 +128,7 @@ fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> Entity
     });
 
     eb.add(Pools{hitpoints: StatPool::new(stats.max_hp),
-        exp : 0, level : 1, armour_class: Attribute::new(ac)});
+        exp : 0, level : level, armour_class: Attribute::new(ac), hit_die: DiceType::new(1, 6, 0)});
 
     eb
 }

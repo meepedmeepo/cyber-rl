@@ -30,7 +30,6 @@ mod map_indexing_system;
 mod attack_system;
 mod damage_system;
 mod clear_dead_system;
-mod gui;
 mod player;
 mod item_pickup_system;
 use player::*;
@@ -48,6 +47,8 @@ use spawns::spawning_system;
 mod ranged_combat;
 mod projectile;
 mod statistics;
+mod gui;
+
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -187,9 +188,11 @@ impl GameState for State{
                 item_pickup_system::run(self);
                 item_use_system::run(self);
                 MapIndexingSystem::run(self);
+                ClearDeadSystem::run(self);
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
                 //gui::draw_inventory(self, ctx);
             }
@@ -238,6 +241,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
                 gui::draw_inventory(self, ctx);
             }
@@ -248,6 +252,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
                 let (inv_state,point) = gui::ranged_target(self, ctx, range, aoe);
                 match inv_state
@@ -276,6 +281,7 @@ impl GameState for State{
                 draw_map(ctx, &self.map);
                 render_system(self, ctx);
                 gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
 
                 let target_state = ranged_aim::aim_projectile(self, ctx, self.player_pos, range);
@@ -363,6 +369,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     draw_map(ctx, &state.map);
     render_system(state, ctx);
     gui::draw_ui(state, ctx);
+    gui::draw_status_box(state, ctx);
     gui::draw_gamelog(state, ctx);
     //state.current_state = ProgramState::Paused;
 }
@@ -384,7 +391,8 @@ fn game_init ( state: &mut State)
     3)
     ,FoV::new(8)
     ,Name{name: "Player".to_string(),}
-    , Pools{hitpoints: StatPool::new(50), exp: 0,level: 0, armour_class: Attribute::new(10)}
+    , Pools{hitpoints: StatPool::new(50), exp: statistics::calculate_xp_from_level(1),level: 1, armour_class: Attribute::new(10)
+        , hit_die: DiceType::new(1, 10, 1)}
     , BaseStatistics{strength: Attribute::new(14), dexterity: Attribute::new(14)
         ,toughness: Attribute::new(12), intelligence: Attribute::new(12)
         , mental_fortitude: Attribute::new(10)}
@@ -398,8 +406,8 @@ fn game_init ( state: &mut State)
     let mut i = 1;
     let pos2 = state.map.rooms[0].center();
 
-    spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
-    spawning_system::spawn_entity(state, &(&1, &"Wooden Bow".to_string()), xy.x-1, xy.y,EntityType::Item);
+    //spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
+    //spawning_system::spawn_entity(state, &(&1, &"Wooden Bow".to_string()), xy.x-1, xy.y,EntityType::Item);
 
 // }
 }
@@ -439,7 +447,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 fn main() ->BError 
 {
     //println!("Hello, world!");
-    let mut context = BTermBuilder::simple(110,50)?
+    let mut context = BTermBuilder::simple(110,80)?
     .with_title("Rust-like")
     .with_fps_cap(60.)
     .build()?;

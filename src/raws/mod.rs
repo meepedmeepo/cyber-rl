@@ -74,7 +74,8 @@ pub struct MobStats
     pub toughness : Option<i32>,
     pub intelligence : Option<i32>,
     pub mental : Option<i32>,
-    pub natural_ac : Option<i32>
+    pub natural_ac : Option<i32>,
+    pub level : Option<i32>,
 }
 
 #[derive(Deserialize, Debug)]

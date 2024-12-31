@@ -10,8 +10,8 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
 
     for (_id,(_item, _in_container,name)) in 
         state.world.query::<(&Item, &InContainer,&Name)>()
-        .iter().filter(|ent| ent.1.1.owner == state.player_ent
-        .expect("Couldn't find player entity to query inventory"))
+            .iter().filter(|ent| ent.1.1.owner == state.player_ent
+            .expect("Couldn't find player entity to query inventory"))
     {
         items.push(name.clone());
     }

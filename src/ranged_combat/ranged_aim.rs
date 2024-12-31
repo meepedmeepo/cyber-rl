@@ -1,6 +1,6 @@
 use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
 
-use crate::{FoV, Map, Position, State};
+use crate::{gui::{self, TargettingMode}, FoV, Map, Position, State};
 
 pub enum TargettingState
 {
@@ -31,8 +31,8 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
     let pos = state.player_pos;
     
     targetting_viewshed(&mut available_cells, state, range, pos, true, ctx);
-
-    let (m_x,m_y) = ctx.mouse_pos();
+  
+    let (m_x,m_y) = gui::select_target_mode(state, ctx).to_tuple();
 
     //let idx = Map::xy_id(m_x, m_y);
     //let mut is_valid_target = false;
@@ -55,6 +55,18 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
             let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
             return TargettingState::Selected { path:targets, end: point };
         }
+        match ctx.key
+        {
+            Some(key) => 
+            {
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End || key == VirtualKeyCode::F
+                {
+                    let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
+                    return TargettingState::Selected { path:targets, end: point };
+                }
+            }
+            None => {}
+        }
     }
     else
     {
@@ -65,6 +77,18 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
         {
             return TargettingState::Cancel;
         }
+        match ctx.key
+        {
+            Some(key) => 
+            {
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End || key == VirtualKeyCode::F
+                {
+                    return TargettingState::Cancel; 
+                }
+            }
+            None => {}
+        }
+        
     }
 
     return TargettingState::None;

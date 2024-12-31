@@ -16,10 +16,10 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
         None => {return ProgramState::AwaitingInput;},
         Some(key) => match key
         {
-            VirtualKeyCode::Left =>try_move(state, -1, 0),
-            VirtualKeyCode::Right => try_move(state,1,0),
-            VirtualKeyCode::Up => try_move(state,0,-1),
-            VirtualKeyCode::Down => try_move(state,0,1),
+            VirtualKeyCode::Numpad4 =>try_move(state, -1, 0),
+            VirtualKeyCode::Numpad6 => try_move(state,1,0),
+            VirtualKeyCode::Numpad8 => try_move(state,0,-1),
+            VirtualKeyCode::Numpad2 => try_move(state,0,1),
             VirtualKeyCode::A=>try_move(state, -1, 0),
             VirtualKeyCode::D => try_move(state,1,0),
             VirtualKeyCode::W => try_move(state,0,-1),

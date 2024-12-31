@@ -4,6 +4,7 @@ use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use gamelog::GameLog;
+use gui::TargettingMode;
 use hecs::*;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
@@ -64,7 +65,8 @@ pub struct State
     player_ent :Option<Entity>,
     game_log : GameLog,
     particle_builder : ParticleBuilder,
-    projectile_builder : ProjectileBuilder
+    projectile_builder : ProjectileBuilder,
+    target_mode : TargettingMode,
 }
 
 
@@ -79,7 +81,8 @@ pub enum ProgramState
     GameOver,
     Inventory,
     Targeting { range: i32, item : Entity, aoe: Option<i32> },
-    RangedCombat {range: i32, dmg: i32}
+    RangedCombat {range: i32, dmg: i32},
+    KeyboardTargetting {cursor_pos : Point}
 }
 
 
@@ -275,6 +278,11 @@ impl GameState for State{
                 }
             }
 
+            ProgramState::KeyboardTargetting { cursor_pos } =>
+            {
+
+            }
+
             ProgramState::RangedCombat { range , dmg } =>
             {
                 ctx.cls();
@@ -351,6 +359,12 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     ClearDeadSystem::run(state);
 
     map_indexing_system::MapIndexingSystem::run(state);
+
+    if(state.current_state == ProgramState::PlayerTurn)
+    {
+        state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
+    }
+
     draw_map(ctx, &state.map);
     render_system(state, ctx);
     gui::draw_ui(state, ctx);
@@ -451,7 +465,8 @@ fn main() ->BError
         player_ent: None,
         game_log : GameLog::new(),
         particle_builder : ParticleBuilder::new(),
-        projectile_builder : ProjectileBuilder::new()
+        projectile_builder : ProjectileBuilder::new(),
+        target_mode: TargettingMode::Keyboard{cursor_pos: Point::zero()},
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

@@ -40,7 +40,7 @@ impl ClearDeadSystem
             }
          }
 
-         let pool = state.world.query_one_mut::<& mut Pools>(state.player_ent.unwrap()).unwrap();
+         let pool = state.world.query_one_mut::<&mut Pools>(state.player_ent.unwrap()).unwrap();
          pool.exp += xp_to_award;
 
          statistics::check_level_up(state);

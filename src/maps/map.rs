@@ -183,7 +183,7 @@ match tile
     TileType::DownStairs =>
     {
         glyph = '>';
-        fg = RGB::named(GREY);
+        fg = RGB::named(WHITE);
 
     }
 }

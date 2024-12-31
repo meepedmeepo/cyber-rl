@@ -2,7 +2,9 @@ use bracket_lib::random::DiceType;
 
 use super::Attribute;
 mod leveling;
+mod skills;
 pub use leveling::*;
+pub use skills::*;
 pub enum StatisticEffect
 {
     Strength, Dexterity, Toughness, Intelligence, MentalFortitude, ArmourClass,

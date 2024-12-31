@@ -293,27 +293,12 @@ impl GameState for State{
 
                     TargettingState::Selected { mut path, end  } =>
                     {
-                        //only handles the case that the missile targets one entity
-                        //let target_point = path.last().expect("Path must have been empty as couldn't find last point!");
                         path.push(end);
                         let dmg = 4;
-
-                        
                         //TODO:!!!!!!!!!!!!!!
-
-                        //self.world.get::<&CombatStats>(self.player_ent.unwrap()).unwrap().power.total;
                         
                         self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
-
-                        // let target_entities = self.map.get_mob_entities_at_position(self, end);
-
-                        // for ent in target_entities.iter()
-                        // {
-                        //     AttackSystem::add_attack(self.player_ent
-                        //         .expect("Couldn't find player to use their stats for targetting ranged attacks")
-                        //         , *ent, self);
-                        // }
 
                         self.current_state = ProgramState::PlayerTurn;
                     }

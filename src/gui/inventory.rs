@@ -16,7 +16,7 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
         items.push(name.clone());
     }
    
-    let height = max(5, items.len()*3 + 1);
+    let height = max(5, items.len() +4);
     
     
     //let height = min(38,max(15,items.len()*3));

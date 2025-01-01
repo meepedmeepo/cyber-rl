@@ -34,7 +34,7 @@ impl ClearDeadSystem
                         console::log(format!("The {} dies!",name.name));
 
                         xp_to_award += xp; 
-                        entities_to_despawn.push((_id, *pos));
+                        entities_to_despawn.push((_id, pos.clone()));
                     }
                 }
             }
@@ -57,18 +57,19 @@ impl ClearDeadSystem
 
             for item in eq_items.iter()
             {
-                state.world.remove_one::<&Equipped>(*item)
+                console::log(format!("removing items! pos: {}:{}", pos.x, pos.y));
+                state.world.remove_one::<Equipped>(*item)
                     .expect("Couldn't remove Equipped from item to drop from dead mob!");
                 
-                state.world.insert_one(*entity, *pos).expect("Couldn't insert position into item to drop from mob!");
+                state.world.insert_one(*item, Position{x : pos.x, y: pos.y}).expect("Couldn't insert position into item to drop from mob!");
             }
 
             for item in bp_items.iter()
             {
-                state.world.remove_one::<&InContainer>(*item)
+                state.world.remove_one::<InContainer>(*item)
                     .expect("Couldn't remove inContainer from item to drop from dead mob!");
                 
-                state.world.insert_one(*entity, *pos).expect("Couldn't insert position into item to drop from mob!");
+                state.world.insert_one(*item, pos.clone()).expect("Couldn't insert position into item to drop from mob!");
             }
 
 

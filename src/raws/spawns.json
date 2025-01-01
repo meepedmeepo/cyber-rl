@@ -289,7 +289,7 @@
     {
         "name" : "Green Ooze",
         "renderable": {
-                "glyph" : "g",
+                "glyph" : "j",
                 "fg" : "#00FF00",
                 "bg" : "#000000",
                 "order" : 3

@@ -64,6 +64,12 @@ impl BaseMap for Map
         if self.is_exit_valid(x+1, y) { exits.push((idx+1, 1.0)) };
         if self.is_exit_valid(x, y-1) { exits.push((idx-w, 1.0)) };
         if self.is_exit_valid(x, y+1) { exits.push((idx+w, 1.0)) };
+
+            // Diagonals
+        if self.is_exit_valid(x-1, y-1) { exits.push(((idx-w)-1, 1.45)); }
+        if self.is_exit_valid(x+1, y-1) { exits.push(((idx-w)+1, 1.45)); }
+        if self.is_exit_valid(x-1, y+1) { exits.push(((idx+w)-1, 1.45)); }
+        if self.is_exit_valid(x+1, y+1) { exits.push(((idx+w)+1, 1.45)); }
     
         exits
     }
@@ -173,7 +179,7 @@ match tile
     TileType::Floor =>
     {
         glyph = '.';
-        fg = RGB::from_f32(0.85, 0.85, 0.85);
+        fg = RGB::named(RED3);
     }// ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
     TileType::Wall => 
     {

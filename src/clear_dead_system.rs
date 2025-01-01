@@ -51,7 +51,7 @@ impl ClearDeadSystem
                 .iter().filter(|(_ent,(_item, equipped))| equipped.owner == *entity)
                 .map(|ent| ent.0).collect::<Vec<_>>();
 
-                let bp_items = state.world.query::<(&components::Item, &InContainer)>()
+            let bp_items = state.world.query::<(&components::Item, &InContainer)>()
                 .iter().filter(|(_ent,(_item, bp))| bp.owner == *entity)
                 .map(|ent| ent.0).collect::<Vec<_>>();
 

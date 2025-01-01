@@ -393,7 +393,7 @@ fn game_init ( state: &mut State)
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
     Renderable::new('@',
-    RGB::from_f32(1., 0., 0.),
+    RGB::named(LIME_GREEN),
     RGB::from_f32(0., 0., 0.),
     3)
     ,FoV::new(8)
@@ -407,6 +407,7 @@ fn game_init ( state: &mut State)
 
     , Player{})));
 
+    spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
     spawning_system::room_spawns(state);
 
     spawning_system::spawn_healing_item(state);

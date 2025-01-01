@@ -24,6 +24,16 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::D => try_move(state,1,0),
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
+
+            // Diagonals
+            VirtualKeyCode::Numpad9 => try_move(state, 1, -1),
+
+            VirtualKeyCode::Numpad7 => try_move(state, -1, -1),
+
+            VirtualKeyCode::Numpad3 => try_move(state, 1, 1),
+
+            VirtualKeyCode::Numpad1 => try_move(state, -1, 1),
+
             VirtualKeyCode::I => return ProgramState::Inventory,
             VirtualKeyCode::Space => 
             {

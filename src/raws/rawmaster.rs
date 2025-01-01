@@ -4,7 +4,7 @@ use bracket_lib::random::DiceType;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
+use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -252,6 +252,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
                     "ranged" => {eb.add(RangedTargetting{range: effect.1.parse::<i32>().unwrap()});}
                     "damage" => {eb.add(DamageEffect{damage_amount: effect.1.parse::<i32>().unwrap()});}
                     "aoe" => {eb.add(AoE{radius: effect.1.parse::<i32>().unwrap()});}
+                    "food"=>{eb.add(GivesFood{amount: effect.1.parse::<i32>().unwrap()});}
                     _ =>{bracket_lib::terminal::console::log
                         (format!("Warning: consumable effect {} not implemented.", effect_name));}
                 }

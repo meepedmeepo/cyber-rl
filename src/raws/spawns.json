@@ -13,6 +13,18 @@
                 "effects" : { "provides_healing" : "8" }
             }
         },
+        {
+            "name" : "Ration",
+            "renderable": {
+                "glyph" : "%",
+                "fg" : "#FF00FF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "consumable" : {
+                "effects" : { "food" : "150" }
+            }
+        },
     
         {
             "name" : "Magic Missile Scroll",
@@ -337,6 +349,8 @@
         { "name" : "Wooden Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 15 },
         { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_map_depth_to_weight" : true },
         { "name" : "Wooden Bow", "weight" : 2, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Bandit", "weight" : 15, "min_depth" : 1, "max_depth" : 5 }
+        { "name" : "Bandit", "weight" : 15, "min_depth" : 1, "max_depth" : 5 },
+        { "name" : "Ration", "weight" : 8, "min_depth" : 0, "max_depth" : 100 }
+
     ]
     }

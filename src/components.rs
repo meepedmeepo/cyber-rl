@@ -1,6 +1,14 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+pub struct WantsToRest
+{}
+
+#[derive(Clone, Copy, Debug)]
+pub struct GivesFood
+{
+   pub amount: i32,
+}
 
 pub struct EquipmentDirty {}
 

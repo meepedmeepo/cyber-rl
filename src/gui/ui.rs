@@ -2,6 +2,7 @@ use bracket_lib::prelude::field_of_view;
 use bracket_lib::terminal::*;
 use bracket_lib::color;
 use crate::gamelog;
+use crate::hunger::HungerLevel;
 use crate::menus::inventory_state;
 use crate::statistics;
 use crate::statistics::BaseStatistics;
@@ -54,8 +55,8 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
 
     let(progress, max) = statistics::get_xp_from_current_level(state);
 
-    for (_id,(_player,stats, bstat)) in
-     state.world.query_mut::<(&Player,&Pools, &BaseStatistics)>()
+    for (_id,(_player,stats, bstat, hunger)) in
+     state.world.query_mut::<(&Player,&Pools, &BaseStatistics, &HungerLevel)>()
     {
         let health = format!("HP: {} / {} ",stats.hitpoints.current_value,stats.hitpoints.max_value);
         
@@ -72,15 +73,19 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
         ctx.draw_bar_horizontal(82, 10, 24, progress, max,
              color::YELLOW, color::BLACK);
         
-        ctx.print_color(81, 12, color::WHITE, color::BLACK, format!("Strength: {}", bstat.strength.total));
-
-        ctx.print_color(81, 14, color::WHITE, color::BLACK, format!("Dexterity: {}", bstat.dexterity.total));
+        ctx.print_color_centered_at(94, 12, color::WHITE, color::BLACK, "Hunger");
+        ctx.draw_bar_horizontal(82, 14, 24, hunger.nutrition.current_value, hunger.nutrition.max_value,
+            color::ORANGE, color::BLACK);
         
-        ctx.print_color(81, 16, color::WHITE, color::BLACK, format!("Intelligence: {}", bstat.intelligence.total));
+        ctx.print_color(81, 17, color::WHITE, color::BLACK, format!("Strength: {}", bstat.strength.total));
 
-        ctx.print_color(81, 18, color::WHITE, color::BLACK, format!("Toughness: {}", bstat.toughness.total));
+        ctx.print_color(81, 18, color::WHITE, color::BLACK, format!("Dexterity: {}", bstat.dexterity.total));
+        
+        ctx.print_color(81, 19, color::WHITE, color::BLACK, format!("Intelligence: {}", bstat.intelligence.total));
 
-        ctx.print_color(81, 20, color::WHITE, color::BLACK, format!("Mental Fortitude {}", bstat.mental_fortitude.total));
+        ctx.print_color(81, 20, color::WHITE, color::BLACK, format!("Toughness: {}", bstat.toughness.total));
+
+        ctx.print_color(81, 21, color::WHITE, color::BLACK, format!("Mental Fortitude {}", bstat.mental_fortitude.total));
     }
     
 }

@@ -3,8 +3,9 @@ use bracket_lib::color::{BLACK, DARKGREEN, DARKRED, GREEN, GREEN3, RED, RGB, WHI
 use bracket_lib::prelude::Point;
 
 use crate::damage_system::DamageSystem;
+use crate::hunger::HungerLevel;
 use crate::statistics::{BaseStatistics, Pools};
-use crate::{AoE, DamageEffect, HealingEffect, Name, Position, State,  Usable, WantsToUseItem};
+use crate::{AoE, DamageEffect, GivesFood, HealingEffect, Name, Position, State, Usable, WantsToUseItem};
 use crate::components::Consumable;
 
 enum TargetType
@@ -33,12 +34,12 @@ pub fn run(state : &mut State)
     {
         let query = 
             state.world.query_one_mut::<(&Name, Option<&Consumable>,
-            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>, &Usable)>
+            Option<&HealingEffect>, Option<&DamageEffect>, Option<&AoE>, &Usable, Option<&GivesFood>)>
             (ents.1).expect("couldn't get item properties");
 
-        let (name,consumable,healing,damage, aoe, _u) = query;
+        let (name,consumable,healing,damage, aoe, _u, food) = query;
 
-        item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied()));
+        item_info.push((name.name.clone(), consumable.copied(), healing.copied(), damage.copied(),ents.4, aoe.copied(), food.copied()));
         
     }
 
@@ -178,6 +179,19 @@ pub fn run(state : &mut State)
 
             None => {}
         }
+    //hunger based effects
+    match item_info[index].6
+    {
+        Some(food) =>
+        {
+            for target in targets[index].iter()
+            {
+                state.world.query_one_mut::<&mut HungerLevel>(*target).unwrap().nutrition.restore(food.amount);
+            }
+        }
+
+        None => {}
+    }
 
      // Removing item if it was a consumable
      match item_info[index].1

@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem};
+use crate::{attack_system, go_down_stairs, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -25,7 +25,18 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::W => try_move(state,0,-1),
             VirtualKeyCode::S => try_move(state,0,1),
             VirtualKeyCode::I => return ProgramState::Inventory,
-            VirtualKeyCode::Space => return ProgramState::PlayerTurn,
+            VirtualKeyCode::Space => 
+            {
+                state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
+                    .expect("Couldn't insert WantsToRest componenent onto player!");
+                return ProgramState::PlayerTurn;
+            },
+            VirtualKeyCode::Numpad5 => 
+            {
+                state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
+                    .expect("Couldn't insert WantsToRest componenent onto player!");
+                return ProgramState::PlayerTurn;
+            },
             VirtualKeyCode::F => 
             {
 

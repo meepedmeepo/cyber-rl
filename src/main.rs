@@ -6,6 +6,8 @@ use damage_system::DamageSystem;
 use gamelog::GameLog;
 use gui::TargettingMode;
 use hecs::*;
+use hunger::hunger_system;
+use hunger::HungerLevel;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use particles::particle_system;
@@ -18,6 +20,7 @@ use spawns::spawning_system::EntityType;
 use statistics::BaseStatistics;
 use statistics::Pools;
 use statistics::StatPool;
+use time_system::time_system;
 use std::cmp::*;
 use maps::*;
 pub mod maps;
@@ -49,7 +52,8 @@ mod ranged_combat;
 mod projectile;
 mod statistics;
 mod gui;
-
+mod hunger;
+mod time_system;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -67,6 +71,7 @@ pub struct State
     particle_builder : ParticleBuilder,
     projectile_builder : ProjectileBuilder,
     target_mode : TargettingMode,
+    turn_number : i32,
 }
 
 
@@ -201,8 +206,11 @@ impl GameState for State{
             }
 
             ProgramState::PlayerTurn =>
-            {
+            {  
+                hunger_system(self);
                 run_systems(self, ctx);
+                time_system(self);
+
                 self.current_state = ProgramState::MonsterTurn;
             }
 
@@ -395,6 +403,7 @@ fn game_init ( state: &mut State)
     , BaseStatistics{strength: Attribute::new(14), dexterity: Attribute::new(14)
         ,toughness: Attribute::new(12), intelligence: Attribute::new(12)
         , mental_fortitude: Attribute::new(10)}
+    , HungerLevel{nutrition: StatPool::new(300)}
 
     , Player{})));
 
@@ -467,6 +476,7 @@ fn main() ->BError
         particle_builder : ParticleBuilder::new(),
         projectile_builder : ProjectileBuilder::new(),
         target_mode: TargettingMode::Keyboard{cursor_pos: Point::zero()},
+        turn_number: 0,
     };
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();

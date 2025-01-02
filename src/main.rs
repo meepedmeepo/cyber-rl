@@ -455,8 +455,16 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
 
 fn main() ->BError 
 {
+    //println!("{}", std::env::current_dir().unwrap().display());
     //println!("Hello, world!");
-    let mut context = BTermBuilder::vga(110,45)
+    let mut context = BTermBuilder::new()
+    .with_dimensions(110, 45)
+    .with_resource_path("resources/")
+    .with_font("dbyte_2x.png", 12 , 16
+
+)
+    .with_tile_dimensions(12, 16)
+    .with_simple_console(110, 45, "dbyte_2x.png")
     .with_title("Rust-like")
     .with_fps_cap(60.)
     .build()?;

@@ -22,6 +22,20 @@ pub struct BaseStatistics
 }
 impl BaseStatistics
 {
+    pub fn roll_stats(num_dice: i32) -> BaseStatistics
+    {
+        let mut rng = bracket_lib::random::RandomNumberGenerator::new();
+        let dice_pool = DiceType::new(num_dice, 6, 1);
+
+        BaseStatistics
+        {
+            strength: Attribute::new( rng.roll(dice_pool)),
+            dexterity: Attribute::new( rng.roll(dice_pool)),
+            toughness: Attribute::new( rng.roll(dice_pool)),
+            intelligence: Attribute::new( rng.roll(dice_pool)),
+            mental_fortitude: Attribute::new( rng.roll(dice_pool))
+        }
+    }
     pub fn get_stat(self, stat: StatType) -> Attribute
     {
         match stat

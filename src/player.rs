@@ -92,36 +92,60 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             }
             VirtualKeyCode::G => 
             {
-                let mut item : Option<Entity> = None;
+                // let mut item : Option<Entity> = None;
+                // for ent in state.map.tile_contents[Map::xy_id(state.player_pos.x, state.player_pos.y)].iter()
+                // {
+
+                //     match state.world.get::<&Item>(*ent)
+                //     {
+                //         Ok(_) =>
+                //         {
+                //             item = Some(*ent);
+                //             break;
+                //         }
+
+                //         Err(_) => 
+                //         {}
+                //     }
+                // }
+                // match item
+                // {
+                //     Some(i) =>
+                //     {
+                //         state.world.insert_one(Option::expect(state.player_ent
+                //             , "Couldn't find player entity to insert WantsToPickupItem component!"),
+                //   WantsToPickupItem{item: i})
+                //             .expect("Couldn't insert WantsToPickupItem component onto the player");
+                //         return ProgramState::AwaitingInput;
+                //     }
+                //     None =>
+                //     {
+                //         return ProgramState::AwaitingInput;
+                //     }
+                // }
+
+
+                let mut items = Vec::new();
+
                 for ent in state.map.tile_contents[Map::xy_id(state.player_pos.x, state.player_pos.y)].iter()
                 {
-
-                    match state.world.get::<&Item>(*ent)
+                    if state.world.get::<&Item>(*ent).is_ok()
                     {
-                        Ok(_) =>
-                        {
-                            item = Some(*ent);
-                            break;
-                        }
-
-                        Err(_) => 
-                        {}
+                        items.push((*ent, false));
                     }
                 }
-                match item
+
+                if items.len() == 1
                 {
-                    Some(i) =>
-                    {
-                        state.world.insert_one(Option::expect(state.player_ent
-                            , "Couldn't find player entity to insert WantsToPickupItem component!"),
-                  WantsToPickupItem{item: i})
-                            .expect("Couldn't insert WantsToPickupItem component onto the player");
-                        return ProgramState::AwaitingInput;
-                    }
-                    None =>
-                    {
-                        return ProgramState::AwaitingInput;
-                    }
+                    state.world.insert_one(state.player_ent.unwrap(), WantsToPickupItem{item: items[0].0}).unwrap();
+                } else if items.len() > 1
+                {
+                    return   ProgramState::SelectionMenu { items: items.clone() };
+                }
+                else 
+                {
+                    console::log("No items to pick up at current location!");
+                    return ProgramState::AwaitingInput;
                 }
 
             }

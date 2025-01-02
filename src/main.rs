@@ -10,6 +10,7 @@ use hunger::hunger_system;
 use hunger::HungerLevel;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
+use menus::MenuSelections;
 use particles::particle_system;
 use particles::ParticleBuilder;
 use projectile::projectile_system;
@@ -75,7 +76,7 @@ pub struct State
 }
 
 
-#[derive(PartialEq,Copy,Clone)]
+#[derive(PartialEq,Clone)]
 pub enum ProgramState
 {
     Paused,
@@ -87,7 +88,9 @@ pub enum ProgramState
     Inventory,
     Targeting { range: i32, item : Entity, aoe: Option<i32> },
     RangedCombat {range: i32, dmg: i32},
-    KeyboardTargetting {cursor_pos : Point}
+    KeyboardTargetting {cursor_pos : Point},
+
+    SelectionMenu{items : Vec<(Entity, bool)>}
 }
 
 
@@ -186,7 +189,7 @@ fn cleanup_ECS(state: &mut State)
 impl GameState for State{
     fn tick(&mut self, ctx: &mut BTerm) {
 
-        match self.current_state
+        match self.current_state.clone()
         {
 
             ProgramState::AwaitingInput =>
@@ -255,6 +258,40 @@ impl GameState for State{
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
                 gui::draw_inventory(self, ctx);
+            }
+
+            ProgramState::SelectionMenu { mut items } =>
+            {
+                ctx.cls();
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
+                gui::draw_gamelog(self, ctx);
+
+                match menus::pickup_menu_input(self, ctx, &mut items)
+                {
+                    MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
+                    MenuSelections::NoInput => {self.current_state = ProgramState::SelectionMenu { items: items .clone()};}
+                    MenuSelections::ToggleSelected => {self.current_state = ProgramState::SelectionMenu { items: items.clone() };}
+                    MenuSelections::Execute =>
+                    {
+                        //TODO: change this to actually use the item pickup system like normal oof
+                        for (item, is_selected) in items.iter()
+                        {
+                            if *is_selected
+                            {
+                                self.world.insert_one(*item, InContainer{owner: self.player_ent.unwrap()}).unwrap();
+                                
+                                self.world.remove_one::<Position>(*item).unwrap();
+                            }
+                        }
+                        self.current_state = ProgramState::AwaitingInput;
+                    }
+                }
+
+                gui::draw_pickup_menu(ctx, items, self);
+
             }
 
             ProgramState::Targeting { range, item, aoe } =>
@@ -400,9 +437,7 @@ fn game_init ( state: &mut State)
     ,Name{name: "Player".to_string(),}
     , Pools{hitpoints: StatPool::new(50), exp: statistics::calculate_xp_from_level(1),level: 1, armour_class: Attribute::new(10)
         , hit_die: DiceType::new(1, 10, 1)}
-    , BaseStatistics{strength: Attribute::new(14), dexterity: Attribute::new(14)
-        ,toughness: Attribute::new(12), intelligence: Attribute::new(12)
-        , mental_fortitude: Attribute::new(10)}
+    , BaseStatistics::roll_stats(3)
     , HungerLevel{nutrition: StatPool::new(300)}
 
     , Player{})));
@@ -490,7 +525,11 @@ fn main() ->BError
     // gs.map = Map::create_room_map(&mut gs);
     // gs.map.create_map_corridors();
     //Map::generate_map_checked(&mut gs);
-    context.with_post_scanlines(true);
+    
+    
+    //context.with_post_scanlines(true);
+
+    context.post_screenburn = true;
     
     game_init(&mut gs);
     main_loop(context,gs)

@@ -31,3 +31,7 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
         index += 1;
     }
 }
+
+
+
+

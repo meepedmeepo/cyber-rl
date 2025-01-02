@@ -24,6 +24,20 @@ pub fn run(state : &mut State)
         //let container = state.world.query_one_mut::<&mut ItemContainer>(ent).expect("Couldn't get ItemContainer component of an entity that should have one");
         //container.items.push(pickup);
         
+        let inv_len = state.world.query::<(&Item, &InContainer)>()
+            .iter()
+            .filter(|(_ent, (_item, backpack))| backpack.owner == ent)
+            .collect::<Vec<_>>()
+            .len();
+
+        if inv_len >24
+        {
+            console::log("Couldn't pickup item as inventory is full!");
+            state.game_log.add_log("Couldn't pickup item as inventory is full!".to_string());
+            
+            continue;
+        }
+
         state.world.insert_one(pickup, InContainer{owner : ent})
         .expect("Couldn't insert InContainer componenent onto item to pickup");
         state.world.remove_one::<Position>(pickup).expect("Couldn't remove Position component from item entity.");

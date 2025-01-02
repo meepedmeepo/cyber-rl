@@ -1,8 +1,8 @@
-use bracket_lib::prelude::BTerm;
+use bracket_lib::prelude::{BTerm, VirtualKeyCode};
 use bracket_lib::terminal::console;
 use hecs::Entity;
 
-use crate::{Equippable, InContainer, Item, Name, ProgramState, RangedTargetting, State, WantsToEquipItem, WantsToUseItem};
+use crate::{Equippable, InContainer, Item, Map, Name, ProgramState, RangedTargetting, State, WantsToEquipItem, WantsToPickupItem, WantsToUseItem};
 
 pub struct InventoryMenu
 {}
@@ -116,4 +116,42 @@ impl InventoryMenu
         //inventory_state::None
     }
 
+}
+
+
+pub enum MenuSelections
+{
+	NoInput,
+	Cancel,
+	ToggleSelected,
+	Execute
+}
+
+pub fn pickup_menu_input(state : &mut State, ctx : &BTerm, items : &mut Vec<(Entity, bool)>) -> MenuSelections
+{
+
+	match ctx.key
+	{
+		Some(key) => 
+		{
+			match key
+			{
+				VirtualKeyCode::Return => {return MenuSelections::Execute;}
+				VirtualKeyCode::Escape => {return MenuSelections::Cancel;}
+				_ => {}
+			}
+
+			match items.get_mut(bracket_lib::terminal::letter_to_option(key) as usize)
+			{
+				Some(target) =>
+				{
+					target.1 = !target.1;
+					return MenuSelections::ToggleSelected;
+				}
+				None => { console::log("Invalid menu item!"); return MenuSelections::NoInput;}
+			} 
+		}
+
+		None => {MenuSelections::NoInput}
+	}
 }

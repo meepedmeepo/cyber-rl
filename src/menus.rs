@@ -2,6 +2,7 @@ use bracket_lib::prelude::{BTerm, VirtualKeyCode};
 use bracket_lib::terminal::console;
 use hecs::Entity;
 
+use crate::gui::draw_pickup_menu;
 use crate::{Equippable, InContainer, Item, Map, Name, ProgramState, RangedTargetting, State, WantsToEquipItem, WantsToPickupItem, WantsToUseItem};
 
 pub struct InventoryMenu
@@ -125,6 +126,32 @@ pub enum MenuSelections
 	Cancel,
 	ToggleSelected,
 	Execute
+}
+
+pub enum MenuType
+{
+	PickupItem,
+	DropItem,
+	UnequipItem
+}
+
+//type defs for function pointers so I can use dynamic dispatch to not have to repeat as much menu code and keep ProgramStates tidier
+type MenuFunction = dyn FnMut (&mut State,  &BTerm,  &mut Vec<(Entity, bool)>) -> MenuSelections;
+type MenuDrawFunction = dyn FnMut ( &mut BTerm, Vec<(Entity, bool)>, &mut State) -> ();
+
+pub fn select_menu_functions(menu : MenuType) -> (Box<MenuFunction>, Box<MenuDrawFunction>)
+{
+	match menu
+	{
+		MenuType::PickupItem => 
+		{
+			let  func: Box<MenuFunction> = Box::new(pickup_menu_input);
+			let draw_func: Box<MenuDrawFunction> = Box::new(draw_pickup_menu);
+			return (func, draw_func);
+		}
+		//TODO: REMOVE THIS
+		_ => {(Box::new(pickup_menu_input), Box::new(draw_pickup_menu))}
+	}
 }
 
 pub fn pickup_menu_input(state : &mut State, ctx : &BTerm, items : &mut Vec<(Entity, bool)>) -> MenuSelections

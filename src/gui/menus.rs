@@ -30,11 +30,11 @@ pub fn draw_menu_list(ctx : &mut BTerm, content: &Vec<(String, bool)>, title : &
     let height = std::cmp::max(content.len() + 4, 5);
     ctx.draw_box_double(pos.x, pos.y, width, height, fg, bg);
 
-    let centre_x = (pos.x + width) /2;
+    let centre_x = pos.x + (width/2);
     
-    ctx.print_color_centered_at(pos.x+1, centre_x, YELLOW, bg, title);
+    ctx.print_color_centered_at(centre_x, pos.y + 1, YELLOW, bg, title);
 
-    let mut current_y =  pos.y + 1;
+    let mut current_y =  pos.y + 3;
 
     for (ln, is_selected) in content.iter()
     {

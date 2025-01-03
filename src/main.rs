@@ -10,6 +10,7 @@ use hunger::hunger_system;
 use hunger::HungerLevel;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
+use menus::select_menu_functions;
 use menus::MenuSelections;
 use particles::particle_system;
 use particles::ParticleBuilder;
@@ -268,8 +269,11 @@ impl GameState for State{
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
+                
+                let (mut input, mut draw) = 
+                    select_menu_functions(menus::MenuType::PickupItem);
 
-                match menus::pickup_menu_input(self, ctx, &mut items)
+                match input(self, ctx, &mut items)
                 {
                     MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
                     MenuSelections::NoInput => {self.current_state = ProgramState::SelectionMenu { items: items .clone()};}
@@ -290,7 +294,8 @@ impl GameState for State{
                     }
                 }
 
-                gui::draw_pickup_menu(ctx, items, self);
+                //gui::draw_pickup_menu(ctx, items, self);
+                draw(ctx,items,self);
 
             }
 
@@ -495,9 +500,7 @@ fn main() ->BError
     let mut context = BTermBuilder::new()
     .with_dimensions(110, 45)
     .with_resource_path("resources/")
-    .with_font("dbyte_2x.png", 12 , 16
-
-)
+    .with_font("dbyte_2x.png", 12 , 16)
     .with_tile_dimensions(12, 16)
     .with_simple_console(110, 45, "dbyte_2x.png")
     .with_title("Rust-like")
@@ -510,8 +513,7 @@ fn main() ->BError
         ,revealed_tiles : vec![false;MAPSIZE]
         ,visible_tiles : vec![false;MAPSIZE]
         ,blocked : vec![false;MAPSIZE]
-        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0
-        },
+        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0},
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::PlayerTurn,
         player_pos : Point::zero(),

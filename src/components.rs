@@ -1,6 +1,23 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
+
+pub struct Prop
+{
+    
+}
+
+pub struct Hidden {}
+
+pub struct Trigger 
+{
+
+}
+
+
+
+
+
 pub struct WantsToRest
 {}
 

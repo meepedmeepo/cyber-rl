@@ -59,6 +59,7 @@ mod statistics;
 mod gui;
 mod hunger;
 mod time_system;
+pub mod effects;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -455,7 +456,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     map_indexing_system::MapIndexingSystem::run(state);
 
-    if(state.current_state == ProgramState::PlayerTurn)
+    if state.current_state == ProgramState::PlayerTurn
     {
         state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
     }

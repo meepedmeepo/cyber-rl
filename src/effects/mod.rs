@@ -1,11 +1,15 @@
 use std::{collections::VecDeque, sync::Mutex};
 use bracket_lib::color::RGB;
-use damage::inflict_damage;
+use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
+use hunger::restore_hunger;
+use triggers::item_trigger;
 use crate::{particles::ParticleBuilder, State, MAPWIDTH};
 
 mod damage;
 mod targetting;
+mod triggers;
+mod hunger;
 pub use targetting::*;
 
 
@@ -19,7 +23,10 @@ lazy_static!
 pub enum EffectType
 {
     Damage {amount : i32},
-    Particle {glyph: char, fg: RGB, bg: RGB, lifetime: f32}
+    Particle {glyph: char, fg: RGB, bg: RGB, lifetime: f32},
+    ItemUse {item : Entity},
+    Healing {amount : i32},
+    Feed {amount : i32},
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -66,15 +73,25 @@ pub fn run_effect_queue(state: &mut State)
 
 fn target_applicator(state: &mut State, effect: &EffectSpawner)
 {
-    match &effect.targets
+    if let EffectType::ItemUse { item } = effect.effect_type
     {
-       Targets::Tile { tile_idx } => affect_tile(state, effect, *tile_idx),
-       Targets::Tiles { tiles } => tiles.iter().for_each(|tile_idx | affect_tile(state, effect, *tile_idx)),
-       Targets::Single { target } => affect_entity(state, effect, *target),
-       Targets::TargetList { targets } => targets.iter().for_each(|target| affect_entity(state, effect, *target)),
-       _ => todo!()
+        //items are handled seperately here because they can be consumable so it requires slightly different handling to despawn 
+        //after use
+
+        item_trigger(effect.creator, item, &effect.targets, state);
+
+    } else 
+    {
+        match &effect.targets
+        {
+        Targets::Tile { tile_idx } => affect_tile(state, effect, *tile_idx),
+        Targets::Tiles { tiles } => tiles.iter().for_each(|tile_idx | affect_tile(state, effect, *tile_idx)),
+        Targets::Single { target } => affect_entity(state, effect, *target),
+        Targets::TargetList { targets } => targets.iter().for_each(|target| affect_entity(state, effect, *target)),
+        _ => todo!()
+        }
     }
-}
+}   
 
 
 fn tile_effect_hits_entities(effect : &EffectType) -> bool
@@ -82,6 +99,8 @@ fn tile_effect_hits_entities(effect : &EffectType) -> bool
     match effect
     {
         EffectType::Damage {..} => return true,
+        EffectType::Healing {..} => return true,
+        EffectType::Feed {..} => return true,
         _ => false
         
 
@@ -115,7 +134,9 @@ fn affect_entity(state : &mut State, effect: &EffectSpawner, target : Entity)
 {
     match effect.effect_type
     {
-        EffectType::Damage { .. } => inflict_damage(state, effect, target),
+        EffectType::Damage {..} => inflict_damage(state, effect, target),
+        EffectType::Healing {..} => heal_damage(state, effect, target),
+        EffectType::Feed {..} => restore_hunger(state, effect, target),
         _ =>{}
     }
 }

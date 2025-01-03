@@ -4,12 +4,14 @@ use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use gamelog::GameLog;
+use gui::menu_theme;
 use gui::TargettingMode;
 use hecs::*;
 use hunger::hunger_system;
 use hunger::HungerLevel;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
+use menus::menu_input;
 use menus::select_menu_functions;
 use menus::MenuSelections;
 use menus::MenuType;
@@ -272,32 +274,78 @@ impl GameState for State{
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
 
-                let (mut input, mut draw) = 
-                    select_menu_functions(menu);
+                //let (mut input, mut draw) = 
+                    //select_menu_functions(menu);
 
-                match input(self, ctx, &mut items)
+                //input(self, ctx, &mut items)
+
+                match menu_input(self, ctx, &mut items)
                 {
                     MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
                     MenuSelections::NoInput => {}
                     MenuSelections::ToggleSelected => {self.current_state = ProgramState::SelectionMenu { items: items.clone(), menu };}
                     MenuSelections::Execute =>
                     {
-                        //TODO: change this to actually use the item pickup system like normal oof
-                        for (item, is_selected) in items.iter()
+                        match menu
                         {
-                            if *is_selected
+                        //TODO: change this to actually use the item pickup system like normal oof
+                            MenuType::PickupItem =>
                             {
-                                self.world.insert_one(*item, InContainer{owner: self.player_ent.unwrap()}).unwrap();
-                                
-                                self.world.remove_one::<Position>(*item).unwrap();
+                                for (item, is_selected) in items.iter()
+                                {
+                                    if *is_selected
+                                    {
+                                        self.world.insert_one(*item, InContainer{owner: self.player_ent.unwrap()}).unwrap();
+                                        
+                                        self.world.remove_one::<Position>(*item).unwrap();
+                                    }
+                                }
                             }
+
+                            MenuType::DropItem =>
+                            {
+                                let pos = self.player_pos;
+                                for (item, is_selected) in items.iter()
+                                {
+                                    if *is_selected
+                                    {
+                                        self.world.insert_one(*item, Position{x: pos.x, y: pos.y}).unwrap();
+
+                                        self.world.remove_one::<InContainer>(*item).unwrap();
+                                    }
+                                }
+                            }
+
+                            MenuType::UnequipItem =>
+                            {
+                                let ent = self.player_ent.unwrap();
+
+                                for (item, is_selected) in items.iter()
+                                {
+                                    if *is_selected
+                                    {
+                                        self.world.insert_one(*item, InContainer{owner: ent}).unwrap();
+
+                                        self.world.remove_one::<Equipped>(*item).unwrap();
+
+                                        self.world.insert_one(ent, EquipmentDirty{}).unwrap();
+                                    }
+                                }
+                            }
+
+
+                            _ => {}
                         }
+
                         self.current_state = ProgramState::AwaitingInput;
                     }
                 }
 
+                let(title, text_colour, highlight) = menu_theme(menu);
+
+                gui::draw_menu_custom(ctx, &items, title, text_colour, highlight, self);
                 //gui::draw_pickup_menu(ctx, items, self);
-                draw(ctx,items,self);
+                //draw(ctx,items,self);
 
             }
 

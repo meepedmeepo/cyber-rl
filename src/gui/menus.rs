@@ -23,18 +23,23 @@ pub fn draw_pickup_menu(ctx : &mut BTerm, items: Vec<(Entity, bool)>, state : &m
          35, RGB::named(WHITE), RGB::named(BLACK), RGB::named(GREEN));
 }
 
-pub fn menu_theme(menu : MenuType)
+pub fn menu_theme(menu : MenuType) -> (&'static str, RGB, RGB) 
 {
     match menu
     {
         MenuType::PickupItem =>
         {
-
+            return ("Pickup Items:", RGB::named(WHITE), RGB::named(GREEN))
         }
 
         MenuType::DropItem => 
         {
-            
+            return ("Drop Items:", RGB::named(WHITE), RGB::named(GREEN))
+        }
+
+        MenuType::UnequipItem =>
+        {
+            return ("Unequip Items:", RGB::named(WHITE), RGB::named(GREEN))
         }
     }
 }

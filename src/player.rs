@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -20,10 +20,11 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::Numpad6 => try_move(state,1,0),
             VirtualKeyCode::Numpad8 => try_move(state,0,-1),
             VirtualKeyCode::Numpad2 => try_move(state,0,1),
-            VirtualKeyCode::A=>try_move(state, -1, 0),
-            VirtualKeyCode::D => try_move(state,1,0),
-            VirtualKeyCode::W => try_move(state,0,-1),
-            VirtualKeyCode::S => try_move(state,0,1),
+           
+            // VirtualKeyCode::A=>try_move(state, -1, 0),
+            // VirtualKeyCode::D => try_move(state,1,0),
+            // VirtualKeyCode::W => try_move(state,0,-1),
+            // VirtualKeyCode::S => try_move(state,0,1),
 
             // Diagonals
             VirtualKeyCode::Numpad9 => try_move(state, 1, -1),
@@ -33,6 +34,28 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             VirtualKeyCode::Numpad3 => try_move(state, 1, 1),
 
             VirtualKeyCode::Numpad1 => try_move(state, -1, 1),
+
+
+            VirtualKeyCode::D =>
+            {
+                let items =state.world.query::<&InContainer>()
+                    .iter()
+                    .filter(|(_ent, cont)| cont.owner == state.player_ent.unwrap())
+                    .map(|(ent, _cont)| (ent, false))
+                    .collect::<Vec<_>>();
+
+                return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::DropItem };
+            }
+            VirtualKeyCode::R =>
+            {
+                let items =state.world.query::<&Equipped>()
+                    .iter()
+                    .filter(|(_ent, eq)| eq.owner == state.player_ent.unwrap())
+                    .map(|(ent, _eq)| (ent, false))
+                    .collect::<Vec<_>>();
+
+                return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::UnequipItem };
+            }
 
             VirtualKeyCode::I => return ProgramState::Inventory,
             VirtualKeyCode::Space => 
@@ -92,38 +115,6 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             }
             VirtualKeyCode::G => 
             {
-                // let mut item : Option<Entity> = None;
-                // for ent in state.map.tile_contents[Map::xy_id(state.player_pos.x, state.player_pos.y)].iter()
-                // {
-
-                //     match state.world.get::<&Item>(*ent)
-                //     {
-                //         Ok(_) =>
-                //         {
-                //             item = Some(*ent);
-                //             break;
-                //         }
-
-                //         Err(_) => 
-                //         {}
-                //     }
-                // }
-                // match item
-                // {
-                //     Some(i) =>
-                //     {
-                //         state.world.insert_one(Option::expect(state.player_ent
-                //             , "Couldn't find player entity to insert WantsToPickupItem component!"),
-                //   WantsToPickupItem{item: i})
-                //             .expect("Couldn't insert WantsToPickupItem component onto the player");
-                //         return ProgramState::AwaitingInput;
-                //     }
-                //     None =>
-                //     {
-                //         return ProgramState::AwaitingInput;
-                //     }
-                // }
-
 
                 let mut items = Vec::new();
 

@@ -34,7 +34,9 @@ impl AttackSystem
             let query = state.world.query_one_mut::<(&BaseStatistics, &Pools)>(target).expect("");
             let stats = query.0.clone();
             let pools = query.1.clone();
-            std::mem::drop(query);
+
+            //Idiomatic way of mem::drop -ing something that implements copy trait
+            let _ = query;
 
             let mut weapons = state.world.query::<(&Equipped, &Weapon)>()
                 .iter()
@@ -118,7 +120,9 @@ impl AttackSystem
 
             if hit
             {
-                let dmg = state.rng.roll_dice(n_dice, dmg_die) + dmg_bonus;
+                let mut dmg = state.rng.roll_dice(n_dice, dmg_die) + dmg_bonus;
+                
+                dmg = std::cmp::max(1, dmg);
                 DamageSystem::mark_for_damage(state, target, dmg);
             }
         }

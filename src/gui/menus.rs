@@ -1,11 +1,11 @@
 use bracket_lib::{color::{BLACK, GREEN, RGB, WHITE, YELLOW}, prelude::{BTerm, Point}};
 use hecs::Entity;
 
-use crate::{Name, State};
+use crate::{menus::MenuType, Name, State};
 
 
 
-
+//TODO: try to remove reference to state from this function to keep a seperation of GUI vs business logic
 pub fn draw_pickup_menu(ctx : &mut BTerm, items: Vec<(Entity, bool)>, state : &mut State)
 {
     let mut menu_content = Vec::new();
@@ -21,6 +21,40 @@ pub fn draw_pickup_menu(ctx : &mut BTerm, items: Vec<(Entity, bool)>, state : &m
 
     draw_menu_list(ctx, &menu_content, "Pickup Item:", Point::new(22, 10),
          35, RGB::named(WHITE), RGB::named(BLACK), RGB::named(GREEN));
+}
+
+pub fn menu_theme(menu : MenuType)
+{
+    match menu
+    {
+        MenuType::PickupItem =>
+        {
+
+        }
+
+        MenuType::DropItem => 
+        {
+            
+        }
+    }
+}
+
+pub fn draw_menu_custom(ctx : &mut BTerm, items: &Vec<(Entity, bool)>, title: &str, text_colour: RGB,
+     highlight: RGB, state: &mut State)
+{
+    let mut menu_content = Vec::new();
+    
+    let mut index: u8 = 97;
+    for item in items.iter()
+    {
+        let name = state.world.query_one_mut::<&Name>(item.0).unwrap();
+        menu_content.push((format!("{}.) {}", index as char, name.name.clone()), item.1));
+        
+        index += 1;
+    }
+
+    draw_menu_list(ctx, &menu_content, title , Point::new(22, 10),
+         35, text_colour, RGB::named(BLACK), highlight);
 }
 
 

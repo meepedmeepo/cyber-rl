@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -140,7 +140,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                     state.world.insert_one(state.player_ent.unwrap(), WantsToPickupItem{item: items[0].0}).unwrap();
                 } else if items.len() > 1
                 {
-                    return   ProgramState::SelectionMenu { items: items.clone() };
+                    return   ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::PickupItem };
                 }
                 else 
                 {

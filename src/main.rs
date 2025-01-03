@@ -12,6 +12,7 @@ use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use menus::select_menu_functions;
 use menus::MenuSelections;
+use menus::MenuType;
 use particles::particle_system;
 use particles::ParticleBuilder;
 use projectile::projectile_system;
@@ -91,7 +92,7 @@ pub enum ProgramState
     RangedCombat {range: i32, dmg: i32},
     KeyboardTargetting {cursor_pos : Point},
 
-    SelectionMenu{items : Vec<(Entity, bool)>}
+    SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType}
 }
 
 
@@ -188,7 +189,8 @@ fn cleanup_ECS(state: &mut State)
 }
 
 impl GameState for State{
-    fn tick(&mut self, ctx: &mut BTerm) {
+    fn tick(&mut self, ctx: &mut BTerm)
+    {
 
         match self.current_state.clone()
         {
@@ -261,7 +263,7 @@ impl GameState for State{
                 gui::draw_inventory(self, ctx);
             }
 
-            ProgramState::SelectionMenu { mut items } =>
+            ProgramState::SelectionMenu { mut items, menu  } =>
             {
                 ctx.cls();
                 draw_map(ctx, &self.map);
@@ -269,15 +271,15 @@ impl GameState for State{
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
-                
+
                 let (mut input, mut draw) = 
-                    select_menu_functions(menus::MenuType::PickupItem);
+                    select_menu_functions(menu);
 
                 match input(self, ctx, &mut items)
                 {
                     MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
-                    MenuSelections::NoInput => {self.current_state = ProgramState::SelectionMenu { items: items .clone()};}
-                    MenuSelections::ToggleSelected => {self.current_state = ProgramState::SelectionMenu { items: items.clone() };}
+                    MenuSelections::NoInput => {}
+                    MenuSelections::ToggleSelected => {self.current_state = ProgramState::SelectionMenu { items: items.clone(), menu };}
                     MenuSelections::Execute =>
                     {
                         //TODO: change this to actually use the item pickup system like normal oof
@@ -326,11 +328,6 @@ impl GameState for State{
 
                     _ => {}
                 }
-            }
-
-            ProgramState::KeyboardTargetting { cursor_pos } =>
-            {
-
             }
 
             ProgramState::RangedCombat { range , dmg } =>

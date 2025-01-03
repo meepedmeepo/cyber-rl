@@ -127,7 +127,7 @@ pub enum MenuSelections
 	ToggleSelected,
 	Execute
 }
-
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MenuType
 {
 	PickupItem,
@@ -145,16 +145,16 @@ pub fn select_menu_functions(menu : MenuType) -> (Box<MenuFunction>, Box<MenuDra
 	{
 		MenuType::PickupItem => 
 		{
-			let  func: Box<MenuFunction> = Box::new(pickup_menu_input);
+			let  func: Box<MenuFunction> = Box::new(menu_input);
 			let draw_func: Box<MenuDrawFunction> = Box::new(draw_pickup_menu);
 			return (func, draw_func);
 		}
 		//TODO: REMOVE THIS
-		_ => {(Box::new(pickup_menu_input), Box::new(draw_pickup_menu))}
+		_ => {(Box::new(menu_input), Box::new(draw_pickup_menu))}
 	}
 }
 
-pub fn pickup_menu_input(state : &mut State, ctx : &BTerm, items : &mut Vec<(Entity, bool)>) -> MenuSelections
+pub fn menu_input(state : &mut State, ctx : &BTerm, items : &mut Vec<(Entity, bool)>) -> MenuSelections
 {
 
 	match ctx.key

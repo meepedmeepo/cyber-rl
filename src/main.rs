@@ -3,6 +3,7 @@ use bracket_lib::prelude::*;
 use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
+use effects::run_effect_queue;
 use gamelog::GameLog;
 use gui::menu_theme;
 use gui::TargettingMode;
@@ -452,6 +453,8 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     AttackSystem::run(state);
     DamageSystem::run(state);
+
+    effects::run_effect_queue(state);
     ClearDeadSystem::run(state);
 
     map_indexing_system::MapIndexingSystem::run(state);

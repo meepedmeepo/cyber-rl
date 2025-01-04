@@ -45,7 +45,7 @@ pub fn heal_damage(state : &mut State, heal : &EffectSpawner, target: Entity)
                 pools.hitpoints.restore(amount);
 
                 add_effect(None,
-                     EffectType::Particle { glyph: bracket_lib::terminal::to_char(3 as u8),//glyph is ♥︎
+                     EffectType::Particle { glyph: '+',//glyph should be changed to ♥︎
                       fg: RGB::named(BLACK), bg: RGB::named(GREEN),
                       lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }

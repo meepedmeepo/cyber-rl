@@ -59,7 +59,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
         {
             Some(key) => 
             {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End || key == VirtualKeyCode::F
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
                 {
                     let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
                     return TargettingState::Selected { path:targets, end: point };
@@ -81,7 +81,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
         {
             Some(key) => 
             {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End || key == VirtualKeyCode::F
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
                 {
                     return TargettingState::Cancel; 
                 }

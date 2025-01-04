@@ -1,6 +1,6 @@
 use bracket_lib::{color::{BLACK, RGB, WHITE}, terminal::console};
 use hecs::{World, Entity};
-use crate::{damage_system::DamageSystem, statistics::{BaseStatistics, Pools}, EquipmentSlot, Equippable, Equipped, Naturals, Position, Weapon, WeaponStat};
+use crate::{damage_system::DamageSystem, effects::{add_effect, Targets}, statistics::{BaseStatistics, Pools}, EquipmentSlot, Equippable, Equipped, Naturals, Position, Weapon, WeaponStat};
 
 use super::{State, Attack, Name, TakeDamage};
 pub struct AttackSystem
@@ -123,7 +123,10 @@ impl AttackSystem
                 let mut dmg = state.rng.roll_dice(n_dice, dmg_die) + dmg_bonus;
                 
                 dmg = std::cmp::max(1, dmg);
-                DamageSystem::mark_for_damage(state, target, dmg);
+
+                add_effect(Some(attacker), crate::effects::EffectType::Damage { amount: dmg },
+                     Targets::Single { target: target });
+                //DamageSystem::mark_for_damage(state, target, dmg);
             }
         }
 
@@ -133,8 +136,8 @@ impl AttackSystem
             state.world.remove_one::<Attack>(*entity)
                 .expect("Couldn't remove Attack component from the attacker");
 
-            state.particle_builder.request(pos.x, pos.y,
-                 RGB::named(WHITE), RGB::named(BLACK), '/', 50., None);
+            //state.particle_builder.request(pos.x, pos.y,
+                // RGB::named(WHITE), RGB::named(BLACK), '/', 50., None);
         }
     }
 

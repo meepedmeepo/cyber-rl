@@ -132,7 +132,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
         {
             Some(key) => 
             {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End || key == VirtualKeyCode::F
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
                 {
                     return (inventory_state::Selected,Some(Point::new(mouse_pos.0, mouse_pos.1)));
                 }
@@ -152,7 +152,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
         {
             Some(key) => 
             {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::End ||key == VirtualKeyCode::F
+                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return ||key == VirtualKeyCode::F
                 {
                     return (inventory_state::Cancel, None);
                 }

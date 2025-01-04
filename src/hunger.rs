@@ -1,6 +1,6 @@
 use bracket_lib::prelude::console;
 
-use crate::{damage_system::DamageSystem, statistics::{BaseStatistics, Pools, StatPool}, Name, State, WantsToRest};
+use crate::{damage_system::DamageSystem, effects::{add_effect, EffectType, Targets}, statistics::{BaseStatistics, Pools, StatPool}, Name, State, WantsToRest};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HungerState
@@ -53,7 +53,8 @@ pub fn hunger_system(state: &mut State)
                 //TODO: CHECK IF IN COMBAT FIRST MAYBE??
                 if pools.hitpoints.current_value != pools.hitpoints.max_value
                 {
-                    pools.hitpoints.restore(2);
+                    //pools.hitpoints.restore(2);
+                    add_effect(None, EffectType::Healing { amount: 1 }, Targets::Single { target: _id });
                     hunger.nutrition.damage(5);
                 }
             }
@@ -73,14 +74,16 @@ pub fn hunger_system(state: &mut State)
                     state.game_log.add_log(msg.clone());
                     console::log(msg);
 
-                    pools.hitpoints.damage(3);
+                    
+                    add_effect(None, EffectType::Damage { amount: 3 }, Targets::Single { target: _id })
                 }else
                 {
                     let msg = format!("{} died of starvation!", name.name.clone());
                     state.game_log.add_log(msg.clone());
                     console::log(msg);
 
-                    pools.hitpoints.damage(10000);   
+                    pools.hitpoints.damage(10000);
+                    //TODO: add a insta kill EffectType
                 }
             }
         }

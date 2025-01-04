@@ -43,6 +43,4 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
         add_effect(creator, EffectType::Feed { amount: food.amount}, targets.clone());
     }
 
-    
-
 }

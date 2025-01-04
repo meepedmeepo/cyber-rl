@@ -1,23 +1,30 @@
-use bracket_lib::color::{BLACK, GREEN, RED, RGB};
+use bracket_lib::{color::{BLACK, GREEN, RED, RGB}, prelude::console};
 use hecs::Entity;
 
-use crate::statistics::Pools;
+use crate::{statistics::Pools, Name};
 
 use super::{add_effect, entity_position, EffectSpawner, EffectType, State, Targets};
 
 
 pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entity)
 {
-    let query =state.world.query_one_mut::<&mut Pools>(target);
+    let query =state.world.query_one_mut::<(&mut Pools, &Name)>(target);
+
+    let mut ent_name = "".to_string();
+    let mut dmg_num = 0;
     
     match query
     {
-        Ok(pools) => 
+        Ok((pools, name)) => 
         {
             
             if let EffectType::Damage{amount} = damage.effect_type
             {
+
                 pools.hitpoints.damage(amount);
+
+                ent_name = name.name.clone();
+                dmg_num = amount;
 
                 add_effect(None,
                      EffectType::Particle { glyph: '!',
@@ -29,6 +36,9 @@ pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entit
         }
         Err(_) => {}
     }
+    let msg = format!("{} took {} damage!",ent_name, dmg_num);
+    state.game_log.add_log(msg.clone());
+    console::log(msg);
 }
 
 pub fn heal_damage(state : &mut State, heal : &EffectSpawner, target: Entity)

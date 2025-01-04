@@ -1,7 +1,7 @@
 use bracket_lib::prelude::{console, BTerm, Point};
 use queues::{queue, Queue, IsQueue};
 
-use crate::{damage_system::DamageSystem, statistics::BaseStatistics, Position, Renderable, State, Name};
+use crate::{damage_system::DamageSystem, effects::{add_effect, EffectType, Targets}, statistics::BaseStatistics, Name, Position, Renderable, State};
 
 use super::{Projectile, ProjectileType};
 
@@ -103,7 +103,9 @@ pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
 
             if roll < 15
             {
-                DamageSystem::mark_for_damage(state, *target, *dmg);
+                //DamageSystem::mark_for_damage(state, *target, *dmg);
+
+                add_effect(None, EffectType::Damage { amount: *dmg }, Targets::Single { target: *target });
                 
                 let msg = format!("{} was hit by missile",name.name.clone());
                 console::log(msg.clone());

@@ -17,7 +17,6 @@ pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entit
     {
         Ok((pools, name)) => 
         {
-            
             if let EffectType::Damage{amount} = damage.effect_type
             {
 
@@ -27,12 +26,10 @@ pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entit
                 dmg_num = amount;
 
                 add_effect(None,
-                     EffectType::Particle { glyph: '!',
-                      fg: RGB::named(BLACK), bg: RGB::named(RED),
-                      lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
+                    EffectType::Particle { glyph: '!',
+                    fg: RGB::named(BLACK), bg: RGB::named(RED),
+                    lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }
-            
-            
         }
         Err(_) => {}
     }
@@ -55,12 +52,10 @@ pub fn heal_damage(state : &mut State, heal : &EffectSpawner, target: Entity)
                 pools.hitpoints.restore(amount);
 
                 add_effect(None,
-                     EffectType::Particle { glyph: '+',//glyph should be changed to ♥︎
-                      fg: RGB::named(BLACK), bg: RGB::named(GREEN),
-                      lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
+                    EffectType::Particle { glyph: '+',//glyph should be changed to ♥︎
+                    fg: RGB::named(BLACK), bg: RGB::named(GREEN),
+                    lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }
-            
-            
         }
         Err(_) => {}
     }

@@ -42,7 +42,7 @@ pub fn menu_theme(menu : MenuType) -> (&'static str, RGB, RGB)
             return ("Unequip Items:", RGB::named(WHITE), RGB::named(GREEN))
         }
     }
-}
+} 
 
 pub fn draw_menu_custom(ctx : &mut BTerm, items: &Vec<(Entity, bool)>, title: &str, text_colour: RGB,
      highlight: RGB, state: &mut State)

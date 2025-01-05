@@ -14,7 +14,7 @@ pub enum HungerState
 #[derive(Clone, Copy)]
 pub struct HungerLevel
 {
-   pub nutrition: StatPool,
+    pub nutrition: StatPool,
 }
 impl HungerLevel
 {
@@ -43,6 +43,7 @@ impl HungerLevel
 pub fn hunger_system(state: &mut State)
 {
     let res =state.turn_number % 5;
+    let mut ent_to_remove_rest = Vec::new();
     for (_id, (hunger,pools, stats, name, is_resting)) 
         in state.world.query_mut::<(&mut HungerLevel, &mut Pools, &BaseStatistics, &Name, Option<&WantsToRest>)>()
     {
@@ -56,6 +57,8 @@ pub fn hunger_system(state: &mut State)
                     //pools.hitpoints.restore(2);
                     add_effect(None, EffectType::Healing { amount: 1 }, Targets::Single { target: _id });
                     hunger.nutrition.damage(5);
+
+                    ent_to_remove_rest.push(_id);
                 }
             }
         }
@@ -89,5 +92,10 @@ pub fn hunger_system(state: &mut State)
         }
 
 
+    }
+
+    for ent in ent_to_remove_rest.iter()
+    {
+        let _ =state.world.remove_one::<WantsToRest>(*ent);
     }
 }

@@ -56,22 +56,19 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
     let(progress, max) = statistics::get_xp_from_current_level(state);
 
     for (_id,(_player,stats, bstat, hunger)) in
-     state.world.query_mut::<(&Player,&Pools, &BaseStatistics, &HungerLevel)>()
+        state.world.query_mut::<(&Player,&Pools, &BaseStatistics, &HungerLevel)>()
     {
         let health = format!("HP: {} / {} ",stats.hitpoints.current_value,stats.hitpoints.max_value);
         
         ctx.print_color(88, 4, color::WHITE, color::BLACK, &health);
         ctx.draw_bar_horizontal(82, 6, 24, stats.hitpoints.current_value, stats.hitpoints.max_value,
-             color::RED, color::BLACK);
-
-        
-        
+            color::RED, color::BLACK);
 
         let xp = format!("Level: {} XP: {} / {} ", stats.level,progress, max);
 
         ctx.print_color_centered_at(96, 8, color::WHITE, color::BLACK, &xp);
         ctx.draw_bar_horizontal(82, 10, 24, progress, max,
-             color::YELLOW, color::BLACK);
+            color::YELLOW, color::BLACK);
         
         ctx.print_color_centered_at(94, 12, color::WHITE, color::BLACK, "Hunger");
         ctx.draw_bar_horizontal(82, 14, 24, hunger.nutrition.current_value, hunger.nutrition.max_value,

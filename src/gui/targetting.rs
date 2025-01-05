@@ -97,8 +97,8 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
             {
                 let distance =
                  bracket_lib::pathfinding::DistanceAlg::Pythagoras.distance2d(state.player_pos, *idx);
-                 if distance <= range as f32
-                 {
+                if distance <= range as f32
+                {
                     ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
                     available_cells.push(idx.clone());
                 }

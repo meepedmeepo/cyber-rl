@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bracket-lib = "0.8.7"
+bracket-lib = {version ="0.8.7", features=["webgpu"], default-features = false}
 hecs = {version ="0.10.5", features = ["row-serialize"]}
 lazy_static = "1.5.0"
 queues = "1.1.0"

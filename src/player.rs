@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -173,6 +173,11 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
         }
         
     }
+        if moved
+        {
+            state.world.insert_one(state.player_ent.unwrap(), HasMoved{}).unwrap();
+        }
+
         if state.map.tile_contents[destination_id].len() > 0 && !moved
         {
             

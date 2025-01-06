@@ -28,6 +28,7 @@ use statistics::Pools;
 use statistics::StatPool;
 use time_system::time_system;
 use std::cmp::*;
+use std::collections::HashMap;
 use maps::*;
 pub mod maps;
 mod components;
@@ -61,6 +62,8 @@ mod gui;
 mod hunger;
 mod time_system;
 pub mod effects;
+mod entry_trigger_system;
+mod prop_trigger_system;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -562,7 +565,7 @@ fn main() ->BError
         ,revealed_tiles : vec![false;MAPSIZE]
         ,visible_tiles : vec![false;MAPSIZE]
         ,blocked : vec![false;MAPSIZE]
-        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0},
+        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()},
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::PlayerTurn,
         player_pos : Point::zero(),

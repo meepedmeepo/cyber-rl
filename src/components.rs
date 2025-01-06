@@ -3,17 +3,21 @@ use hecs::Entity;
 
 
 pub struct Prop
+{}
+
+pub struct Hidden
+{}
+
+pub struct Triggered
 {
-    
+    pub entity : Entity,
 }
 
-pub struct Hidden {}
+pub struct TriggerOnEnter
+{}
 
-pub struct Trigger 
-{
-
-}
-
+pub struct HasMoved
+{}
 
 
 

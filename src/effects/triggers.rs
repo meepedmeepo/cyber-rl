@@ -23,6 +23,12 @@ pub fn item_trigger(creator : Option<Entity>, item : Entity, targets : &Targets,
     }
 }
 
+#[allow(dead_code)]
+pub fn entry_trigger_fire(creator : Option<Entity>, prop: Entity, targets : &Targets, state : &mut State)
+{
+    event_trigger(creator, prop, targets, state);
+}
+
 fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, state : &mut State)
 {
     //do .get on item for different Components and then execute relevant code you nerdd!!!!!!

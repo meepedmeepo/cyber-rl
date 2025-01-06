@@ -1,6 +1,6 @@
 use bracket_lib::prelude::{console, DistanceAlg,Point};
 use hecs::Entity;
-use crate::{ statistics::BaseStatistics, Monster, MAPWIDTH};
+use crate::{ statistics::BaseStatistics, HasMoved, Monster, MAPWIDTH};
 use super::{Map,State,FoV,Name,Position,AttackSystem};
 
 pub struct MonsterAI{}
@@ -8,7 +8,8 @@ impl MonsterAI
 {
     pub fn run(state : &mut State)
     {
-        let mut attacking_monsters : Vec<(Entity)> = Vec::new();
+        let mut attacking_monsters : Vec<Entity> = Vec::new();
+        let mut moved_monsters = Vec::new();
         for (_id,(fov,name,position,_monster,stats)) 
         in state.world.query_mut::<(&mut FoV,&Name,&mut Position,&Monster,&BaseStatistics)>()  
         {
@@ -30,16 +31,18 @@ impl MonsterAI
                 if path.success && path.steps.len() > 2
                 {
                     state.map.blocked[Map::xy_id(position.x,position.y)] = false;
-                   
+                
                     position.x = path.steps[1] as i32 % MAPWIDTH;
                     position.y = path.steps[1] as i32 / MAPWIDTH;
 
                     state.map.blocked[Map::xy_id(position.x,position.y)] = true;
                     fov.dirty = true;
+
+                    moved_monsters.push(_id);
                 }
             }
         }
-           
+        
         for attacker in attacking_monsters.iter()
         {
             match state.player_ent
@@ -55,6 +58,11 @@ impl MonsterAI
                 }
 
             }
+        }
+
+        for moved in moved_monsters.iter()
+        {
+            state.world.insert_one(*moved, HasMoved{}).unwrap();
         }
     }
 

@@ -1,4 +1,6 @@
 
+use std::collections::{hash_map, HashMap};
+
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
@@ -17,12 +19,13 @@ pub fn new(new_depth : i32) -> Map
     {
         map : vec![TileType::Wall; MAPSIZE],
         rooms : Vec::new(),
- 
+
         revealed_tiles : vec![false; MAPSIZE],
         visible_tiles : vec![false; MAPSIZE],
         blocked : vec![false; MAPSIZE],
         tile_contents : vec![Vec::new(); MAPSIZE],
         depth: new_depth,
+        props: HashMap::new(),
         
     }
 }
@@ -44,10 +47,11 @@ pub struct Map
     pub blocked: Vec<bool>,
     pub tile_contents: Vec<Vec<Entity>>,
     pub depth : i32,
+    pub props : HashMap<i32,Entity>,
 }
 
 impl BaseMap for Map
- {
+{
     fn is_opaque(&self, _idx: usize) -> bool {
         if self.map[_idx as usize] == TileType::Wall { true}
         else 
@@ -88,7 +92,7 @@ impl BaseMap for Map
         Point::new(MAPWIDTH,MAPHEIGHT)
     }
 
- }
+}
 impl Map
 {
 
@@ -107,7 +111,8 @@ impl Map
             revealed_tiles : vec![false;MAPSIZE],
             visible_tiles: vec![false;MAPSIZE],
             blocked : vec![false;MAPSIZE],
-            tile_contents : vec![Vec::new(); MAPSIZE] , depth: 0
+            tile_contents : vec![Vec::new(); MAPSIZE] , depth: 0,
+            props: HashMap::new(),
         }
 
     }

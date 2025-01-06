@@ -27,6 +27,7 @@ pub enum EffectType
     ItemUse {item : Entity},
     Healing {amount : i32},
     Feed {amount : i32},
+    ParticleLine {glyph: char, fg: RGB, bg: RGB, lifetime:f32},
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -112,7 +113,7 @@ fn affect_tile(state : &mut State, effect: &EffectSpawner, tile_idx : i32)
     if tile_effect_hits_entities(&effect.effect_type)
     {
         let contents =  state.map.tile_contents[tile_idx as usize].clone();
-          
+        
         contents.iter()
             .for_each(|target| affect_entity(state, effect, *target));
     }

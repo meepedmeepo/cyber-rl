@@ -28,6 +28,7 @@ pub enum EffectType
     Healing {amount : i32},
     Feed {amount : i32},
     ParticleLine {glyph: char, fg: RGB, bg: RGB, lifetime:f32},
+    PropTriggered {prop : Entity},
 }
 
 #[derive(Clone, PartialEq, Eq)]

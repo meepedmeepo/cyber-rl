@@ -1,4 +1,4 @@
-use crate::{HasMoved, Hidden, Map, Name, Position, State, TriggerOnEnter, Triggered};
+use crate::{HasMoved, Hidden, Map, Name, Position, State, Trigger, TriggerOnEnter, Triggered};
 
 
 
@@ -17,20 +17,20 @@ pub fn run(state: &mut State)
         {
             Some(prop) =>
             {
-                triggered_props.push((*prop,ent));
+                triggered_props.push((*prop,ent, idx));
             }
 
             None => {}
         }
     }
 
-    for (prop, target) in triggered_props.iter()
+    for (prop, target, idx) in triggered_props.iter()
     {
-        if state.world.get::<&TriggerOnEnter>(*prop).is_ok()
+        if state.world.get::<&TriggerOnEnter>(*prop).is_ok() && state.world.get::<&Trigger>(*prop).is_ok()
         {
             let _ = state.world.remove_one::<&Hidden>(*prop);
 
-            let _ = state.world.insert_one(*prop, Triggered{entity: *target});
+            let _ = state.world.insert_one(*prop, Triggered{entity: *target, idx : *idx as i32});
         }
     }
 

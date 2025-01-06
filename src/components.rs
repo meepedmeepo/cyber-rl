@@ -7,13 +7,20 @@ pub struct Prop
 
 pub struct Hidden
 {}
-
+#[derive(Clone, Copy)]
 pub struct Triggered
 {
     pub entity : Entity,
+    pub idx : i32,
 }
 
 pub struct TriggerOnEnter
+{}
+
+pub struct SingleActivation
+{}
+
+pub struct Trigger
 {}
 
 pub struct HasMoved
@@ -28,7 +35,7 @@ pub struct WantsToRest
 #[derive(Clone, Copy, Debug)]
 pub struct GivesFood
 {
-   pub amount: i32,
+    pub amount: i32,
 }
 
 pub struct EquipmentDirty {}
@@ -52,12 +59,12 @@ pub struct Naturals
 #[derive(Clone, Copy)]
 pub struct Weapon
 {
-   pub uses_statistic : WeaponStat,
+    pub uses_statistic : WeaponStat,
 
-   pub damage_die : i32,
-   pub to_hit_bonus : i32,
-   pub dmg_bonus: i32,
-   pub num_dmg_dice : i32
+    pub damage_die : i32,
+    pub to_hit_bonus : i32,
+    pub dmg_bonus: i32,
+    pub num_dmg_dice : i32
 }
 
 pub struct RangedWeapon
@@ -76,10 +83,10 @@ pub struct WantsToEquipItem
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct Attribute
 {
-   pub base : i32,
-   pub bonuses : i32,
-   pub total : i32,
-   pub dirty : bool,
+    pub base : i32,
+    pub bonuses : i32,
+    pub total : i32,
+    pub dirty : bool,
 }
 
 impl Attribute
@@ -140,8 +147,8 @@ pub struct InContainer
 
 pub struct Renderable
 {
-   pub glyph : char,
-   pub fg : bracket_lib::color::RGB,
+    pub glyph : char,
+    pub fg : bracket_lib::color::RGB,
     pub bg : bracket_lib::color::RGB,
     pub order : i32,
 }
@@ -154,7 +161,7 @@ pub struct Name
 
 impl Renderable
 {
-   pub fn new(glyph: char,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
+    pub fn new(glyph: char,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
     {
         Renderable
         {
@@ -169,7 +176,7 @@ impl Renderable
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
 pub struct AoE
 {
-   pub radius: i32,
+    pub radius: i32,
 }
 
 #[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
@@ -181,7 +188,7 @@ pub struct RangedTargetting
 #[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
 pub struct DamageEffect
 {
-   pub damage_amount: i32,
+    pub damage_amount: i32,
 }
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Item
@@ -189,7 +196,7 @@ pub struct Item
 #[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
 pub struct HealingEffect
 {
-   pub healing_amount: i32,
+    pub healing_amount: i32,
 }
 
 #[derive(Clone, Copy,PartialEq, Eq, PartialOrd, Ord)]
@@ -214,7 +221,7 @@ pub struct BlocksTiles
 
 pub struct Attack
 {
-   pub target: Entity,
+    pub target: Entity,
 }
 
 /// This is used to mark all the damage that an entity will take that is processed by the damage_system

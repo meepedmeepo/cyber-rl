@@ -1,10 +1,10 @@
 use std::{borrow::Borrow, clone, collections::HashMap, string};
 
-use bracket_lib::random::DiceType;
+use bracket_lib::{color::RGB, random::DiceType};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{components, effects::{Particle, ParticleBurst}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -86,6 +86,11 @@ fn add_effects_comps(entity_builder: EntityBuilder, effects: HashMap<String, Str
                 "damage" => {eb.add(DamageEffect{damage_amount: effect.1.parse::<i32>().unwrap()});}
                 "aoe" => {eb.add(AoE{radius: effect.1.parse::<i32>().unwrap()});}
                 "food"=>{eb.add(GivesFood{amount: effect.1.parse::<i32>().unwrap()});}
+                "particle" => 
+                {
+                    let particle = RawMaster::parse_particle_string(effect.1.clone());
+                    eb.add(ParticleBurst{particle});
+                }
                 _ =>{bracket_lib::terminal::console::log
                     (format!("Warning: effect {} not implemented.", effect_name));}
             }
@@ -111,7 +116,17 @@ pub fn get_prop_name_list(&self)-> Vec<String>
     self.prop_index.keys().map(|key| key.clone()).collect()
 }
 
-pub fn 
+pub fn parse_particle_string(particle_string : String) -> Particle
+{
+    let parts = particle_string.split(';').collect::<Vec<_>>();
+    
+    let glyph = parts[0].parse::<char>().expect("not valid char for particle");
+    let fg =  RGB::from_hex(parts[1]).expect("not valid hex rgb for particle fg");
+    let bg = RGB::from_hex(parts[2]).expect("not valid hex rgb for particle bg");
+    let lifetime = parts[3].parse::<f32>().expect("not valid f32 for particle lifetime");
+
+    Particle{fg,glyph,bg,lifetime}
+}
 
 fn add_position_comp(entity_builder: EntityBuilder, x : i32, y: i32) -> EntityBuilder
 {

@@ -3,7 +3,7 @@ use hecs::Entity;
 
 use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, State};
 
-use super::{add_effect, EffectType, Targets};
+use super::{add_effect, EffectType, ParticleBurst, Targets};
 
 
 
@@ -48,6 +48,12 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
     if let Ok(food) = state.world.get::<&GivesFood>(item)
     {
         add_effect(creator, EffectType::Feed { amount: food.amount}, targets.clone());
+    }
+
+    if let Ok(p) = state.world.get::<&ParticleBurst>(item)
+    {
+        add_effect(creator, EffectType::Particle { glyph: p.particle.glyph, fg: p.particle.fg
+            , bg: p.particle.bg, lifetime: p.particle.lifetime }, targets.clone());
     }
 
 }

@@ -126,12 +126,9 @@ fn affect_tile(state : &mut State, effect: &EffectSpawner, tile_idx : i32)
     
     match effect.effect_type
     {
-        //MOVE THIS TO HELPER FUNCTION MAYHAPS
         EffectType::Particle { glyph, fg, bg, lifetime } =>
         {
-            let x = tile_idx % MAPWIDTH;
-            let y = tile_idx / MAPWIDTH;
-            state.particle_builder.request(x, y, fg, bg, glyph, lifetime, None);
+            spawn_particle(state, glyph, fg, bg, lifetime, tile_idx);
         }
         _ => {}
     }

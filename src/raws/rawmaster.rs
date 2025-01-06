@@ -4,7 +4,7 @@ use bracket_lib::random::DiceType;
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, Usable, WeaponStat};
+use crate::{components, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -17,6 +17,7 @@ pub struct RawMaster
     raws : Raws,
     item_index : HashMap<String, usize>,
     mob_index : HashMap<String, usize>,
+    prop_index : HashMap<String, usize>
 
 }
 
@@ -26,9 +27,10 @@ pub fn empty() -> RawMaster
 {
     RawMaster
     {
-        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new()},
+        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new(), props: Vec::new()},
         item_index : HashMap::new(),
-        mob_index: HashMap::new()
+        mob_index: HashMap::new(),
+        prop_index : HashMap::new(),
     }
 }
 
@@ -45,6 +47,11 @@ pub fn load(&mut self, raws : Raws)
     {
         self.mob_index.insert(mob.name.clone(), j);
     }
+
+    for (k, prop) in self.raws.props.iter().enumerate()
+    {
+        self.prop_index.insert(prop.name.clone(), k);
+    }
 }
 
 fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) -> EntityBuilder
@@ -54,9 +61,37 @@ fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) 
         {
             glyph: renderable.glyph.chars().next().unwrap(),
             fg: bracket_lib::color::RGB::from_hex(&renderable.fg).expect("Invalid RBG"),
-            bg: bracket_lib::color::RGB::from_hex(&renderable.bg).expect("Invalid RBG"),
+            bg: bracket_lib::color::RGB::from_hex(&renderable.bg).expect(format!("Invalid RGB {}",renderable.glyph.clone()).as_str()),
             order: renderable.order,
         });
+
+    eb
+}
+
+fn add_effects_comps(entity_builder: EntityBuilder, effects: HashMap<String, String>) -> EntityBuilder
+{
+    let mut eb = entity_builder;
+
+    for effect in effects.iter()
+        {
+            let effect_name = effect.0.as_str();
+                
+            match effect_name
+            {
+                "provides_healing" =>
+                {
+                eb.add(HealingEffect {healing_amount: effect.1.parse::<i32>().unwrap()});
+                }
+                "ranged" => {eb.add(RangedTargetting{range: effect.1.parse::<i32>().unwrap()});}
+                "damage" => {eb.add(DamageEffect{damage_amount: effect.1.parse::<i32>().unwrap()});}
+                "aoe" => {eb.add(AoE{radius: effect.1.parse::<i32>().unwrap()});}
+                "food"=>{eb.add(GivesFood{amount: effect.1.parse::<i32>().unwrap()});}
+                _ =>{bracket_lib::terminal::console::log
+                    (format!("Warning: effect {} not implemented.", effect_name));}
+            }
+
+                
+        }
 
     eb
 }
@@ -69,6 +104,11 @@ pub fn get_item_name_list(&self)-> Vec<String>
 pub fn get_mob_name_list(&self)-> Vec<String>
 {
     self.mob_index.keys().map(|key| key.clone()).collect()
+}
+
+pub fn get_prop_name_list(&self)-> Vec<String>
+{
+    self.prop_index.keys().map(|key| key.clone()).collect()
 }
 
 fn add_position_comp(entity_builder: EntityBuilder, x : i32, y: i32) -> EntityBuilder
@@ -105,7 +145,7 @@ fn parse_weapon_comp(weapon : super::Weapon) -> components::Weapon
     }
 
     components::Weapon {uses_statistic: stat,damage_die:dmg_die.die_type,
-         to_hit_bonus: weapon.to_hit_bonus, dmg_bonus : dmg_die.bonus, num_dmg_dice: dmg_die.n_dice}
+        to_hit_bonus: weapon.to_hit_bonus, dmg_bonus : dmg_die.bonus, num_dmg_dice: dmg_die.n_dice}
 }
 
 fn add_monster_stats_comp(new_entity: EntityBuilder, stats: &MobStats) -> EntityBuilder
@@ -197,8 +237,8 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
 }
 
 pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilder, key : &str, pos : SpawnType)
- ->Option<Box::<EntityBuilder>>
- {
+    ->Option<Box::<EntityBuilder>>
+{
     if raws.item_index.contains_key(key)
     {
         let item_template = &raws.raws.items[raws.item_index[key]];
@@ -239,26 +279,10 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
         {
             eb.add(components::Consumable {});
             eb.add(Usable{});
-            for effect in consumable.effects.iter()
-            {
-                let effect_name = effect.0.as_str();
-                
-                match effect_name
-                {
-                    "provides_healing" =>
-                    {
-                    eb.add(HealingEffect {healing_amount: effect.1.parse::<i32>().unwrap()});
-                    }
-                    "ranged" => {eb.add(RangedTargetting{range: effect.1.parse::<i32>().unwrap()});}
-                    "damage" => {eb.add(DamageEffect{damage_amount: effect.1.parse::<i32>().unwrap()});}
-                    "aoe" => {eb.add(AoE{radius: effect.1.parse::<i32>().unwrap()});}
-                    "food"=>{eb.add(GivesFood{amount: effect.1.parse::<i32>().unwrap()});}
-                    _ =>{bracket_lib::terminal::console::log
-                        (format!("Warning: consumable effect {} not implemented.", effect_name));}
-                }
 
-                
-            }
+            let effects = consumable.effects.clone();
+
+            eb = RawMaster::add_effects_comps(eb, effects);
             
         }
         if let Some(equipment) = &item_template.equippable
@@ -294,7 +318,47 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
     }
 
     None
- }
+}
+pub fn spawn_named_prop<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilder, key : &str, pos : SpawnType)
+    ->Option<Box::<EntityBuilder>>
+{
+    let mut eb = new_entity;
+    if raws.prop_index.contains_key(key)
+    {
+        let prop_template = &raws.raws.props[raws.prop_index[key]];
+
+        eb.add(Name{name: prop_template.name.clone()});
+        
+        eb = RawMaster::add_renderable_comp(eb, &prop_template.renderable);
+
+        if let Some(_) = &prop_template.single_activation
+        {
+            eb.add(SingleActivation{});
+        }
+
+        if let Some(_) = &prop_template.entry_trigger
+        {
+            eb.add(Hidden{});
+            eb.add(Trigger{});
+            eb.add(TriggerOnEnter{});
+        }
+
+        let effects = prop_template.consumable.effects.clone();
+        eb = RawMaster::add_effects_comps(eb, effects);
+
+        match pos
+        {
+            SpawnType::AtPosition { x, y } => {eb.add(Position{x: x, y: y});}
+            _ => {}
+        }
+
+
+
+        return Some(Box::new(eb));
+    }
+
+    None{}
+}
     
 }
 

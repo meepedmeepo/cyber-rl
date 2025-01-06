@@ -3,7 +3,7 @@ use bracket_lib::color::RGB;
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
-use triggers::item_trigger;
+use triggers::{entry_trigger_fire, item_trigger};
 use crate::{particles::ParticleBuilder, State, MAPWIDTH};
 
 mod damage;
@@ -82,7 +82,10 @@ fn target_applicator(state: &mut State, effect: &EffectSpawner)
 
         item_trigger(effect.creator, item, &effect.targets, state);
 
-    } else 
+    } else if let EffectType::PropTriggered{prop} = effect.effect_type
+    {
+        entry_trigger_fire(effect.creator, prop, &effect.targets, state);
+    }else
     {
         match &effect.targets
         {

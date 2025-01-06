@@ -106,8 +106,8 @@ pub enum ProgramState
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position
 {
- x: i32,
- y : i32,
+    x: i32,
+    y : i32,
 }
 
 impl Position
@@ -372,8 +372,8 @@ impl GameState for State{
                         {
                             let point = point.expect("Couldn't find point even tho it is Some??? like wtf");
                             self.world.insert_one(self.player_ent.expect("Couldn't find player"),
-                             WantsToUseItem{item:item, target: Some(point)})
-                             .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
+                            WantsToUseItem{item:item, target: Some(point)})
+                            .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
                             self.current_state = ProgramState::PlayerTurn;
                         }
                     }
@@ -444,7 +444,7 @@ impl GameState for State{
 fn run_systems(state: &mut State, ctx: &mut BTerm)
 {
     ctx.cls();
-   
+
     VisibilitySystem::run(state);
     if state.current_state == ProgramState::MonsterTurn
     {
@@ -453,6 +453,9 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     item_equip_system::run(state);
     item_use_system::run(state);
     calculate_attribute_system::run(state);
+
+    entry_trigger_system::run(state);
+    prop_trigger_system::run(state);
 
     AttackSystem::run(state);
     DamageSystem::run(state);
@@ -526,7 +529,7 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     projectile_system::update_projectiles(state, ctx);
 
     let mut entities_to_render  = 
-        state.world.query_mut::<(&Position,&Renderable)>()
+        state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
         .into_iter()
         .map(|ent|{(ent.1.0,ent.1.1)})
         .collect::<Vec<_>>();

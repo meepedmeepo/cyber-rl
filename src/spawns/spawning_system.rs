@@ -16,12 +16,13 @@ pub const MAXMOBS : i32 = 8;
 pub enum EntityType
 {
     Item,
-    Mob
+    Mob,
+    Prop,
 }
 
 pub fn spawn_healing_item(state : &mut State) 
 {
-   let mut pos = state.map.rooms[0].center();
+    let mut pos = state.map.rooms[0].center();
     pos += Point{x:1,y:1};
 
     state.world.spawn((Position::new(pos.x, pos.y),
@@ -33,7 +34,7 @@ pub fn spawn_healing_item(state : &mut State)
 
 pub fn spawn_damage_item(state : &mut State) 
 {
-   let mut pos = state.map.rooms[0].center();
+    let mut pos = state.map.rooms[0].center();
     pos += Point{x:0,y:1};
 
     state.world.spawn((Position::new(pos.x, pos.y),
@@ -64,7 +65,7 @@ pub fn spawn_item_equipped(state : &mut State, item_name: &String, target: Entit
                     slot = Some(equippable.slot);
 
                     build_box.add(Equipped {owner: target,
-                         slot: slot.expect("Couldn't get slot")});
+                        slot: slot.expect("Couldn't get slot")});
 
                     state.world.spawn(build_box.build());
                 }
@@ -153,7 +154,29 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
                     format!("Can't find mob entity named {}",&spawn.1));
                 } 
             }
-    }
+        }
+
+        EntityType::Prop => 
+        {
+            let prop_res = RawMaster::spawn_named_prop(&RAWS.lock().unwrap(),
+                hecs::EntityBuilder::new(), &spawn.1, SpawnType::AtPosition { x, y });
+            
+            match prop_res
+            {
+                Some(mut prop) =>
+                {
+                    state.world.spawn(prop.build());
+                }
+
+                None =>
+                {
+                    bracket_lib::terminal::console::log(
+                        format!("Can't find prop entity named {}",&spawn.1));
+                }
+            }
+
+
+        }
     
 }
 
@@ -183,6 +206,10 @@ pub fn spawn_room(state : &mut State, room : Rect, depth :i32)
     let itemguard =  RAWS.lock().unwrap();
     let item_names =itemguard.get_item_name_list();
     std::mem::drop(itemguard);
+
+    let prop_names = RAWS.lock().unwrap().get_prop_name_list();
+
+    
     let mut num_mobs = 0;
     let mut num_items = 0;
     let mut ent_type  = EntityType::Mob;
@@ -206,10 +233,13 @@ pub fn spawn_room(state : &mut State, room : Rect, depth :i32)
         } else if item_names.contains(&name)
         {
             ent_type = EntityType::Item;
+        }else if prop_names.contains(&name)
+        {
+            ent_type = EntityType::Prop;
         }
         else
         {
-            panic!("{} is not a valid item or mob name so can't be spawned", name);    
+            panic!("{} is not a valid item, mob or prop name so can't be spawned", name);    
         }
 
         let pos_set = room.point_set();

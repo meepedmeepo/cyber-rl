@@ -17,6 +17,7 @@ pub struct Raws
 {
     pub items : Vec<Item>,
     pub mobs : Vec<Mob>,
+    pub props : Vec<Prop>,
     pub spawn_table : Vec<SpawnTableEntry>
 }
 
@@ -88,6 +89,15 @@ pub struct Renderable
 pub struct Consumable
 {
     pub effects : HashMap<String,String>
+}
+#[derive(Deserialize, Debug)]
+pub struct Prop
+{
+    pub name : String,
+    pub renderable : Renderable,
+    pub single_activation : Option<bool>,
+    pub entry_trigger : Option<bool>,
+    pub consumable : Consumable,
 }
 
 pub fn run()

@@ -1,3 +1,5 @@
+use bracket_lib::prelude::console;
+
 use crate::{HasMoved, Hidden, Map, Name, Position, State, Trigger, TriggerOnEnter, Triggered};
 
 
@@ -6,17 +8,18 @@ pub fn run(state: &mut State)
 {
     let mut queried_ents = Vec::new();
     let mut triggered_props = Vec::new();
-    for (ent, (pos, name)) 
-        in state.world.query_mut::<(&Position, &Name)>().with::<&HasMoved>()
+    for (ent, (pos, name, _moved)) 
+        in state.world.query_mut::<(&Position, &Name, &HasMoved)>()
     {
         queried_ents.push(ent);
+        //console::log(format!("{} traps on map", state.map.props.len()));
+        let idx = Map::xy_id(pos.x, pos.y) as i32;
 
-        let idx = Map::xy_id(pos.x, pos.y);
-
-        match state.map.props.get(&(idx as i32))
+        match state.map.props.get(&idx)
         {
             Some(prop) =>
             {
+                //console::log("trap triggered started!");
                 triggered_props.push((*prop,ent, idx));
             }
 
@@ -28,8 +31,8 @@ pub fn run(state: &mut State)
     {
         if state.world.get::<&TriggerOnEnter>(*prop).is_ok() && state.world.get::<&Trigger>(*prop).is_ok()
         {
-            let _ = state.world.remove_one::<&Hidden>(*prop);
-
+            let _ = state.world.remove_one::<Hidden>(*prop);
+            //console::log("trap triggered!");
             let _ = state.world.insert_one(*prop, Triggered{entity: *target, idx : *idx as i32});
         }
     }

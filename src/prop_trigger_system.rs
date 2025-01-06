@@ -1,6 +1,6 @@
 use bracket_lib::prelude::Point;
 
-use crate::{effects::{self, add_effect, EffectType, Targets}, AoE, SingleActivation, State, Trigger, Triggered, MAPWIDTH};
+use crate::{effects::{self, add_effect, EffectType, Targets}, AoE, Hidden, SingleActivation, State, Trigger, Triggered, MAPWIDTH};
 
 
 
@@ -37,6 +37,7 @@ pub fn run(state: &mut State)
         }
 
         let _ = state.world.remove_one::<Triggered>(*prop);
+        //let _ = state.world.remove_one::<Hidden>(*prop);
     }
 
 }

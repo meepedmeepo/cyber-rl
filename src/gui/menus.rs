@@ -45,7 +45,7 @@ pub fn menu_theme(menu : MenuType) -> (&'static str, RGB, RGB)
 } 
 
 pub fn draw_menu_custom(ctx : &mut BTerm, items: &Vec<(Entity, bool)>, title: &str, text_colour: RGB,
-     highlight: RGB, state: &mut State)
+    highlight: RGB, state: &mut State)
 {
     let mut menu_content = Vec::new();
     
@@ -59,7 +59,7 @@ pub fn draw_menu_custom(ctx : &mut BTerm, items: &Vec<(Entity, bool)>, title: &s
     }
 
     draw_menu_list(ctx, &menu_content, title , Point::new(22, 10),
-         35, text_colour, RGB::named(BLACK), highlight);
+        35, text_colour, RGB::named(BLACK), highlight);
 }
 
 

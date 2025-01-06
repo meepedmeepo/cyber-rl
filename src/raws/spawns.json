@@ -1,356 +1,439 @@
-
+{
+  "items": [
     {
-    "items" : [
-        {
-            "name" : "Health Potion",
-            "renderable": {
-                "glyph" : "!",
-                "fg" : "#FF00FF",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "consumable" : {
-                "effects" : { "provides_healing" : "8" }
-            }
-        },
-        {
-            "name" : "Ration",
-            "renderable": {
-                "glyph" : "%",
-                "fg" : "#FF00FF",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "consumable" : {
-                "effects" : { "food" : "150" }
-            }
-        },
-    
-        {
-            "name" : "Magic Missile Scroll",
-            "renderable": {
-                "glyph" : ")",
-                "fg" : "#00FFFF",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "consumable" : {
-                "effects" : { 
-                    "ranged" : "6",
-                    "damage" : "15"
-                }
-            }
-        },
-
-        {
-            "name" : "Fireball Scroll",
-            "renderable": {
-                "glyph" : ")",
-                "fg" : "#880808",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "consumable" : {
-                "effects" : { 
-                    "ranged" : "8",
-                    "aoe" : "4",
-                    "damage" : "10"
-                }
-            }
-        },
-        {
-            "name" : "Wooden Bow",
-            "renderable": {
-                "glyph" : ")",
-                "fg" : "#880808",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "ranged": 6,
-            "equippable" : {
-                "slot" : "ranged"
-            }
-        },
-        {
-            "name" : "Rusty Sword",
-            "renderable": {
-                "glyph" : "/",
-                "fg" : "#FFFFFF",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "mainhand"
-            },
-            "weapon" :{
-                "statistic": "strength",
-                "damage_die" : "1d6",
-                "to_hit_bonus" : 0
-
-            }
-        },
-        {
-            "name" : "Leather Breastplate",
-            "renderable": {
-                "glyph" : "[",
-                "fg" : "#72442a",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "body"
-            },
-            "wearable" : {
-                "ac_bonus" : 1
-            }
-        },
-        {
-            "name" : "Leather Leggings",
-            "renderable": {
-                "glyph" : "[",
-                "fg" : "#72442a",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "legs"
-            },
-            "wearable" : {
-                "ac_bonus" : 1
-            }
-        },
-        {
-            "name" : "Leather Boots",
-            "renderable": {
-                "glyph" : "[",
-                "fg" : "#72442a",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "boots"
-            },
-            "wearable" : {
-                "ac_bonus" : 1
-            }
-        },
-        {
-            "name" : "Leather Gauntlets",
-            "renderable": {
-                "glyph" : "[",
-                "fg" : "#72442a",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "hands"
-            },
-            "wearable" : {
-                "ac_bonus" : 1
-            }
-        },
-        {
-            "name" : "Wooden Shield",
-            "renderable": {
-                "glyph" : "[",
-                "fg" : "#72442a",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "offhand"
-            },
-            "wearable" : {
-                "ac_bonus" : 1
-            }
-        },
-        {
-            "name" : "Iron Longsword",
-            "renderable": {
-                "glyph" : "/",
-                "fg" : "#b50023",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "mainhand"
-            },
-            "weapon" :{
-                "statistic": "strength",
-                "damage_die" : "1d8",
-                "to_hit_bonus" : 1
-
-            }
-        },
-        {
-            "name" : "Iron Dagger",
-            "renderable": {
-                "glyph" : "/",
-                "fg" : "#b50023",
-                "bg" : "#000000",
-                "order" : 2
-            },
-            "equippable" : {
-                "slot" : "mainhand"
-            },
-            "weapon" :{
-                "statistic": "dexterity",
-                "damage_die" : "1d4",
-                "to_hit_bonus" : 2
-
-            }
+      "name": "Health Potion",
+      "renderable": {
+        "glyph": "!",
+        "fg": "#FF00FF",
+        "bg": "#000000",
+        "order": 2
+      },
+      "consumable": {
+        "effects": {
+          "provides_healing": "8"
         }
-    ],
-
-    "mobs" : [
+      }
+    },
     {
-        "name" : "Orc",
-        "renderable": {
-                "glyph" : "O",
-                "fg" : "#FF00FF",
-                "bg" : "#000000",
-                "order" : 3
-            },
-        
-        "vision_range" : 6,
-        
-        "blocks_tiles" : true,
-
-        "stats" : {
-            "max_hp": 30,
-            "hp": 30
+      "name": "Ration",
+      "renderable": {
+        "glyph": "%",
+        "fg": "#FF00FF",
+        "bg": "#000000",
+        "order": 2
+      },
+      "consumable": {
+        "effects": {
+          "food": "150"
         }
+      }
     },
     {
-        "name" : "Goblin",
-        "renderable": {
-                "glyph" : "g",
-                "fg" : "#00FF00",
-                "bg" : "#000000",
-                "order" : 3
-            },
-        
-        "vision_range" : 4,
-        
-        "blocks_tiles" : true,
-
-        "stats" : {
-            "max_hp": 20,
-            "hp": 20,
-            "dexterity" : 16
-        },
-        "naturals" : [
-            {
-                "statistic" : "dexterity",
-                "damage_die" : "1d4",
-                "to_hit_bonus" : 2
-            }
-            
-        ]
-        
+      "name": "Magic Missile Scroll",
+      "renderable": {
+        "glyph": ")",
+        "fg": "#00FFFF",
+        "bg": "#000000",
+        "order": 2
+      },
+      "consumable": {
+        "effects": {
+          "ranged": "6",
+          "damage": "15"
+        }
+      }
     },
     {
-        "name" : "Kobold",
-        "renderable": {
-                "glyph" : "k",
-                "fg" : "#FFFF00",
-                "bg" : "#000000",
-                "order" : 3
-            },
-        
-        "vision_range" : 6,
-        
-        "blocks_tiles" : true,
-
-        "stats" : {
-            "max_hp": 15,
-            "hp": 15
-        },
-        "equipment" : [
-            "Leather Breastplate",
-            "Rusty Sword",
-            "Wooden Shield"
-        ]
+      "name": "Fireball Scroll",
+      "renderable": {
+        "glyph": ")",
+        "fg": "#880808",
+        "bg": "#000000",
+        "order": 2
+      },
+      "consumable": {
+        "effects": {
+          "ranged": "8",
+          "aoe": "4",
+          "damage": "10"
+        }
+      }
     },
     {
-        "name" : "Bandit",
-        "renderable": {
-                "glyph" : "h",
-                "fg" : "#FFFF00",
-                "bg" : "#000000",
-                "order" : 3
-            },
-        
-        "vision_range" : 8,
-        
-        "blocks_tiles" : true,
-
-        "stats" : {
-            "max_hp": 15,
-            "hp": 15,
-            "dexterity" : 16,
-            "strength" : 14
-        },
-        "equipment" : [
-            "Leather Breastplate",
-            "Wooden Shield",
-            "Leather Boots",
-            "Iron Dagger"
-        ]
+      "name": "Wooden Bow",
+      "renderable": {
+        "glyph": ")",
+        "fg": "#880808",
+        "bg": "#000000",
+        "order": 2
+      },
+      "ranged": 6,
+      "equippable": {
+        "slot": "ranged"
+      }
     },
     {
-        "name" : "Green Ooze",
-        "renderable": {
-                "glyph" : "j",
-                "fg" : "#00FF00",
-                "bg" : "#000000",
-                "order" : 3
-            },
-        
-        "vision_range" : 3,
-        
-        "blocks_tiles" : true,
-
-        "stats" : {
-            "max_hp": 50,
-            "hp": 50,
-            "dexterity" : 4,
-            "strength": 14,
-            "intelligence" : 1,
-            "mental":2,
-            "natural_ac" : 12
-
-        },
-        "naturals" : [
-            {
-                "statistic" : "strength",
-                "damage_die" : "1d4",
-                "to_hit_bonus" : 2
-            }
-            
-        ]
-        
+      "name": "Rusty Sword",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#FFFFFF",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "strength",
+        "damage_die": "1d6",
+        "to_hit_bonus": 0
+      }
+    },
+    {
+      "name": "Leather Breastplate",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#72442a",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "body"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Leather Leggings",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#72442a",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "legs"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Leather Boots",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#72442a",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "boots"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Leather Gauntlets",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#72442a",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "hands"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Wooden Shield",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#72442a",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "offhand"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Iron Longsword",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#b50023",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "strength",
+        "damage_die": "1d8",
+        "to_hit_bonus": 1
+      }
+    },
+    {
+      "name": "Iron Dagger",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#b50023",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "dexterity",
+        "damage_die": "1d4",
+        "to_hit_bonus": 2
+      }
     }
-    ],
-
-    "spawn_table" : [
-
-        { "name" : "Kobold", "weight" : 20, "min_depth" : 0, "max_depth" : 3 },
-        { "name" : "Orc", "weight" : 5, "min_depth" : 1, "max_depth" : 100, "add_map_depth_to_weight" : true},
-        { "name" : "Goblin", "weight" : 15, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Health Potion", "weight" : 10, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
-        { "name" : "Magic Missile Scroll", "weight" : 6, "min_depth" : 0, "max_depth" : 100 },
-        { "name" : "Fireball Scroll", "weight" : 8, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true},
-        { "name" : "Rusty Sword", "weight" : 3, "min_depth" : 0, "max_depth" : 5 },
-        { "name" : "Leather Breastplate", "weight" : 2, "min_depth" : 1, "max_depth" : 15 },
-        { "name" : "Leather Leggings", "weight" : 3, "min_depth" : 1, "max_depth" : 15 },
-        { "name" : "Leather Gauntlets", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
-        { "name" : "Leather Boots", "weight" : 4, "min_depth" : 0, "max_depth" : 10 },
-        { "name" : "Wooden Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Iron Longsword", "weight" : 4, "min_depth" : 3, "max_depth" : 20, "add_map_depth_to_weight" : true },
-        { "name" : "Wooden Bow", "weight" : 2, "min_depth" : 0, "max_depth" : 15 },
-        { "name" : "Bandit", "weight" : 15, "min_depth" : 1, "max_depth" : 5 },
-        { "name" : "Ration", "weight" : 8, "min_depth" : 0, "max_depth" : 100 }
-
-    ]
+  ],
+  "mobs": [
+    {
+      "name": "Orc",
+      "renderable": {
+        "glyph": "O",
+        "fg": "#FF00FF",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 6,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 30,
+        "hp": 30
+      }
+    },
+    {
+      "name": "Goblin",
+      "renderable": {
+        "glyph": "g",
+        "fg": "#00FF00",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 4,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 20,
+        "hp": 20,
+        "dexterity": 16
+      },
+      "naturals": [
+        {
+          "statistic": "dexterity",
+          "damage_die": "1d4",
+          "to_hit_bonus": 2
+        }
+      ]
+    },
+    {
+      "name": "Kobold",
+      "renderable": {
+        "glyph": "k",
+        "fg": "#FFFF00",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 6,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 15,
+        "hp": 15
+      },
+      "equipment": [
+        "Leather Breastplate",
+        "Rusty Sword",
+        "Wooden Shield"
+      ]
+    },
+    {
+      "name": "Bandit",
+      "renderable": {
+        "glyph": "h",
+        "fg": "#FFFF00",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 8,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 15,
+        "hp": 15,
+        "dexterity": 16,
+        "strength": 14
+      },
+      "equipment": [
+        "Leather Breastplate",
+        "Wooden Shield",
+        "Leather Boots",
+        "Iron Dagger"
+      ]
+    },
+    {
+      "name": "Green Ooze",
+      "renderable": {
+        "glyph": "j",
+        "fg": "#00FF00",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 3,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 50,
+        "hp": 50,
+        "dexterity": 4,
+        "strength": 14,
+        "intelligence": 1,
+        "mental": 2,
+        "natural_ac": 12
+      },
+      "naturals": [
+        {
+          "statistic": "strength",
+          "damage_die": "1d4",
+          "to_hit_bonus": 2
+        }
+      ]
     }
+  ],
+  "spawn_table": [
+    {
+      "name": "Kobold",
+      "weight": 20,
+      "min_depth": 0,
+      "max_depth": 3
+    },
+    {
+      "name": "Orc",
+      "weight": 5,
+      "min_depth": 1,
+      "max_depth": 100,
+      "add_map_depth_to_weight": true
+    },
+    {
+      "name": "Goblin",
+      "weight": 15,
+      "min_depth": 0,
+      "max_depth": 15
+    },
+    {
+      "name": "Health Potion",
+      "weight": 10,
+      "min_depth": 0,
+      "max_depth": 100,
+      "add_map_depth_to_weight": true
+    },
+    {
+      "name": "Magic Missile Scroll",
+      "weight": 6,
+      "min_depth": 0,
+      "max_depth": 100
+    },
+    {
+      "name": "Fireball Scroll",
+      "weight": 8,
+      "min_depth": 0,
+      "max_depth": 100,
+      "add_map_depth_to_weight": true
+    },
+    {
+      "name": "Rusty Sword",
+      "weight": 3,
+      "min_depth": 0,
+      "max_depth": 5
+    },
+    {
+      "name": "Leather Breastplate",
+      "weight": 2,
+      "min_depth": 1,
+      "max_depth": 15
+    },
+    {
+      "name": "Leather Leggings",
+      "weight": 3,
+      "min_depth": 1,
+      "max_depth": 15
+    },
+    {
+      "name": "Leather Gauntlets",
+      "weight": 4,
+      "min_depth": 0,
+      "max_depth": 10
+    },
+    {
+      "name": "Leather Boots",
+      "weight": 4,
+      "min_depth": 0,
+      "max_depth": 10
+    },
+    {
+      "name": "Wooden Shield",
+      "weight": 3,
+      "min_depth": 0,
+      "max_depth": 15
+    },
+    {
+      "name": "Iron Longsword",
+      "weight": 4,
+      "min_depth": 3,
+      "max_depth": 20,
+      "add_map_depth_to_weight": true
+    },
+    {
+      "name": "Wooden Bow",
+      "weight": 2,
+      "min_depth": 0,
+      "max_depth": 15
+    },
+    {
+      "name": "Bandit",
+      "weight": 15,
+      "min_depth": 1,
+      "max_depth": 5
+    },
+    {
+      "name": "Ration",
+      "weight": 8,
+      "min_depth": 0,
+      "max_depth": 100
+    },
+    {
+      "name": "Bear Trap",
+      "weight": 50,
+      "min_depth": 0,
+      "max_depth": 100
+    }
+  ],
+  "props": [
+    {
+      "name": "Bear Trap",
+      "renderable": {
+        "glyph": "^",
+        "fg": "#998e99",
+        "bg": "#000000",
+        "order": 2
+      },
+      "single_activation" : true,
+      "entry_trigger" : true,
+      "consumable": {
+        "effects": {
+          "damage": "5"
+        }
+
+      }
+    }
+  ]
+}

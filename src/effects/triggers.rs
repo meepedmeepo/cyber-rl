@@ -1,7 +1,7 @@
 use bracket_lib::prelude::console;
 use hecs::Entity;
 
-use crate::{Consumable, DamageEffect, GivesFood, HealingEffect, State};
+use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, State};
 
 use super::{add_effect, EffectType, Targets};
 
@@ -26,6 +26,7 @@ pub fn item_trigger(creator : Option<Entity>, item : Entity, targets : &Targets,
 #[allow(dead_code)]
 pub fn entry_trigger_fire(creator : Option<Entity>, prop: Entity, targets : &Targets, state : &mut State)
 {
+    state.game_log.add_log("Trap fired!".to_string());
     event_trigger(creator, prop, targets, state);
 }
 

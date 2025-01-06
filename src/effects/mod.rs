@@ -10,7 +10,9 @@ mod damage;
 mod targetting;
 mod triggers;
 mod hunger;
+mod particles;
 pub use targetting::*;
+pub use particles::*;
 
 
 

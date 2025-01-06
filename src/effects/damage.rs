@@ -33,9 +33,12 @@ pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entit
         }
         Err(_) => {}
     }
-    let msg = format!("{} took {} damage!",ent_name, dmg_num);
-    state.game_log.add_log(msg.clone());
-    console::log(msg);
+    if ent_name != ""
+    {
+        let msg = format!("{} took {} damage!",ent_name, dmg_num);
+        state.game_log.add_log(msg.clone());
+        console::log(msg);
+    }
 }
 
 pub fn heal_damage(state : &mut State, heal : &EffectSpawner, target: Entity)

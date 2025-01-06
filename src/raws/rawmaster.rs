@@ -111,6 +111,8 @@ pub fn get_prop_name_list(&self)-> Vec<String>
     self.prop_index.keys().map(|key| key.clone()).collect()
 }
 
+pub fn 
+
 fn add_position_comp(entity_builder: EntityBuilder, x : i32, y: i32) -> EntityBuilder
 {
     let mut eb = entity_builder;

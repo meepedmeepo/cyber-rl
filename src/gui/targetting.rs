@@ -24,7 +24,7 @@ pub fn keyboard_cursor(state : &mut State, ctx: &mut BTerm, pos : Point) -> Poin
         pos
     }
 }
-   
+
 
 pub fn key_to_translation(ctx: &mut BTerm) -> Point
 {

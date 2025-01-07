@@ -547,7 +547,6 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     }
 }
 
-
 fn main() ->BError 
 {
     //println!("{}", std::env::current_dir().unwrap().display());
@@ -579,10 +578,6 @@ fn main() ->BError
         target_mode: TargettingMode::Keyboard{cursor_pos: Point::zero()},
         turn_number: 0,
     };
-    // gs.map = Map::create_room_map(&mut gs);
-    // gs.map.create_map_corridors();
-    //Map::generate_map_checked(&mut gs);
-    
     
     //context.with_post_scanlines(true);
 

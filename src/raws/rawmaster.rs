@@ -4,7 +4,7 @@ use bracket_lib::{color::RGB, random::DiceType};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, effects::{Particle, ParticleBurst}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -91,6 +91,7 @@ fn add_effects_comps(entity_builder: EntityBuilder, effects: HashMap<String, Str
                     let particle = RawMaster::parse_particle_string(effect.1.clone());
                     eb.add(ParticleBurst{particle});
                 }
+                "particleline" => {eb.add(ParticleLine{particle: RawMaster::parse_particle_string(effect.1.clone())});}
                 _ =>{bracket_lib::terminal::console::log
                     (format!("Warning: effect {} not implemented.", effect_name));}
             }

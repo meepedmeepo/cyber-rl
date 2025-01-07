@@ -1,9 +1,9 @@
-use bracket_lib::prelude::console;
+use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
-use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, State};
+use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Map, Position, State, MAPWIDTH};
 
-use super::{add_effect, EffectType, ParticleBurst, Targets};
+use super::{add_effect, EffectType, ParticleBurst, ParticleLine, Targets};
 
 
 
@@ -54,6 +54,40 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
     {
         add_effect(creator, EffectType::Particle { glyph: p.particle.glyph, fg: p.particle.fg
             , bg: p.particle.bg, lifetime: p.particle.lifetime }, targets.clone());
+    }
+
+    if let Ok(p) = state.world.get::<&ParticleLine>(item)
+    {
+        if let Some(source) = creator
+        {
+            let pl = *p;
+
+            if let Ok(source_pos) = state.world.get::<&Position>( source)
+            {
+                let start_pos = *source_pos;
+
+                let mut end_pos = Point::zero();
+
+                if let Targets::Tile{tile_idx} = *targets
+                {
+                    end_pos = Point::new(tile_idx % MAPWIDTH, tile_idx / MAPWIDTH);
+                }
+                else if let Targets::Tiles { tiles } = targets.clone()
+                {
+                    end_pos = Point::new(tiles[0] % MAPWIDTH, tiles[0] / MAPWIDTH);
+                }
+                if end_pos != Point::zero()
+                {
+                    //TODO: change this so that there is a staggered appearance and dissappearance of the particles!
+                    let line = bracket_lib::geometry::Bresenham::new(Point{x:start_pos.x,y: start_pos.y}, end_pos);
+                    let tile_vec =line.skip(1).map(|point| Map::xy_id(point.x, point.y) as i32).collect::<Vec<_>>();
+
+                    add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph, fg: pl.particle.fg
+                        , bg: pl.particle.bg, lifetime: pl.particle.lifetime }
+                    , Targets::Tiles { tiles: tile_vec.clone() });
+                }
+            }
+        }
     }
 
 }

@@ -766,6 +766,7 @@ dependencies = [
  "bracket-lib",
  "hecs",
  "lazy_static",
+ "priority-queue",
  "queues",
  "serde",
  "serde_json",
@@ -1416,6 +1417,17 @@ name = "pollster"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5da3b0203fd7ee5720aa0b5e790b591aa5d3f41c3ed2c34a3a393382198af2f7"
+
+[[package]]
+name = "priority-queue"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "714c75db297bc88a63783ffc6ab9f830698a6705aa0201416931759ef4c8183d"
+dependencies = [
+ "autocfg",
+ "equivalent",
+ "indexmap 2.6.0",
+]
 
 [[package]]
 name = "proc-macro-crate"
@@ -2098,7 +2110,7 @@ dependencies = [
  "js-sys",
  "log",
  "naga",
- "parking_lot 0.11.2",
+ "parking_lot 0.12.3",
  "raw-window-handle 0.4.3",
  "smallvec",
  "wasm-bindgen",
@@ -2124,7 +2136,7 @@ dependencies = [
  "fxhash",
  "log",
  "naga",
- "parking_lot 0.11.2",
+ "parking_lot 0.12.3",
  "profiling",
  "raw-window-handle 0.4.3",
  "smallvec",
@@ -2161,7 +2173,7 @@ dependencies = [
  "metal",
  "naga",
  "objc",
- "parking_lot 0.11.2",
+ "parking_lot 0.12.3",
  "profiling",
  "range-alloc",
  "raw-window-handle 0.4.3",

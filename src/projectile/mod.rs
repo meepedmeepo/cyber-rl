@@ -54,7 +54,7 @@ impl ProjectileBuilder
     }
 
     pub fn add_request(&mut self, frame_time: f32, path: Vec<Point>,
-         projectile_type: ProjectileType, glyph: char, fg: RGB, bg: RGB, order: i32, dmg : i32)
+        projectile_type: ProjectileType, glyph: char, fg: RGB, bg: RGB, order: i32, dmg : i32)
     {
         self.requests.push(ProjectileRequest::new(frame_time, path, projectile_type, glyph, fg, bg, order, dmg));
     }

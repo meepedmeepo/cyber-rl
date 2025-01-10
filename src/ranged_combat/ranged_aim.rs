@@ -31,7 +31,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
     let pos = state.player_pos;
     
     targetting_viewshed(&mut available_cells, state, range, pos, true, ctx);
-  
+
     let (m_x,m_y) = gui::select_target_mode(state, ctx).to_tuple();
 
     //let idx = Map::xy_id(m_x, m_y);
@@ -46,7 +46,6 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
             {
                 ctx.set(pos.x, pos.y, BLACK, GREEN, '*');
             });
-           
         
         ctx.set_bg(point.x, point.y, GREEN);
 

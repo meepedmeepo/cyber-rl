@@ -1,3 +1,6 @@
+use ai::adjacent_ai_system;
+use ai::run_initiative;
+use ai::TURN_QUEUE;
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
 use bracket_lib::color;
@@ -64,6 +67,7 @@ mod time_system;
 pub mod effects;
 mod entry_trigger_system;
 mod prop_trigger_system;
+mod ai;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -98,7 +102,7 @@ pub enum ProgramState
     Targeting { range: i32, item : Entity, aoe: Option<i32> },
     RangedCombat {range: i32, dmg: i32},
     KeyboardTargetting {cursor_pos : Point},
-
+    Ticking,
     SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType}
 }
 
@@ -216,6 +220,26 @@ impl GameState for State{
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
                 //gui::draw_inventory(self, ctx);
+            }
+            ProgramState::Ticking =>
+            {
+                self.current_state = run_initiative(self);
+                if self.current_state == ProgramState::AwaitingInput
+                {
+                    return;
+                }
+                else
+                {
+            
+                    //check adjacent reactions
+                    ai::adjacent_ai_system(self);
+                    //check further away reactions
+                    
+                    //check for goal behaviour
+                    //default behaviour
+
+                    //run systems!
+                }
             }
 
             ProgramState::PlayerTurn =>

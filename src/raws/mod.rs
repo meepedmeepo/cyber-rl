@@ -5,7 +5,9 @@ pub use rawmaster::*;
 mod spawn_table_structs;
 use spawn_table_structs::*;
 use std::sync::Mutex;
-use crate::lazy_static::LazyStatic;
+use crate::{lazy_static::LazyStatic, Faction};
+mod faction_structs;
+pub use faction_structs::*;
 //makes it safe to use RawMaster as a global static singleton.
 lazy_static! {
     pub static ref RAWS : Mutex<RawMaster> = Mutex::new(RawMaster::empty());
@@ -18,7 +20,8 @@ pub struct Raws
     pub items : Vec<Item>,
     pub mobs : Vec<Mob>,
     pub props : Vec<Prop>,
-    pub spawn_table : Vec<SpawnTableEntry>
+    pub spawn_table : Vec<SpawnTableEntry>,
+    pub faction_table : Vec<FactionInfo>
 }
 
 #[derive(Deserialize, Debug)]
@@ -59,7 +62,8 @@ pub struct Mob
     pub vision_range: i32,
     pub blocks_tiles: bool,
     pub naturals: Option<Vec<Weapon>>,
-    pub equipment: Option<Vec<String>>
+    pub equipment: Option<Vec<String>>,
+    pub faction: Option<String>
 }
 
 #[derive(Deserialize, Debug)]

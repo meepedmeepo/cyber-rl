@@ -1,10 +1,10 @@
-use std::{borrow::Borrow, clone, collections::HashMap, string};
+use std::{borrow::Borrow, clone, collections::HashMap, hash::Hash, string};
 
 use bracket_lib::{color::RGB, random::DiceType};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
-use super::{Consumable, Mob, MobStats, Raws, Renderable};
-use crate::{components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
+use crate::{components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -17,7 +17,8 @@ pub struct RawMaster
     raws : Raws,
     item_index : HashMap<String, usize>,
     mob_index : HashMap<String, usize>,
-    prop_index : HashMap<String, usize>
+    prop_index : HashMap<String, usize>,
+    faction_index : HashMap<String, HashMap<String, Reaction>>
 
 }
 
@@ -27,10 +28,11 @@ pub fn empty() -> RawMaster
 {
     RawMaster
     {
-        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new(), props: Vec::new()},
+        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new(), props: Vec::new(), faction_table : Vec::new()},
         item_index : HashMap::new(),
         mob_index: HashMap::new(),
         prop_index : HashMap::new(),
+        faction_index : HashMap::new(),
     }
 }
 
@@ -52,6 +54,22 @@ pub fn load(&mut self, raws : Raws)
     {
         self.prop_index.insert(prop.name.clone(), k);
     }
+
+    for faction in self.raws.faction_table.iter()
+    {
+        let mut reactions : HashMap<String, Reaction> = HashMap::new();
+        for other in faction.responses.iter()
+        {
+            reactions.insert(other.0.clone(), match other.1.as_str() 
+            {
+                "ignore" => Reaction::Ignore,
+                "flee" => Reaction::Flee,
+                _ => Reaction::Attack
+            });
+        }
+        self.faction_index.insert(faction.name.clone(), reactions);
+    }
+
 }
 
 fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) -> EntityBuilder
@@ -247,6 +265,14 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
             eb.add(EquipmentDirty{});
         }
 
+        if let Some(faction) = &mob_template.faction
+        {
+            eb.add(Faction{name : faction.clone()});
+        }else
+        {
+            eb.add(Faction{name : "Mindless".to_string()});    
+        }
+
         return (Some((Box::new(eb))), equip_list);
     }
 
@@ -402,4 +428,27 @@ pub fn get_spawn_table_for_depth(raws : &RawMaster, depth : i32) -> RandomTable
     }
 
     rt
+}
+
+
+pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster) -> Reaction
+{
+    if raws.faction_index.contains_key(my_faction) 
+    {
+        let mf = &raws.faction_index[my_faction];
+        if mf.contains_key(their_faction)
+        {
+            return mf[their_faction];
+        }
+        else if mf.contains_key("Default")
+        {
+            return mf["Default"];
+        }
+        else 
+        {
+            return Reaction::Ignore;
+        }
+    }
+
+    Reaction::Ignore
 }

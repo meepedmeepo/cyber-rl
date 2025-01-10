@@ -84,7 +84,7 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
                     add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph, fg: pl.particle.fg
                         , bg: pl.particle.bg, lifetime: pl.particle.lifetime }
-                    , Targets::Tiles { tiles: tile_vec.clone() });
+                        , Targets::Tiles { tiles: tile_vec.clone() });
                 }
             }
         }

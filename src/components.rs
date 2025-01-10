@@ -1,6 +1,22 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
+use serde::Deserialize;
 
+#[derive(Debug, Clone)]
+pub struct WantsToApproach
+{
+    pub target : Entity,
+}
+#[derive(Debug, Clone)]
+pub struct WantsToFlee
+{
+    pub indices : Vec<i32>,
+}
+#[derive(Clone, PartialEq, Eq, Deserialize, Debug)]
+pub struct Faction
+{
+    pub name : String
+}
 
 pub struct Prop
 {}
@@ -25,9 +41,6 @@ pub struct Trigger
 
 pub struct HasMoved
 {}
-
-
-
 
 pub struct WantsToRest
 {}
@@ -179,7 +192,7 @@ pub struct AoE
     pub radius: i32,
 }
 
-#[derive(Clone, Copy, PartialEq,Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RangedTargetting
 {
     pub range : i32,

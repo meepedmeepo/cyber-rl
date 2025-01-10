@@ -347,7 +347,7 @@
     },
     {
       "name": "Fireball Scroll",
-      "weight": 8,
+      "weight": 4,
       "min_depth": 0,
       "max_depth": 100,
       "add_map_depth_to_weight": true

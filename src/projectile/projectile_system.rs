@@ -1,7 +1,7 @@
 use bracket_lib::prelude::{console, BTerm, Point};
 use queues::{queue, Queue, IsQueue};
 
-use crate::{damage_system::DamageSystem, effects::{add_effect, EffectType, Targets}, statistics::BaseStatistics, Name, Position, Renderable, State};
+use crate::{ effects::{add_effect, EffectType, Targets}, statistics::BaseStatistics, Name, Position, Renderable, State};
 
 use super::{Projectile, ProjectileType};
 
@@ -74,7 +74,7 @@ pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
 
     for (ent, new_location, proj_type, dmg) in projectiles_to_update.iter()
     {
-       let _proj = state.world
+        let _proj = state.world
             .insert_one(*ent, Position{ x: new_location.x, y: new_location.y });
 
         let hits = state.map.get_mob_entities_at_position(state, *new_location);

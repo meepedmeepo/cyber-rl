@@ -1,9 +1,14 @@
 mod initiative;
+use hecs::Entity;
 pub use initiative::*;
 mod adjacent_ai;
 pub use adjacent_ai::*;
 mod visible_ai;
 pub use visible_ai::*;
+mod approach_ai;
+pub use approach_ai::*;
+mod flee_ai;
+pub use flee_ai::*;
 use crate::{statistics::BaseStatistics, State};
 
 
@@ -37,12 +42,10 @@ impl ActionType
     }
 }
 
-pub fn world_tick(state : &mut State)
+pub fn apply_energy_cost (state: &mut State, action: ActionType, ent : Entity)
 {
-    //increase world turn timer by one
-    state.turn_number += 1;
-    //select which entities will have turns
-   // init_turn_queue(state);
-
-
+    if let Ok( mut energy) = state.world.get::<&mut Energy>(ent)
+    {
+        energy.value -= action.get_cost();
+    }
 }

@@ -10,7 +10,7 @@ pub struct WantsToApproach
 #[derive(Debug, Clone)]
 pub struct WantsToFlee
 {
-    pub indices : Vec<i32>,
+    pub indices : Vec<usize>,
 }
 #[derive(Clone, PartialEq, Eq, Deserialize, Debug)]
 pub struct Faction

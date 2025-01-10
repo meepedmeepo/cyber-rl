@@ -16,14 +16,14 @@ pub fn visible_ai_system(state :&mut State)
     let mut possible_attacks: HashMap<Entity,Vec<usize>> = HashMap::new();
 
     //stores lists of indices to flee from for targets that want to flee
-    let mut flee_targets : HashMap<Entity, Vec<i32>> = HashMap::new();
+    let mut flee_targets : HashMap<Entity, Vec<usize>> = HashMap::new();
 
     for (ent, (_turn, my_faction, pos, fov)) 
         in state.world.query::<(&MyTurn, &Faction, &Position, &FoV)>().without::<&Player>().iter()
     {
         let my_idx = Map::xy_id(pos.x, pos.y);
         let mut reactions : Vec<(usize, Reaction)> = Vec::new();
-        let mut flee : Vec<i32> = Vec::new();
+        let mut flee : Vec<usize> = Vec::new();
 
         for tile in fov.visible_tiles.iter()
         {
@@ -41,7 +41,7 @@ pub fn visible_ai_system(state :&mut State)
             match reaction.1 
             {
                 Reaction::Attack => {attacks.push(reaction.0); done = true;},
-                Reaction::Flee => flee.push(reaction.0 as i32),
+                Reaction::Flee => flee.push(reaction.0),
                 _ => {}
             }
         }

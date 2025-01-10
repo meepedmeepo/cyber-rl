@@ -4,7 +4,7 @@ use hecs::Entity;
 
 use crate::{raws::{self, Reaction}, Attack, Faction, Map, Player, Position, State, MAPHEIGHT, MAPWIDTH};
 
-use super::MyTurn;
+use super::{apply_energy_cost, MyTurn};
 
 
 
@@ -59,6 +59,8 @@ pub fn adjacent_ai_system(state : &mut State)
     for done in turn_done.iter()
     {
         let _ = state.world.remove_one::<MyTurn>(*done);
+        
+        apply_energy_cost(state, super::ActionType::Attack, *done);
     }
 }
 

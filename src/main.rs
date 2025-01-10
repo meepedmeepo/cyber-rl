@@ -1,5 +1,6 @@
 use ai::adjacent_ai_system;
 use ai::run_initiative;
+use ai::Energy;
 use ai::TURN_QUEUE;
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
@@ -230,19 +231,23 @@ impl GameState for State{
                 }
                 else
                 {
-            
+                    //makes sure all the visual information for the ai is up to date!
+                    VisibilitySystem::run(self);
+
+                    //todo: in all of the systems that can end a turn apply the energy costs to the entities!
                     //check adjacent reactions
                     ai::adjacent_ai_system(self);
 
                     //check further away reactions
                     ai::visible_ai_system(self);
 
-                    //check for goal behaviour
-                    
-
+                    //run current goal behaviour
+                    ai::approach_ai_system(self);
+                    ai::flee_ai_system(self);
                     //default behaviour
 
                     //run systems!
+                    run_systems(self, ctx);
                 }
             }
 
@@ -527,7 +532,7 @@ fn game_init ( state: &mut State)
         , hit_die: DiceType::new(1, 10, 1)}
     , BaseStatistics::roll_stats(3)
     , HungerLevel{nutrition: StatPool::new(300)}
-
+    , Energy{value: 100}
     , Player{})));
 
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());

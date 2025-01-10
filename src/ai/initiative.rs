@@ -1,8 +1,8 @@
-use std::{collections::{BinaryHeap, VecDeque}, sync::Mutex};
+use std::sync::Mutex;
 
 use crate::{statistics::BaseStatistics, Position, ProgramState, State};
 
-use super::{world_tick, Energy, MyTurn};
+use super::{ Energy, MyTurn};
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 use priority_queue::{self, PriorityQueue};
@@ -66,8 +66,8 @@ pub fn run_initiative(state : &mut State) -> ProgramState
             if bracket_lib::geometry::DistanceAlg::Pythagoras
                 .distance2d(state.player_pos, Point::new(pos.x, pos.y)) < 25. 
             {
-                let mut energy_gain = 100;
-                energy_gain += stats.dexterity.get_modifier() * 10;
+                let mut energy_gain = 25;
+                energy_gain += stats.dexterity.get_modifier() * 5;
                 energy.value += energy_gain;
             
                 if energy.value > 0

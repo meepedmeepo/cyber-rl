@@ -1,7 +1,7 @@
 use bracket_lib::prelude::DijkstraMap;
 use hecs::Entity;
 
-use crate::{FoV, HasMoved, Map, Position, State, WantsToApproach, WantsToFlee, MAPHEIGHT, MAPWIDTH};
+use crate::{FoV, HasMoved, Map, Player, Position, State, WantsToApproach, WantsToFlee, MAPHEIGHT, MAPWIDTH};
 
 use super::{apply_energy_cost, MyTurn};
 
@@ -14,7 +14,7 @@ pub fn flee_ai_system(state : &mut State)
     let mut has_moved: Vec<Entity> = Vec::new();
 
     for (ent, (pos, flee, fov, _turn)) 
-        in state.world.query_mut::<(&mut Position, &WantsToFlee, &mut FoV, &MyTurn)>()
+        in state.world.query_mut::<(&mut Position, &WantsToFlee, &mut FoV, &MyTurn)>().without::<&Player>()
     {
         turn_done.push(ent);
 

@@ -9,6 +9,8 @@ mod approach_ai;
 pub use approach_ai::*;
 mod flee_ai;
 pub use flee_ai::*;
+mod default_move_ai;
+pub use default_move_ai::*;
 use crate::{statistics::BaseStatistics, State};
 
 
@@ -26,7 +28,8 @@ pub enum ActionType
 {
     Move,
     Attack,
-    Equip
+    Equip,
+    Pickup,
 }
 
 impl ActionType
@@ -38,6 +41,7 @@ impl ActionType
             ActionType::Move => 100,
             ActionType::Equip => 200,
             ActionType::Attack => 150,
+            ActionType::Pickup => 50,
         }
     }
 }

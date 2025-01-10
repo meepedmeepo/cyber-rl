@@ -137,14 +137,14 @@ impl Map
         }
     }
 
-   pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Vec<Entity>
+pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Vec<Entity>
     {
         let mut mobs = Vec::new();
         for ent in self.tile_contents[Map::xy_id(position.x, position.y)].iter()
         {
             if state.world.get::<&Pools>(*ent).is_ok()
             {
-               mobs.push(*ent);
+                mobs.push(*ent);
             }
         }
         mobs

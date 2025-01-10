@@ -155,7 +155,7 @@ pub fn go_down_stairs(state: &mut State)
 
     state.game_log.add_log(msg);
 
-    state.current_state = ProgramState::PlayerTurn;
+    state.current_state = ProgramState::Ticking;
 
 }
 
@@ -245,7 +245,7 @@ impl GameState for State{
                     ai::approach_ai_system(self);
                     ai::flee_ai_system(self);
                     //default behaviour
-
+                    ai::default_move_ai_system(self);
                     //run systems!
                     run_systems(self, ctx);
                 }
@@ -277,7 +277,7 @@ impl GameState for State{
                 match invent_state
                 {
                     inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
-                    inventory_state::Selected => {self.current_state = ProgramState::PlayerTurn;}
+                    inventory_state::Selected => {self.current_state = ProgramState::Ticking;}
                     inventory_state::None => {}
                     inventory_state::TargetedItem { item, range } =>
                     {
@@ -407,7 +407,7 @@ impl GameState for State{
                             self.world.insert_one(self.player_ent.expect("Couldn't find player"),
                             WantsToUseItem{item:item, target: Some(point)})
                             .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
-                            self.current_state = ProgramState::PlayerTurn;
+                            self.current_state = ProgramState::Ticking;
                         }
                     }
                     inventory_state::None => {}
@@ -441,7 +441,7 @@ impl GameState for State{
                         self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
 
-                        self.current_state = ProgramState::PlayerTurn;
+                        self.current_state = ProgramState::Ticking;
                     }
                 }
 
@@ -498,7 +498,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     map_indexing_system::MapIndexingSystem::run(state);
 
-    if state.current_state == ProgramState::PlayerTurn
+    if state.current_state == ProgramState::AwaitingInput
     {
         state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
     }
@@ -533,6 +533,7 @@ fn game_init ( state: &mut State)
     , BaseStatistics::roll_stats(3)
     , HungerLevel{nutrition: StatPool::new(300)}
     , Energy{value: 100}
+    ,Faction{name: "Player".to_string()}
     , Player{})));
 
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
@@ -602,7 +603,7 @@ fn main() ->BError
         ,blocked : vec![false;MAPSIZE]
         ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()},
         rng : bracket_lib::random::RandomNumberGenerator::new(),
-        current_state : ProgramState::PlayerTurn,
+        current_state : ProgramState::Ticking,
         player_pos : Point::zero(),
         player_ent: None,
         game_log : GameLog::new(),

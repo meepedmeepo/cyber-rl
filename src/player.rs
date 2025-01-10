@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -62,13 +62,17 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
-                return ProgramState::PlayerTurn;
+                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
+                return ProgramState::Ticking;
             },
             VirtualKeyCode::Numpad5 => 
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
-                return ProgramState::PlayerTurn;
+                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
+                return ProgramState::Ticking;
             },
             VirtualKeyCode::F => 
             {
@@ -106,7 +110,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 if state.map.map[idx] == TileType::DownStairs
                 {
                     go_down_stairs(state);
-                    return ProgramState::PlayerTurn;
+                    return ProgramState::Ticking;
                 }
                 else
                 { 
@@ -129,6 +133,9 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 if items.len() == 1
                 {
                     state.world.insert_one(state.player_ent.unwrap(), WantsToPickupItem{item: items[0].0}).unwrap();
+                    
+                    state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                    apply_energy_cost(state, crate::ai::ActionType::Pickup, state.player_ent.unwrap());
                 } else if items.len() > 1
                 {
                     return   ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::PickupItem };
@@ -145,7 +152,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
         }
 
     }
-    ProgramState::PlayerTurn
+    ProgramState::Ticking
 }
 
 
@@ -176,6 +183,8 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
         if moved
         {
             state.world.insert_one(state.player_ent.unwrap(), HasMoved{}).unwrap();
+            apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
+            state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
         }
 
         if state.map.tile_contents[destination_id].len() > 0 && !moved
@@ -207,6 +216,9 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
             {
                 //console::log(format!("Target found! {}",state.world.get::<&Name>(target).expect("No target name found!").name));
                 AttackSystem::add_attack(attacker, target, state);
+                apply_energy_cost(state, crate::ai::ActionType::Attack, state.player_ent.unwrap());
+
+                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
             }
 
         

@@ -64,10 +64,10 @@ pub fn run_initiative(state : &mut State) -> ProgramState
             in state.world.query_mut::<(&mut Energy, &BaseStatistics, &Position)>()
         {
             if bracket_lib::geometry::DistanceAlg::Pythagoras
-                .distance2d(state.player_pos, Point::new(pos.x, pos.y)) < 25. 
+                .distance2d(state.player_pos, Point::new(pos.x, pos.y)) < 15. || ent == state.player_ent.unwrap()
             {
-                let mut energy_gain = 25;
-                energy_gain += stats.dexterity.get_modifier() * 5;
+                let mut energy_gain = 50;
+                energy_gain += std::cmp::max(0,stats.dexterity.get_modifier() * 5);
                 energy.value += energy_gain;
             
                 if energy.value > 0

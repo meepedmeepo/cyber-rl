@@ -4,7 +4,7 @@ use bracket_lib::{color::RGB, random::DiceType};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
-use crate::{components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{ai::Energy, components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -272,6 +272,8 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
         {
             eb.add(Faction{name : "Mindless".to_string()});    
         }
+
+        eb.add(Energy{value: 1});
 
         return (Some((Box::new(eb))), equip_list);
     }

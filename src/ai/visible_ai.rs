@@ -56,7 +56,19 @@ pub fn visible_ai_system(state :&mut State)
 
     for (id, targets) in possible_attacks.iter()
     {
-        let index = state.rng.range(0, targets.len());
+        let mut index: usize = 0;
+        if targets.len() == 0
+        {
+            continue
+        }
+        if targets.len() == 1
+        {
+            index = 0;
+        }
+        else
+        {
+            index = state.rng.range(0, targets.len());
+        }
 
         let _ = state.world.insert_one(*id, WantsToApproach{target: targets[index] as i32});
     }
@@ -64,6 +76,7 @@ pub fn visible_ai_system(state :&mut State)
     for (id, tiles) in flee_targets.iter()
     {
         let _ = state.world.insert_one(*id, WantsToFlee {indices : tiles.clone()});
+        //let _ = state.world.remove_one::<MyTurn>(*id);
     }
 }
 

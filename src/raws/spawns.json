@@ -463,5 +463,9 @@
 
       }
     }
+  ],
+  "faction_table" : [
+    { "name" : "Mindless", "responses" : {"Default" : "Attack"}}
+
   ]
 }

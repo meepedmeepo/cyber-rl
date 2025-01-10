@@ -5,7 +5,7 @@ use serde::Deserialize;
 #[derive(Debug, Clone)]
 pub struct WantsToApproach
 {
-    pub target : Entity,
+    pub target : i32,
 }
 #[derive(Debug, Clone)]
 pub struct WantsToFlee

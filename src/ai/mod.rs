@@ -2,6 +2,8 @@ mod initiative;
 pub use initiative::*;
 mod adjacent_ai;
 pub use adjacent_ai::*;
+mod visible_ai;
+pub use visible_ai::*;
 use crate::{statistics::BaseStatistics, State};
 
 

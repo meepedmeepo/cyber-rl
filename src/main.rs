@@ -233,9 +233,13 @@ impl GameState for State{
             
                     //check adjacent reactions
                     ai::adjacent_ai_system(self);
+
                     //check further away reactions
-                    
+                    ai::visible_ai_system(self);
+
                     //check for goal behaviour
+                    
+
                     //default behaviour
 
                     //run systems!

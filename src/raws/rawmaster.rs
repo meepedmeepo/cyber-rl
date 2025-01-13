@@ -273,7 +273,7 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
             eb.add(Faction{name : "Mindless".to_string()});    
         }
 
-        eb.add(Energy{value: 1});
+        
 
         return (Some((Box::new(eb))), equip_list);
     }

@@ -245,10 +245,10 @@ impl Map
         let mut i = 1;
         while !is_valid
         {
-           state.map = Map::create_room_map(state);
-           state.map.create_map_corridors();
-           if state.map.check_map_validity()
-           {
+            state.map = Map::create_room_map(state);
+            state.map.create_map_corridors();
+            if state.map.check_map_validity()
+        {
             console::log(format!("Successfully generated map after {} tries!",i));
 
             let pos = state.map.rooms[state.map.rooms.len()-1].center();
@@ -258,12 +258,12 @@ impl Map
             state.map.map[idx] = TileType::DownStairs;
 
             return;
-           }
-           else 
-           {
+        }
+        else 
+        {
             console::log(format!("Failed to generate valid map! Attempt {}!",i));
             i+=1;
-           }
+        }
         }
     }
 
@@ -271,7 +271,7 @@ impl Map
 pub fn create_room_map(state : &mut State) -> Map
 {
     let mut  map = vec![TileType::Wall; MAPSIZE];
-   
+
     let mut rooms : Vec<Rect> = Vec::new();
 
     
@@ -346,7 +346,7 @@ fn generate_simple_corridors (&self,
         let mut is_valid_target = false;
         let mut target_room = *r;
         while !is_valid_target
-         {
+        {
             target_room = self.rooms[rng.range(0, self.rooms.len())];
             
             if target_room!= *r

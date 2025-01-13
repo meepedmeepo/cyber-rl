@@ -1,6 +1,7 @@
 use core::panic;
 use std::collections::HashSet;
 
+use crate::ai::Energy;
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
 use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
@@ -139,6 +140,9 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
             {
                 Some(mut mob) => 
                 {
+                    //gives random energy so not every mob processes on same tick!
+                    mob.add(Energy{value: state.rng.range(-120, 71)});
+
                     let mob_ent = state.world.spawn(mob.build());
                     for eq in equip_list.iter()
                     {

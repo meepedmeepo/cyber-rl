@@ -147,6 +147,8 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 }
 
             }
+
+            VirtualKeyCode::Semicolon => {return ProgramState::KeyboardTargetting { cursor_pos: state.player_pos };}
             _ =>{return ProgramState::AwaitingInput;},
 
         }

@@ -23,7 +23,7 @@ pub fn get_input_text(state : &mut State, ctx: &mut BTerm, text : &mut Vec<char>
             text.push(c);
             }
         }
-        if let BEvent::KeyboardInput { key: VirtualKeyCode::Return, pressed: false, ..  } = event
+        if let BEvent::KeyboardInput { key: VirtualKeyCode::Return, pressed: true, ..  } = event
         {
             enter_pressed = true;
         }

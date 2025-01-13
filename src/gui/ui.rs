@@ -15,6 +15,8 @@ use crate::{Player, Name,Item};
 use crate::State;
 use std::cmp::{max,min};
 
+use super::keyboard_cursor;
+
 pub fn draw_ui(state :&mut State, ctx: &mut BTerm)
 {
    // ctx.draw_box_double(0, 42, 76, 7,bracket_lib::color::WHITE, bracket_lib::color::BLACK);
@@ -88,4 +90,11 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
 }
 
 
+pub fn draw_cursor(pos : Point, ctx: &mut BTerm, state : &mut State, bg :  (u8, u8, u8)) -> Point
+{
+    let cursor_pos = keyboard_cursor(state, ctx, pos);
 
+    ctx.set_bg(cursor_pos.x, cursor_pos.y, bg);
+
+    cursor_pos
+}

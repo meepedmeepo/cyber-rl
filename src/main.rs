@@ -12,6 +12,7 @@ use damage_system::DamageSystem;
 use effects::run_effect_queue;
 use gamelog::GameLog;
 use gui::display_input_text;
+use gui::draw_cursor;
 use gui::get_input_text;
 use gui::menu_theme;
 use gui::TargettingMode;
@@ -120,6 +121,23 @@ pub struct Position
     y : i32,
 }
 
+
+impl From<Point> for Position
+{
+    fn from(item: Point) -> Self
+    {
+        Position{x: item.x, y: item.y}
+    }
+}
+
+impl Into<Point> for Position
+{
+    fn into(self) -> Point
+    {
+        Point{x: self.x, y: self.y}
+    }
+}
+
 impl Position
 {
     fn new (x : i32, y: i32) -> Position
@@ -130,6 +148,8 @@ impl Position
             y,
         }
     }
+
+
 }
 
 pub fn go_down_stairs(state: &mut State)
@@ -215,6 +235,18 @@ impl GameState for State{
             ProgramState::AwaitingInput =>
             {
                 ctx.cls();
+                {
+                    let mut input = INPUT.lock();
+                    
+                    input.for_each_message(|event| {
+                        if let BEvent::CloseRequested = event
+                        {
+                            ctx.quit();
+                            return;
+                        }
+                    });
+                    
+                }
                 self.current_state = player_input_system(ctx, self);
                 item_pickup_system::run(self);
                 item_use_system::run(self);
@@ -257,23 +289,6 @@ impl GameState for State{
                 }
             }
 
-            ProgramState::PlayerTurn =>
-            {  
-                hunger_system(self);
-                run_systems(self, ctx);
-                time_system(self);
-
-                self.current_state = ProgramState::MonsterTurn;
-            }
-
-            ProgramState::MonsterTurn =>
-            {
-                run_systems(self, ctx);
-                if self.current_state != ProgramState::GameOver
-                {
-                    self.current_state = ProgramState::AwaitingInput;
-                }
-            }
 
             ProgramState::TextInput {mut text } =>
             {
@@ -296,7 +311,7 @@ impl GameState for State{
                             apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
                             let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
                             self.current_state = ProgramState::Ticking;
-                            return;
+                            //return;
                     }
                     inventory_state::None => {}
                     inventory_state::TargetedItem { item, range } =>
@@ -423,6 +438,11 @@ impl GameState for State{
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
+
+                if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
+                {
+                    gui::draw_tooltip(self, ctx, cursor_pos );
+                }
                 let (inv_state,point) = gui::ranged_target(self, ctx, range, aoe);
                 match inv_state
                 {
@@ -455,6 +475,11 @@ impl GameState for State{
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
 
+                if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
+                {
+                    gui::draw_tooltip(self, ctx, cursor_pos );
+                }
+                
                 let target_state = ranged_aim::aim_projectile(self, ctx, self.player_pos, range);
 
                 match target_state
@@ -475,6 +500,26 @@ impl GameState for State{
                     }
                 }
 
+            }
+
+            ProgramState::KeyboardTargetting { cursor_pos } =>
+            {
+                ctx.cls();
+                
+                draw_map(ctx, &self.map);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
+                gui::draw_gamelog(self, ctx);
+
+                self.current_state = ProgramState::KeyboardTargetting{cursor_pos: gui::draw_cursor(cursor_pos, ctx, self, LIGHT_GREEN)};
+
+                gui::draw_tooltip(self, ctx, cursor_pos);
+
+                if INPUT.lock().is_key_pressed(VirtualKeyCode::Escape)
+                {
+                    self.current_state = ProgramState::AwaitingInput;
+                }
             }
 
             ProgramState::GameOver =>
@@ -509,10 +554,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     ctx.cls();
 
     VisibilitySystem::run(state);
-    if state.current_state == ProgramState::MonsterTurn
-    {
-        MonsterAI::run(state);
-    }
+
     item_equip_system::run(state);
     item_use_system::run(state);
     calculate_attribute_system::run(state);
@@ -633,7 +675,7 @@ fn main() ->BError
         ,blocked : vec![false;MAPSIZE]
         ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()},
         rng : bracket_lib::random::RandomNumberGenerator::new(),
-        current_state : ProgramState::TextInput { text: Vec::new() },
+        current_state : ProgramState::Ticking,
         player_pos : Point::zero(),
         player_ent: None,
         game_log : GameLog::new(),

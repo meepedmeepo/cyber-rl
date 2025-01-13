@@ -226,7 +226,7 @@
         "bg": "#000000",
         "order": 3
       },
-      "vision_range": 4,
+      "vision_range": 6,
       "blocks_tiles": true,
       "stats": {
         "max_hp": 20,
@@ -465,7 +465,7 @@
     }
   ],
   "faction_table" : [
-    { "name" : "Mindless", "responses" : {"Default" : "Attack"}}
+    { "name" : "Mindless", "responses" : {"Default" : "Attack", "Mindless" : "Attack"}}
 
   ]
 }

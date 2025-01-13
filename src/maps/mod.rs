@@ -1,6 +1,7 @@
 pub mod map;
 pub mod common;
 pub mod simple_map;
+mod cellular_automata;
 use crate::map::*;
 
 

@@ -2,6 +2,8 @@ mod ui;
 mod targetting;
 mod inventory;
 mod menus;
+mod text_input;
+pub use text_input::*;
 pub use ui::*;
 pub use targetting::*;
 pub use inventory::*;

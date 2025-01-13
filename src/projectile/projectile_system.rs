@@ -104,7 +104,7 @@ pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
             if roll < 15
             {
                 //DamageSystem::mark_for_damage(state, *target, *dmg);
-
+                //make a way of adding the original creator of the projectile to this
                 add_effect(None, EffectType::Damage { amount: *dmg }, Targets::Single { target: *target });
                 
                 let msg = format!("{} was hit by missile",name.name.clone());

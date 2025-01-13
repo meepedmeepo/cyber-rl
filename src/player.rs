@@ -16,10 +16,10 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
         None => {return ProgramState::AwaitingInput;},
         Some(key) => match key
         {
-            VirtualKeyCode::Numpad4 =>try_move(state, -1, 0),
-            VirtualKeyCode::Numpad6 => try_move(state,1,0),
-            VirtualKeyCode::Numpad8 => try_move(state,0,-1),
-            VirtualKeyCode::Numpad2 => try_move(state,0,1),
+            VirtualKeyCode::Numpad4 =>return attempt_move(state, -1, 0),
+            VirtualKeyCode::Numpad6 => return attempt_move(state,1,0),
+            VirtualKeyCode::Numpad8 => return attempt_move(state,0,-1),
+            VirtualKeyCode::Numpad2 => return attempt_move(state,0,1),
         
             // VirtualKeyCode::A=>try_move(state, -1, 0),
             // VirtualKeyCode::D => try_move(state,1,0),
@@ -27,13 +27,13 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             // VirtualKeyCode::S => try_move(state,0,1),
 
             // Diagonals
-            VirtualKeyCode::Numpad9 => try_move(state, 1, -1),
+            VirtualKeyCode::Numpad9 => return attempt_move(state, 1, -1),
 
-            VirtualKeyCode::Numpad7 => try_move(state, -1, -1),
+            VirtualKeyCode::Numpad7 => return attempt_move(state, -1, -1),
 
-            VirtualKeyCode::Numpad3 => try_move(state, 1, 1),
+            VirtualKeyCode::Numpad3 => return attempt_move(state, 1, 1),
 
-            VirtualKeyCode::Numpad1 => try_move(state, -1, 1),
+            VirtualKeyCode::Numpad1 => return attempt_move(state, -1, 1),
 
 
             VirtualKeyCode::D =>
@@ -62,7 +62,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
-                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
                 //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
                 return ProgramState::Ticking;
             },
@@ -70,7 +70,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
-                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
                 //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
                 return ProgramState::Ticking;
             },
@@ -134,7 +134,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 {
                     state.world.insert_one(state.player_ent.unwrap(), WantsToPickupItem{item: items[0].0}).unwrap();
                     
-                    state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                    let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
                     apply_energy_cost(state, crate::ai::ActionType::Pickup, state.player_ent.unwrap());
                 } else if items.len() > 1
                 {
@@ -155,9 +155,16 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
     ProgramState::Ticking
 }
 
-
+fn attempt_move(state: &mut State, delta_x:i32, delta_y:i32) -> ProgramState
+{
+    match try_move(state, delta_x, delta_y)
+    {
+        true => {return ProgramState::Ticking;}
+        false => { return ProgramState::AwaitingInput;}
+    }
+}
 /// TODO: cleanup this absolute fucking mess holy shit wtf
-pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
+pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
 {
     let mut moved =  false;
     let mut destination_id : usize = 0;
@@ -177,6 +184,10 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
         moved = true;
         attacker = _id;
         break;
+        }
+        else if state.map.map[destination_id] == TileType::Wall
+        {
+            return false;
         }
         
     }
@@ -209,7 +220,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
                         target = *potential_target;
                         found_target = true;
                     }
-                    Err(_) =>{return;}
+                    Err(_) =>{return false;}
                 }
             }
             if found_target
@@ -219,9 +230,13 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32)
                 apply_energy_cost(state, crate::ai::ActionType::Attack, state.player_ent.unwrap());
 
                 state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+
+                return true;
             }
 
         
         }
+
+        true
 
 }

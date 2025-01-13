@@ -1,6 +1,8 @@
 use ai::adjacent_ai_system;
+use ai::apply_energy_cost;
 use ai::run_initiative;
 use ai::Energy;
+use ai::MyTurn;
 use ai::TURN_QUEUE;
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
@@ -9,6 +11,8 @@ use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
 use effects::run_effect_queue;
 use gamelog::GameLog;
+use gui::display_input_text;
+use gui::get_input_text;
 use gui::menu_theme;
 use gui::TargettingMode;
 use hecs::*;
@@ -104,7 +108,8 @@ pub enum ProgramState
     RangedCombat {range: i32, dmg: i32},
     KeyboardTargetting {cursor_pos : Point},
     Ticking,
-    SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType}
+    SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType},
+    TextInput {text: Vec<char>},
 }
 
 
@@ -224,6 +229,7 @@ impl GameState for State{
             }
             ProgramState::Ticking =>
             {
+                VisibilitySystem::run(self);
                 self.current_state = run_initiative(self);
                 if self.current_state == ProgramState::AwaitingInput
                 {
@@ -232,7 +238,7 @@ impl GameState for State{
                 else
                 {
                     //makes sure all the visual information for the ai is up to date!
-                    VisibilitySystem::run(self);
+                    
 
                     //todo: in all of the systems that can end a turn apply the energy costs to the entities!
                     //check adjacent reactions
@@ -269,6 +275,14 @@ impl GameState for State{
                 }
             }
 
+            ProgramState::TextInput {mut text } =>
+            {
+                ctx.cls();
+                get_input_text(self, ctx, &mut text);
+                display_input_text(self, ctx, &text, 5, 15);
+                self.current_state = ProgramState::TextInput { text, }
+            }
+
             ProgramState::Inventory =>
             {
                 ctx.cls();
@@ -277,7 +291,13 @@ impl GameState for State{
                 match invent_state
                 {
                     inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
-                    inventory_state::Selected => {self.current_state = ProgramState::Ticking;}
+                    inventory_state::Selected => 
+                    {
+                            apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
+                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                            self.current_state = ProgramState::Ticking;
+                            return;
+                    }
                     inventory_state::None => {}
                     inventory_state::TargetedItem { item, range } =>
                     {
@@ -352,6 +372,10 @@ impl GameState for State{
                                         self.world.remove_one::<InContainer>(*item).unwrap();
                                     }
                                 }
+                                apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
+                                let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                                self.current_state = ProgramState::Ticking;
+                                return;
                             }
 
                             MenuType::UnequipItem =>
@@ -369,6 +393,10 @@ impl GameState for State{
                                         self.world.insert_one(ent, EquipmentDirty{}).unwrap();
                                     }
                                 }
+                                apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
+                                let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                                self.current_state = ProgramState::Ticking;
+                                return;
                             }
 
 
@@ -407,6 +435,8 @@ impl GameState for State{
                             self.world.insert_one(self.player_ent.expect("Couldn't find player"),
                             WantsToUseItem{item:item, target: Some(point)})
                             .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
+                            apply_energy_cost(self, ai::ActionType::Attack, self.player_ent.unwrap());
+                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
                             self.current_state = ProgramState::Ticking;
                         }
                     }
@@ -440,7 +470,7 @@ impl GameState for State{
                         
                         self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                             '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
-
+                        let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
                         self.current_state = ProgramState::Ticking;
                     }
                 }
@@ -498,10 +528,9 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     map_indexing_system::MapIndexingSystem::run(state);
 
-    if state.current_state == ProgramState::AwaitingInput
-    {
-        state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
-    }
+    
+    
+    state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
     draw_map(ctx, &state.map);
     render_system(state, ctx);
@@ -593,6 +622,7 @@ fn main() ->BError
     .with_simple_console(110, 45, "dbyte_2x.png")
     .with_title("Rust-like")
     .with_fps_cap(60.)
+    .with_advanced_input(true)
     .build()?;
 
     let mut gs: State = State{
@@ -603,7 +633,7 @@ fn main() ->BError
         ,blocked : vec![false;MAPSIZE]
         ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()},
         rng : bracket_lib::random::RandomNumberGenerator::new(),
-        current_state : ProgramState::Ticking,
+        current_state : ProgramState::TextInput { text: Vec::new() },
         player_pos : Point::zero(),
         player_ent: None,
         game_log : GameLog::new(),

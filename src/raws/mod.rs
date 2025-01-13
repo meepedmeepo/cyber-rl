@@ -110,6 +110,6 @@ pub fn run()
         .expect("Unable to read spawns.json");
     println!("{}", data);
     let decoder : Raws = serde_json::from_str(&data).expect("Unable to parse JSON");
-    bracket_lib::terminal::console::log(format!("{:?}", decoder));
+    //bracket_lib::terminal::console::log(format!("{:?}", decoder));
     RAWS.lock().unwrap().load(decoder);
 }

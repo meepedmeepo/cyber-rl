@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "name": "Health Potion",
+      "name": "Health Injector",
       "renderable": {
         "glyph": "!",
         "fg": "#FF00FF",
@@ -10,7 +10,7 @@
       },
       "consumable": {
         "effects": {
-          "provides_healing": "8"
+          "provides_healing": "25"
         }
       }
     },
@@ -29,7 +29,7 @@
       }
     },
     {
-      "name": "Magic Missile Scroll",
+      "name": "Xn Singleshot Taser",
       "renderable": {
         "glyph": ")",
         "fg": "#00FFFF",
@@ -45,28 +45,28 @@
       }
     },
     {
-      "name": "Fireball Scroll",
+      "name": "HE Grenade",
       "renderable": {
-        "glyph": ")",
-        "fg": "#880808",
+        "glyph": "*",
+        "fg": "#f7dd4a",
         "bg": "#000000",
         "order": 2
       },
       "consumable": {
         "effects": {
-          "ranged": "8",
-          "aoe": "4",
+          "ranged": "7",
+          "aoe": "3",
           "damage": "10",
-          "particle":"*;#ffffff;#880808;250.",
-          "particleline":".;#ffffff;#880808;200."
+          "particle":"*;#ffffff;#f79b4a;250.",
+          "particleline":".;#ffffff;#f79b4a;200."
         }
       }
     },
     {
-      "name": "Wooden Bow",
+      "name": "Light Pistol",
       "renderable": {
         "glyph": ")",
-        "fg": "#880808",
+        "fg": "#4e4b4c",
         "bg": "#000000",
         "order": 2
       },
@@ -76,7 +76,7 @@
       }
     },
     {
-      "name": "Rusty Sword",
+      "name": "Rusted Knuckle Duster",
       "renderable": {
         "glyph": "/",
         "fg": "#FFFFFF",
@@ -88,15 +88,15 @@
       },
       "weapon": {
         "statistic": "strength",
-        "damage_die": "1d6",
-        "to_hit_bonus": 0
+        "damage_die": "1d4",
+        "to_hit_bonus": 1
       }
     },
     {
-      "name": "Leather Breastplate",
+      "name": "Stabproof Vest",
       "renderable": {
         "glyph": "[",
-        "fg": "#72442a",
+        "fg": "#5a4635",
         "bg": "#000000",
         "order": 2
       },
@@ -104,7 +104,7 @@
         "slot": "body"
       },
       "wearable": {
-        "ac_bonus": 1
+        "ac_bonus": 3
       }
     },
     {
@@ -153,7 +153,7 @@
       }
     },
     {
-      "name": "Wooden Shield",
+      "name": "Riot Shield",
       "renderable": {
         "glyph": "[",
         "fg": "#72442a",
@@ -168,24 +168,7 @@
       }
     },
     {
-      "name": "Iron Longsword",
-      "renderable": {
-        "glyph": "/",
-        "fg": "#b50023",
-        "bg": "#000000",
-        "order": 2
-      },
-      "equippable": {
-        "slot": "mainhand"
-      },
-      "weapon": {
-        "statistic": "strength",
-        "damage_die": "1d8",
-        "to_hit_bonus": 1
-      }
-    },
-    {
-      "name": "Iron Dagger",
+      "name": "Katana",
       "renderable": {
         "glyph": "/",
         "fg": "#b50023",
@@ -197,31 +180,117 @@
       },
       "weapon": {
         "statistic": "dexterity",
-        "damage_die": "1d4",
+        "damage_die": "1d8",
+        "to_hit_bonus": 0
+      }
+    },
+    {
+      "name": "Switch Blade",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#976d75",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "dexterity",
+        "damage_die": "1d2+3",
         "to_hit_bonus": 2
       }
+    },
+    {
+      "name": "Tire Iron",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#bab8b0",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "strength",
+        "damage_die": "1d5",
+        "to_hit_bonus": 1
+      }
+    },
+    {
+      "name": "Baton",
+      "renderable": {
+        "glyph": "/",
+        "fg": "#0b0909",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "mainhand"
+      },
+      "weapon": {
+        "statistic": "strength",
+        "damage_die": "1d3+1",
+        "to_hit_bonus": 3
+      }
+    },
+    {
+      "name": "Leather Trenchcoat",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#0b0909",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "body"
+      },
+      "wearable": {
+        "ac_bonus": 1
+      }
+    },
+    {
+      "name": "Enforcer Helmet",
+      "renderable": {
+        "glyph": "[",
+        "fg": "#1010ea",
+        "bg": "#000000",
+        "order": 2
+      },
+      "equippable": {
+        "slot": "head"
+      },
+      "wearable": {
+        "ac_bonus": 2
+      }
     }
+
+
   ],
   "mobs": [
     {
-      "name": "Orc",
+      "name": "X Corp Goon",
       "renderable": {
-        "glyph": "O",
-        "fg": "#FF00FF",
+        "glyph": "g",
+        "fg": "#149ce6",
         "bg": "#000000",
         "order": 3
       },
       "vision_range": 6,
       "blocks_tiles": true,
+      "faction" : "xcorp",
+      "equipment" : ["Switch Blade", "Stabproof Vest"],
       "stats": {
         "max_hp": 30,
-        "hp": 30
+        "hp": 30,
+        "natural_ac" : 12
       }
     },
     {
-      "name": "Goblin",
+      "name": "Runner",
       "renderable": {
-        "glyph": "g",
+        "glyph": "h",
         "fg": "#00FF00",
         "bg": "#000000",
         "order": 3
@@ -233,198 +302,108 @@
         "hp": 20,
         "dexterity": 16
       },
+      "equipment" : ["Leather Trenchcoat"],
       "naturals": [
         {
           "statistic": "dexterity",
-          "damage_die": "1d4",
+          "damage_die": "1d7",
           "to_hit_bonus": 2
         }
       ]
     },
+    
     {
-      "name": "Kobold",
+      "name": "Street Thug",
       "renderable": {
-        "glyph": "k",
-        "fg": "#FFFF00",
+        "glyph": "t",
+        "fg": "#f04014",
         "bg": "#000000",
         "order": 3
       },
-      "vision_range": 6,
+      "vision_range": 7,
       "blocks_tiles": true,
       "stats": {
-        "max_hp": 15,
-        "hp": 15
-      },
-      "equipment": [
-        "Leather Breastplate",
-        "Rusty Sword",
-        "Wooden Shield"
-      ]
-    },
-    {
-      "name": "Bandit",
-      "renderable": {
-        "glyph": "h",
-        "fg": "#FFFF00",
-        "bg": "#000000",
-        "order": 3
-      },
-      "vision_range": 8,
-      "blocks_tiles": true,
-      "stats": {
-        "max_hp": 15,
-        "hp": 15,
-        "dexterity": 16,
-        "strength": 14
-      },
-      "equipment": [
-        "Leather Breastplate",
-        "Wooden Shield",
-        "Leather Boots",
-        "Iron Dagger"
-      ]
-    },
-    {
-      "name": "Green Ooze",
-      "renderable": {
-        "glyph": "j",
-        "fg": "#00FF00",
-        "bg": "#000000",
-        "order": 3
-      },
-      "vision_range": 3,
-      "blocks_tiles": true,
-      "stats": {
-        "max_hp": 50,
-        "hp": 50,
-        "dexterity": 4,
+        "max_hp": 20,
+        "hp": 20,
+        "dexterity": 12,
         "strength": 14,
-        "intelligence": 1,
-        "mental": 2,
-        "natural_ac": 12
+        "intelligence": 8,
+        "mental": 7,
+        "natural_ac": 11
       },
+      "faction" : "criminals",
+      "equipment" : [
+        "Tire Iron"
+      ]
+    },
+    {
+      "name": "Peacekeeper Recruit",
+      "renderable": {
+        "glyph": "t",
+        "fg": "#1010ea",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 7,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 20,
+        "hp": 20,
+        "dexterity": 9,
+        "strength": 14,
+        "intelligence": 6,
+        "mental": 7,
+        "natural_ac": 10
+      },
+      "faction" : "peacekeeper",
+      "equipment" : [
+        "Baton", "Enforcer Helmet" , "Riot Shield"
+      ]
+    },
+    {
+      "name": "Rat",
+      "renderable": {
+        "glyph": "r",
+        "fg": "#68382c",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 4,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 10,
+        "hp": 10,
+        "dexterity": 16,
+        "strength": 6,
+        "intelligence": 9,
+        "mental": 4,
+        "natural_ac": 8
+      },
+      "faction" : "vermin",
       "naturals": [
         {
-          "statistic": "strength",
-          "damage_die": "1d4",
+          "statistic": "dexterity",
+          "damage_die": "1d3",
           "to_hit_bonus": 2
+        },
+        {
+          "statistic": "dexterity",
+          "damage_die": "1d2+1",
+          "to_hit_bonus": 1
         }
       ]
     }
   ],
   "spawn_table": [
-    {
-      "name": "Kobold",
-      "weight": 20,
-      "min_depth": 0,
-      "max_depth": 3
-    },
-    {
-      "name": "Orc",
-      "weight": 5,
-      "min_depth": 1,
-      "max_depth": 100,
-      "add_map_depth_to_weight": true
-    },
-    {
-      "name": "Goblin",
-      "weight": 15,
-      "min_depth": 0,
-      "max_depth": 15
-    },
-    {
-      "name": "Health Potion",
-      "weight": 10,
-      "min_depth": 0,
-      "max_depth": 100,
-      "add_map_depth_to_weight": true
-    },
-    {
-      "name": "Magic Missile Scroll",
-      "weight": 6,
-      "min_depth": 0,
-      "max_depth": 100
-    },
-    {
-      "name": "Fireball Scroll",
-      "weight": 4,
-      "min_depth": 0,
-      "max_depth": 100,
-      "add_map_depth_to_weight": true
-    },
-    {
-      "name": "Rusty Sword",
-      "weight": 3,
-      "min_depth": 0,
-      "max_depth": 5
-    },
-    {
-      "name": "Leather Breastplate",
-      "weight": 2,
-      "min_depth": 1,
-      "max_depth": 15
-    },
-    {
-      "name": "Leather Leggings",
-      "weight": 3,
-      "min_depth": 1,
-      "max_depth": 15
-    },
-    {
-      "name": "Leather Gauntlets",
-      "weight": 4,
-      "min_depth": 0,
-      "max_depth": 10
-    },
-    {
-      "name": "Leather Boots",
-      "weight": 4,
-      "min_depth": 0,
-      "max_depth": 10
-    },
-    {
-      "name": "Wooden Shield",
-      "weight": 3,
-      "min_depth": 0,
-      "max_depth": 15
-    },
-    {
-      "name": "Iron Longsword",
-      "weight": 4,
-      "min_depth": 3,
-      "max_depth": 20,
-      "add_map_depth_to_weight": true
-    },
-    {
-      "name": "Wooden Bow",
-      "weight": 2,
-      "min_depth": 0,
-      "max_depth": 15
-    },
-    {
-      "name": "Bandit",
-      "weight": 15,
-      "min_depth": 1,
-      "max_depth": 5
-    },
-    {
-      "name": "Ration",
-      "weight": 8,
-      "min_depth": 0,
-      "max_depth": 100
-    },
-    {
-      "name": "Bear Trap",
-      "weight": 9,
-      "min_depth": 0,
-      "max_depth": 100
-    },
-    {
-      "name": "Fireball Trap",
-      "weight": 6,
-      "min_depth": 0,
-      "max_depth": 100
-    }
+    {"name": "Xn Singleshot Taser", "weight": 12, "min_depth": 0,"max_depth": 100},
+    {"name": "X Corp Goon", "weight": 8, "min_depth": 2,"max_depth": 100, "add_map_depth_to_weight" : true},
+    {"name": "Peacekeeper Recruit", "weight": 9, "min_depth": 0,"max_depth": 100},
+    {"name": "Street Thug", "weight": 15, "min_depth": 0,"max_depth": 100},
+    {"name": "Rat", "weight": 15, "min_depth": 0,"max_depth": 3},
+    {"name": "Health Injector", "weight": 15, "min_depth": 0,"max_depth": 100},
+    {"name" :"Bear Trap", "weight" : 10, "min_depth" : 0, "max_depth" : 100},
+    {"name" :"HE Grenade Trap", "weight" : 6, "min_depth" : 0, "max_depth" : 100},
+    {"name": "HE Grenade","weight": 8, "min_depth": 0,"max_depth": 100}
   ],
   "props": [
     {
@@ -445,7 +424,7 @@
       }
     },
     {
-      "name": "Fireball Trap",
+      "name": "HE Grenade Trap",
       "renderable": {
         "glyph": "^",
         "fg": "#cf1d1d",
@@ -465,7 +444,11 @@
     }
   ],
   "faction_table" : [
-    { "name" : "Mindless", "responses" : {"Default" : "Attack", "Mindless" : "Attack"}}
-
+    {"name" : "Mindless", "responses" : {"Default" : "attack", "Mindless" : "attack"}},
+    {"name" : "criminals", "responses" : {"Default" : "attack", "criminals" : "ignore", "peacekeeper" : "flee", "hacker" : "ignore"}},
+    {"name" : "vermin", "responses" : {"Default" : "flee", "Player" : "attack", "vermin" : "ignore"}},
+    {"name" : "peacekeeper", "responses" : {"Default" : "ignore", "criminals" : "attack", "Player" : "attack", "Mindless" : "attack"}},
+    {"name" : "xcorp", "responses" : {"Default" : "attack", "peacekeeper" : "ignore", "vermin" : "ignore"}},
+    {"name" : "hacker", "responses" : {"Default" : "ignore", "peacekeeper" : "flee", "xcorp" : "attack" }}
   ]
 }

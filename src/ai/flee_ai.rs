@@ -1,4 +1,4 @@
-use bracket_lib::prelude::DijkstraMap;
+use bracket_lib::prelude::{console, DijkstraMap};
 use hecs::Entity;
 
 use crate::{FoV, HasMoved, Map, Player, Position, State, WantsToApproach, WantsToFlee, MAPHEIGHT, MAPWIDTH};

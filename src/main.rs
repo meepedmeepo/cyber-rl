@@ -261,32 +261,33 @@ impl GameState for State{
             }
             ProgramState::Ticking =>
             {
-                VisibilitySystem::run(self);
-                self.current_state = run_initiative(self);
-                if self.current_state == ProgramState::AwaitingInput
+                let mut newrunstate = ProgramState::Ticking;
+                while newrunstate == ProgramState::Ticking
                 {
-                    return;
+                    VisibilitySystem::run(self);
+                    newrunstate = run_initiative(self);
+
+                    {
+                        //makes sure all the visual information for the ai is up to date!
+                        
+
+                        //todo: in all of the systems that can end a turn apply the energy costs to the entities!
+                        //check adjacent reactions
+                        ai::adjacent_ai_system(self);
+
+                        //check further away reactions
+                        ai::visible_ai_system(self);
+
+                        //run current goal behaviour
+                        ai::approach_ai_system(self);
+                        ai::flee_ai_system(self);
+                        //default behaviour
+                        ai::default_move_ai_system(self);
+                        //run systems!
+                        run_systems(self, ctx);
+                    }
                 }
-                else
-                {
-                    //makes sure all the visual information for the ai is up to date!
-                    
-
-                    //todo: in all of the systems that can end a turn apply the energy costs to the entities!
-                    //check adjacent reactions
-                    ai::adjacent_ai_system(self);
-
-                    //check further away reactions
-                    ai::visible_ai_system(self);
-
-                    //run current goal behaviour
-                    ai::approach_ai_system(self);
-                    ai::flee_ai_system(self);
-                    //default behaviour
-                    ai::default_move_ai_system(self);
-                    //run systems!
-                    run_systems(self, ctx);
-                }
+                self.current_state = newrunstate;
             }
 
 
@@ -610,15 +611,9 @@ fn game_init ( state: &mut State)
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
     spawning_system::room_spawns(state);
 
-    spawning_system::spawn_healing_item(state);
-    spawning_system::spawn_damage_item(state);
     let mut i = 1;
     let pos2 = state.map.rooms[0].center();
 
-    //spawning_system::spawn_entity(state, &(&0, &"Health Potion".to_string()), xy.x, xy.y+2, EntityType::Item);
-    //spawning_system::spawn_entity(state, &(&1, &"Wooden Bow".to_string()), xy.x-1, xy.y,EntityType::Item);
-
-// }
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)

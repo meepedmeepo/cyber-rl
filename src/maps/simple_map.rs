@@ -50,7 +50,7 @@ impl MapBuilder for SimpleMapBuilder
 impl SimpleMapBuilder {
     pub fn new(new_depth : i32) -> SimpleMapBuilder
     {
-        SimpleMapBuilder{depth: new_depth, map : Map::new(vec![TileType::Wall;MAPSIZE]), starting_position : Point::zero(), rooms : Vec::new()}
+        SimpleMapBuilder{depth: new_depth, map : Map::new(new_depth), starting_position : Point::zero(), rooms : Vec::new()}
     }
     fn rooms_and_corridors(&mut self) {
         const MAX_ROOMS : i32 = 30;

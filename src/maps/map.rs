@@ -100,15 +100,16 @@ impl Map
         !self.blocked[idx as usize]
     }
 
-    pub fn new(map : Vec<TileType>) -> Map
+    pub fn new(new_depth : i32) -> Map
     {
         Map
         {
-            map,
+            map: vec![TileType::Wall; MAPSIZE],
             revealed_tiles : vec![false;MAPSIZE],
             visible_tiles: vec![false;MAPSIZE],
             blocked : vec![false;MAPSIZE],
-            tile_contents : vec![Vec::new(); MAPSIZE] , depth: 0,
+            tile_contents : vec![Vec::new(); MAPSIZE] , 
+            depth: new_depth,
             props: HashMap::new(),
         }
 

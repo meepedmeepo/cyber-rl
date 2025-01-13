@@ -2,13 +2,22 @@ pub mod map;
 pub mod common;
 pub mod simple_map;
 mod cellular_automata;
-use crate::map::*;
-
+use crate::{map::*, State};
+use bracket_lib::prelude::Point;
+use simple_map::*;
 
 pub trait MapBuilder
 {
-    fn build(new_depth: i32) -> Map;
+    fn build(&mut self) -> Map;
+    fn spawn_entities(&mut self, state : &mut State);
+    fn get_map(&mut self) -> Map;
+    fn get_starting_position(&mut self) -> Point;
 }
 
+pub fn random_map_builder(new_depth : i32) -> Box<dyn MapBuilder>
+{
+
+    Box::new(SimpleMapBuilder::new(new_depth))
+}
 
 

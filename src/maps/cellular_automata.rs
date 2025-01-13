@@ -18,9 +18,21 @@ pub struct CellularAutomataBuilder
 
 impl MapBuilder for CellularAutomataBuilder
 {
-    fn build(new_depth: i32) -> Map
+    fn build(&mut self) -> Map
     {
         todo!()   
+    }
+    
+    fn spawn_entities(&mut self, state : &mut crate::State) {
+        todo!()
+    }
+    
+    fn get_map(&mut self) -> Map {
+        todo!()
+    }
+    
+    fn get_starting_position(&mut self) -> bracket_lib::prelude::Point {
+        todo!()
     }
 }
 

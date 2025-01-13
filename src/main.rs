@@ -156,11 +156,11 @@ pub fn go_down_stairs(state: &mut State)
 {
     cleanup_ECS(state);
     //Map::generate_map_checked(state);
-    state.map = simple_map::SimpleMapBuilder::build(state.map.depth+1);
-    state.player_pos = state.map.rooms[0].center();
-    let roompos = state.map.rooms.last().expect("Room list is empty!").center();
-    let idx = Map::xy_id(roompos.x, roompos.y);
-    state.map.map[idx] = TileType::DownStairs;
+    let mut builder = random_map_builder(state.map.depth + 1);
+    builder.build();
+    builder.spawn_entities(state);
+    state.map = builder.get_map();
+    state.player_pos = builder.get_starting_position();
 
     for (_id,(_player, pos , fov)) 
         in state.world.query_mut::<(&Player,&mut Position, &mut FoV)>()
@@ -171,8 +171,6 @@ pub fn go_down_stairs(state: &mut State)
         fov.visible_tiles.clear();
         fov.dirty = true;
     }
-
-    spawning_system::room_spawns(state);
 
     let msg = format!("You traversed the stairs downwards to the next layer of the dungeon");
 
@@ -586,11 +584,15 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 fn game_init ( state: &mut State)
 {
     raws::run();
+    let mut builder = random_map_builder(0);
     
-    state.map = simple_map::SimpleMapBuilder::build(0);
+    builder.build();
+
+    state.map = builder.get_map();
+    builder.spawn_entities(state);
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
-    let xy = state.map.rooms[0].center();
+    let xy = builder.get_starting_position();
     
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
@@ -609,10 +611,6 @@ fn game_init ( state: &mut State)
     , Player{})));
 
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
-    spawning_system::room_spawns(state);
-
-    let mut i = 1;
-    let pos2 = state.map.rooms[0].center();
 
 }
 
@@ -664,7 +662,7 @@ fn main() ->BError
 
     let mut gs: State = State{
         world: World::new(),
-        map : Map {map :Vec::new(), rooms : Vec::new()
+        map : Map {map :Vec::new()
         ,revealed_tiles : vec![false;MAPSIZE]
         ,visible_tiles : vec![false;MAPSIZE]
         ,blocked : vec![false;MAPSIZE]

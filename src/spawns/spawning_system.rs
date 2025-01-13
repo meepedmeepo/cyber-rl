@@ -162,15 +162,6 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
 
 }
 
-pub fn room_spawns( state : &mut State)
-{
-    let rooms = state.map.rooms.clone();
-    for room in rooms.iter().skip(1)
-    {
-        spawn_room(state, *room, state.map.depth);
-    }
-}
-
 fn room_table(state : &mut State) -> RandomTable
 {
     get_spawn_table_for_depth(&RAWS.lock().unwrap(), state.map.depth)

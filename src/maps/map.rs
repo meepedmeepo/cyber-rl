@@ -18,7 +18,6 @@ pub fn new(new_depth : i32) -> Map
     Map
     {
         map : vec![TileType::Wall; MAPSIZE],
-        rooms : Vec::new(),
 
         revealed_tiles : vec![false; MAPSIZE],
         visible_tiles : vec![false; MAPSIZE],
@@ -32,16 +31,15 @@ pub fn new(new_depth : i32) -> Map
 
 
 
-#[derive(PartialEq,Clone, Copy)]
+#[derive(PartialEq,Clone, Copy, Debug)]
 pub enum TileType
 {
     Floor, Wall, DownStairs,
 }
-
+#[derive(Debug, Clone)]
 pub struct Map
 {
     pub map : Vec<TileType>,
-    pub rooms: Vec<Rect>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
     pub blocked: Vec<bool>,
@@ -84,10 +82,10 @@ impl BaseMap for Map
         DistanceAlg::Pythagoras.distance2d(p1, p2)
     }
     
- }
+}
 
- impl Algorithm2D for Map
- {
+impl Algorithm2D for Map
+{
     fn dimensions(&self) -> Point {
         Point::new(MAPWIDTH,MAPHEIGHT)
     }
@@ -102,12 +100,11 @@ impl Map
         !self.blocked[idx as usize]
     }
 
-    pub fn new(map : Vec<TileType> , rooms:Vec<Rect>) -> Map
+    pub fn new(map : Vec<TileType>) -> Map
     {
         Map
         {
             map,
-            rooms,
             revealed_tiles : vec![false;MAPSIZE],
             visible_tiles: vec![false;MAPSIZE],
             blocked : vec![false;MAPSIZE],
@@ -216,160 +213,6 @@ y += 1;
 
 impl Map
 {
-    pub fn check_map_validity(&self) -> bool
-    {
-        let p1 = self.rooms[0].center();
-        for room in self.rooms.iter().skip(1)
-        {
-            let p2 = room.center();
-            if !self.check_room_path(p1,p2)
-            {
-                return false;
-            }
-        }
-        true
-    }
-    pub fn check_room_path(&self, p1 : Point, p2 : Point) -> bool
-    {
-        //let distance = DistanceAlg::Pythagoras.distance2d(p1,p2);
-        let path = a_star_search(Map::xy_id(p1.x, p1.y), Map::xy_id(p2.x, p2.y), self);
-        if path.success && path.steps.len() > 2
-        {
-            return true;
-        }
-        return false;
-    }
-    pub fn generate_map_checked(state: &mut State)
-    {
-        let is_valid = false;
-        let mut i = 1;
-        while !is_valid
-        {
-            state.map = Map::create_room_map(state);
-            state.map.create_map_corridors();
-            if state.map.check_map_validity()
-        {
-            console::log(format!("Successfully generated map after {} tries!",i));
-
-            let pos = state.map.rooms[state.map.rooms.len()-1].center();
-
-            let idx = Map::xy_id(pos.x, pos.y);
-
-            state.map.map[idx] = TileType::DownStairs;
-
-            return;
-        }
-        else 
-        {
-            console::log(format!("Failed to generate valid map! Attempt {}!",i));
-            i+=1;
-        }
-        }
-    }
-
-
-pub fn create_room_map(state : &mut State) -> Map
-{
-    let mut  map = vec![TileType::Wall; MAPSIZE];
-
-    let mut rooms : Vec<Rect> = Vec::new();
-
-    
-    while rooms.len() < 14
-    {
-        let  room = Map::create_room(state);
-        let mut intersects = false;
-        for r in rooms.iter()
-        {
-            if room.intersect(r)
-            {
-                intersects = true;
-            }
-        }
-        if !intersects
-        {
-            rooms.push(room);
-        }
-    }
-    for r in rooms.iter()
-    {
-        r.for_each(|xy| map[Map::xy_id(xy.x, xy.y)] = TileType::Floor);
-    }
-    
-    Map::new(map, rooms)
-
-}
-
-pub fn create_room( state : &mut State) -> Rect
-{ 
-    let x =state.rng.range(1, MAPWIDTH - 6);
-    let mut  w = state.rng.range(4,15);
-    let y: i32 = state.rng.range(1,MAPHEIGHT - 6);
-    let mut h = state.rng.range(3,15);
-    //Rect::with_exact(x1,x2,y2,y2)
-    if x+w > MAPWIDTH -2
-    {
-        w = MAPWIDTH-2-x;
-    }
-    if y + h > MAPHEIGHT -2
-    {
-        h = MAPHEIGHT-2 - y;
-    }
-    Rect::with_size(x, y, w, h)
-
-}
-
-pub fn create_map_corridors(&mut self)
-{
-        //let mut start : Point;
-        //let mut target : Point;
-        let mut rooms : Vec<Rect> = Vec::new();
-        rooms = self.generate_simple_corridors(  &mut rooms);
-        //rooms = self.generate_simple_corridors( &mut rooms);
-    
-        self.apply_rooms(&mut rooms);
-
-}
-
-fn generate_simple_corridors (&self,
-    rooms :&mut Vec<Rect>) ->  Vec<Rect>
-{
-    let mut start: Point;
-    let mut target: Point;
-    let mut rng = bracket_lib::random::RandomNumberGenerator::new();
-    for r in self.rooms.iter()
-    {
-        let start_x = rng.range(r.x1,r.x2);
-        let start_y = rng.range(r.y1, r.y2);
-        start = Point::new(start_x, start_y);
-
-        let mut is_valid_target = false;
-        let mut target_room = *r;
-        while !is_valid_target
-        {
-            target_room = self.rooms[rng.range(0, self.rooms.len())];
-            
-            if target_room!= *r
-            {
-                is_valid_target = true;
-            }
-        }
-
-        //let target_room = state.maproom.rooms[rng.range(0, state.maproom.rooms.len())];
-        
-        let target_x = rng.range(target_room.x1+1, target_room.x2);
-        let target_y = rng.range(target_room.y1+1, target_room.y2);
-        
-        target = Point::new(target_x,target_y);
-    
-        let  r1 = Rect::with_exact(start.x, start.y, target.x+2, start.y+2);
-        let  r2 = Rect::with_exact(target.x,start.y,target.x+2,target.y+2);
-        rooms.push(r1);
-        rooms.push(r2);
-    }
-    rooms.to_vec()
-}
-
 
 fn apply_rooms(&mut self,rooms: &Vec<Rect>)
 {
@@ -380,4 +223,5 @@ fn apply_rooms(&mut self,rooms: &Vec<Rect>)
     }
 
 }
+
 

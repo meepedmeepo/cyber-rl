@@ -1,9 +1,9 @@
 use core::panic;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::ai::Energy;
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
-use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable};
+use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable, MAPWIDTH};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::{console, Rect};
@@ -229,5 +229,60 @@ pub fn spawn_room(state : &mut State, room : Rect, depth :i32)
             }
         }
     }
+
+}
+
+
+pub fn spawn_region(state : &mut State, area : &[usize], map_depth : i32)
+{
+    let mut areas = Vec::from(area);
+    let mobguard = RAWS.lock().unwrap();
+    let mob_names = mobguard.get_mob_name_list();
+    std::mem::drop(mobguard);
+    let itemguard =  RAWS.lock().unwrap();
+    let item_names =itemguard.get_item_name_list();
+    std::mem::drop(itemguard);
+
+    let prop_names = RAWS.lock().unwrap().get_prop_name_list();
+
+    let mut ent_type  = EntityType::Mob;
+
+    
+    let mut attempts = 20;
+
+    let mut num_spawns = std::cmp::min(state.rng.range(0, MAXMOBS+1), area.len() as i32);
+
+    let mut spawn_points : HashMap<usize, String> = HashMap::new();
+
+
+    for _i in 0..num_spawns
+    {
+        let array_index = if areas.len() == 1 {0usize} else {(state.rng.roll_dice(1, areas.len() as i32) -1) as usize};
+
+        let map_idx = areas[array_index];
+        areas.remove(array_index);
+        spawn_points.insert(map_idx, room_table(state).roll(&mut state.rng));
+    }
+
+    for (idx, name) in spawn_points.iter()
+    {
+        if mob_names.contains(name)
+        {
+            ent_type = EntityType::Mob;
+        } else if item_names.contains(name)
+        {
+            ent_type = EntityType::Item;
+        }else if prop_names.contains(name)
+        {
+            ent_type = EntityType::Prop;
+        }
+        else
+        {
+            panic!("{} is not a valid item, mob or prop name so can't be spawned", name);    
+        }
+
+        spawn_entity(state, &(&0usize, name), *idx as i32  % MAPWIDTH, *idx as i32 / MAPWIDTH, ent_type);
+    }
+
 
 }

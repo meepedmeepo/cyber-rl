@@ -586,9 +586,9 @@ fn game_init ( state: &mut State)
     raws::run();
     let mut builder = random_map_builder(0);
     
-    builder.build();
+    
 
-    state.map = builder.get_map();
+    state.map = builder.build();
     builder.spawn_entities(state);
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object

@@ -4,6 +4,7 @@ pub mod simple_map;
 mod cellular_automata;
 use crate::{map::*, State};
 use bracket_lib::prelude::Point;
+use cellular_automata::CellularAutomataBuilder;
 use simple_map::*;
 
 pub trait MapBuilder
@@ -17,7 +18,7 @@ pub trait MapBuilder
 pub fn random_map_builder(new_depth : i32) -> Box<dyn MapBuilder>
 {
 
-    Box::new(SimpleMapBuilder::new(new_depth))
+    Box::new(CellularAutomataBuilder::new(new_depth))
 }
 
 

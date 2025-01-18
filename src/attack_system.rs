@@ -41,9 +41,10 @@ impl AttackSystem
             let mut weapons = state.world.query::<(&Equipped, &Weapon)>()
                 .iter()
                 .filter(|(_ent,(equip, _wep))|
-                 equip.owner == attacker && equip.slot == EquipmentSlot::MainHand)
-                 .map(|ent| *ent.1.1)
-                 .collect::<Vec<_>>();
+                equip.owner == attacker && equip.slot == EquipmentSlot::MainHand)
+                .map(|ent| *ent.1.1)
+                .collect::<Vec<_>>();
+
             if weapons.len() < 1
             {
                 //TODO: fix this shitty implementation
@@ -125,7 +126,7 @@ impl AttackSystem
                 dmg = std::cmp::max(1, dmg);
 
                 add_effect(Some(attacker), crate::effects::EffectType::Damage { amount: dmg },
-                     Targets::Single { target: target });
+                    Targets::Single { target: target });
                 //DamageSystem::mark_for_damage(state, target, dmg);
             }
         }

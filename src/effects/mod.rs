@@ -1,4 +1,5 @@
 use std::{collections::VecDeque, sync::Mutex};
+use animation::Animation;
 use bracket_lib::color::RGB;
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
@@ -11,6 +12,7 @@ mod targetting;
 mod triggers;
 mod hunger;
 mod particles;
+mod animation;
 pub use targetting::*;
 pub use particles::*;
 
@@ -19,6 +21,7 @@ pub use particles::*;
 lazy_static!
 {
     pub static ref EFFECTQUEUE : Mutex<VecDeque<EffectSpawner>> = Mutex::new(VecDeque::new());
+    pub static ref ANIMATIONQUEUE : Mutex<Vec<Animation>> = Mutex::new(Vec::new());
 }
 
 #[derive(Debug, PartialEq)]
@@ -31,6 +34,7 @@ pub enum EffectType
     Feed {amount : i32},
     ParticleLine {glyph: char, fg: RGB, bg: RGB, lifetime:f32},
     PropTriggered {prop : Entity},
+    ParticleProjectile {glyph : char, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 }
 }
 
 #[derive(Clone, PartialEq, Eq)]

@@ -20,7 +20,7 @@ pub fn draw_pickup_menu(ctx : &mut BTerm, items: Vec<(Entity, bool)>, state : &m
     }
 
     draw_menu_list(ctx, &menu_content, "Pickup Item:", Point::new(22, 10),
-         35, RGB::named(WHITE), RGB::named(BLACK), RGB::named(GREEN));
+        35, RGB::named(WHITE), RGB::named(BLACK), RGB::named(GREEN));
 }
 
 pub fn menu_theme(menu : MenuType) -> (&'static str, RGB, RGB) 

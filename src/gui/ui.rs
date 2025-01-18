@@ -50,10 +50,13 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
     
     
     let depth = format!("Depth: {}",state.map.depth);
-    ctx.print_color(82, 1, color::YELLOW, color::BLACK, &depth);
+    ctx.print_color(80, 1, color::YELLOW, color::BLACK, &depth);
     
     let fps = format!("FPS: {}",ctx.fps);
-    ctx.print_color(100, 1, color::YELLOW, color::BLACK, &fps);
+    ctx.print_color(90, 1, color::YELLOW, color::BLACK, &fps);
+
+    let turn = format!("Turn: {}",state.turn_number);
+    ctx.print_color(98, 1, color::YELLOW, color::BLACK, &turn);
 
     let(progress, max) = statistics::get_xp_from_current_level(state);
 

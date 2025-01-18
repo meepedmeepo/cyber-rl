@@ -33,6 +33,10 @@ pub fn spawn_projectiles(state : &mut State)
     state.projectile_builder.requests.clear();
 }
 
+pub fn projectile_system(state : &mut State, ctx: &mut BTerm)
+{
+    
+}
 
 pub fn update_projectiles(state : &mut State, ctx: &mut BTerm)
 {

@@ -15,7 +15,7 @@ pub fn draw_inventory(state: &mut State, ctx: &mut BTerm)
     {
         items.push(name.clone());
     }
-   
+
     let height = max(5, items.len() +4);
     
     

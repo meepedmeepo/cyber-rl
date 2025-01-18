@@ -612,6 +612,8 @@ fn game_init ( state: &mut State)
 
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
 
+    spawning_system::spawn_item_equipped(state, &"Rusted Knuckle Duster".to_string(), state.player_ent.unwrap());
+
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)

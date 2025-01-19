@@ -4,7 +4,7 @@ use bracket_lib::{color::RGB, random::DiceType};
 use hecs::{BuiltEntity, Entity, EntityBuilder};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
-use crate::{ai::Energy, components, effects::{Particle, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{ai::Energy, components, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -358,6 +358,11 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
         if let Some(weapon) = &item_template.weapon
         {
             eb.add(Self::parse_weapon_comp(weapon.clone()));
+        }
+
+        if let Some(proj) = &item_template.rangedprojectile
+        {
+            eb.add(ParticleAnimation{particle: RawMaster::parse_particle_string(proj.clone())});
         }
 
         return Some(Box::new(eb) );

@@ -55,11 +55,11 @@ pub fn init_turn_queue(state : &mut State)
 /// left all entities will have energy added to them. If the player can act then the program state will go to AwaitingInput
 pub fn run_initiative(state : &mut State) -> ProgramState
 {
-    hunger_system(state);
-    time_system::time_system(state);
-    
     if state.world.query_mut::<&MyTurn>().into_iter().len() < 1
     {
+        hunger_system(state);
+        time_system::time_system(state);
+
         let mut turns_to_add = Vec::new();
         
         for (ent, (energy, stats, pos)) 

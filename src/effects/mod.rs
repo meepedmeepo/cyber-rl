@@ -4,7 +4,7 @@ use bracket_lib::color::RGB;
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
-use triggers::{entry_trigger_fire, item_trigger};
+use triggers::{entry_trigger_fire, item_trigger, ranged_trigger};
 use crate::{particles::ParticleBuilder, State, MAPWIDTH};
 
 mod damage;
@@ -15,6 +15,7 @@ mod particles;
 mod animation;
 pub use targetting::*;
 pub use particles::*;
+pub use animation::*;
 
 
 
@@ -34,7 +35,8 @@ pub enum EffectType
     Feed {amount : i32},
     ParticleLine {glyph: char, fg: RGB, bg: RGB, lifetime:f32},
     PropTriggered {prop : Entity},
-    ParticleProjectile {glyph : char, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 }
+    ParticleProjectile {glyph : char, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 },
+    RangedFire{item : Entity},
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -91,7 +93,11 @@ fn target_applicator(state: &mut State, effect: &EffectSpawner)
     } else if let EffectType::PropTriggered{prop} = effect.effect_type
     {
         entry_trigger_fire(effect.creator, prop, &effect.targets, state);
-    }else
+    }else if let EffectType::RangedFire { item } = effect.effect_type
+    {
+        ranged_trigger(effect.creator, item, &effect.targets, state);
+    }
+    else
     {
         match &effect.targets
         {

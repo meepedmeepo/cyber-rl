@@ -1,12 +1,15 @@
 use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
-use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Map, Position, State, MAPWIDTH};
+use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, State, MAPWIDTH};
 
-use super::{add_effect, EffectType, ParticleBurst, ParticleLine, Targets};
+use super::{add_effect, animation::Animation, EffectType, ParticleAnimation, ParticleBurst, ParticleLine, Targets, ANIMATIONQUEUE};
 
 
-
+pub fn ranged_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, state : &mut State)
+{
+    event_trigger(creator, item, targets, state);
+}
 
 pub fn item_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, state : &mut State)
 {
@@ -85,6 +88,42 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
                     add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph, fg: pl.particle.fg
                         , bg: pl.particle.bg, lifetime: pl.particle.lifetime }
                         , Targets::Tiles { tiles: tile_vec.clone() });
+                }
+            }
+        }
+    }
+
+    if let Ok(p) = state.world.get::<&ParticleAnimation>(item)
+    {
+        if let Some(ent) = creator
+        {
+            if let Ok(pos) = state.world.get::<&Position>(ent)
+            {
+                let start_pos = Into::<Point>::into(*pos);
+                let mut end_pos = Point::zero();
+
+                if let Targets::Tile { tile_idx } = targets
+                {
+                    end_pos.x = tile_idx % MAPWIDTH;
+                    end_pos.y = tile_idx / MAPWIDTH;
+                }
+                if let Targets::Tiles { tiles } = targets
+                {
+                    end_pos.x = tiles[0] % MAPWIDTH;
+                    end_pos.y = tiles[0] / MAPWIDTH;
+                }
+
+                if end_pos != Point::zero()
+                {
+                    let path = bracket_lib::geometry::BresenhamInclusive::new(start_pos, end_pos).collect::<Vec<_>>();
+
+                    let anim = Animation{step_time: p.particle.lifetime-30., particle: p.particle.clone(), path: path,
+                        index: 0, current_step_time : p.particle.lifetime };
+                    
+                    //std::mem::drop(p);
+                    //std::mem::drop(pos);
+                    ANIMATIONQUEUE.lock().unwrap().push(anim);
+                    //return;
                 }
             }
         }

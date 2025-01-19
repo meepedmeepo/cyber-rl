@@ -33,7 +33,8 @@ pub struct Item
     pub equippable: Option<EquipmentStats>,
     pub weapon: Option <Weapon>,
     pub ranged: Option<i32>,
-    pub wearable: Option<Wearable>
+    pub wearable: Option<Wearable>,
+    pub rangedprojectile : Option<String>,
 }
 #[derive(Debug, Deserialize, Clone)]
 pub struct Weapon

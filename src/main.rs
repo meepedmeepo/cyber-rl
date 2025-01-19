@@ -9,6 +9,7 @@ use bracket_lib::prelude::*;
 use bracket_lib::color;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
+use effects::add_effect;
 use effects::run_effect_queue;
 use gamelog::GameLog;
 use gui::display_input_text;
@@ -111,6 +112,7 @@ pub enum ProgramState
     Ticking,
     SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType},
     TextInput {text: Vec<char>},
+    PlayAnimation,
 }
 
 
@@ -257,6 +259,19 @@ impl GameState for State{
                 gui::draw_gamelog(self, ctx);
                 //gui::draw_inventory(self, ctx);
             }
+
+            ProgramState::PlayAnimation =>
+            {
+                ctx.cls();
+                draw_map(ctx, &self.map);
+                effects::run_effect_queue(self);
+                effects::run_animation_queue(self, ctx);
+                render_system(self, ctx);
+                gui::draw_ui(self, ctx);
+                gui::draw_status_box(self, ctx);
+                gui::draw_gamelog(self, ctx);
+                
+            }
             ProgramState::Ticking =>
             {
                 let mut newrunstate = ProgramState::Ticking;
@@ -283,6 +298,8 @@ impl GameState for State{
                         ai::default_move_ai_system(self);
                         //run systems!
                         run_systems(self, ctx);
+
+                        
                     }
                 }
                 self.current_state = newrunstate;
@@ -492,10 +509,27 @@ impl GameState for State{
                         let dmg = 4;
                         //TODO:!!!!!!!!!!!!!!
                         
-                        self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
-                            '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
+                        let query = self.world.query::<&Equipped>()
+                            .iter()
+                            .filter(|(_ent,equip) | 
+                            equip.slot == EquipmentSlot::Ranged && equip.owner == self.player_ent
+                            .expect("Couldn't find player entity to fetch ranged stats for combat"))
+                            .map(|(ent, _eq)| ent)
+                            .collect::<Vec<_>>();
+
+                        
+                        
+                        //effects::ra
+                        add_effect(Some(self.player_ent.unwrap()), effects::EffectType::RangedFire { item: query[0] }, 
+                            effects::Targets::Tile { tile_idx: Map::xy_id(end.x, end.y) as i32 });
+
+                        effects::run_effect_queue(self);
+                        effects::run_animation_queue(self, ctx);
+
+                        //self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
+                        //    '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
                         let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
-                        self.current_state = ProgramState::Ticking;
+                        self.current_state = ProgramState::PlayAnimation;
                     }
                 }
 
@@ -566,6 +600,9 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     effects::run_effect_queue(state);
     ClearDeadSystem::run(state);
+    
+
+    
 
     map_indexing_system::MapIndexingSystem::run(state);
 
@@ -574,6 +611,7 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
     draw_map(ctx, &state.map);
+    effects::run_animation_queue(state, ctx);
     render_system(state, ctx);
     gui::draw_ui(state, ctx);
     gui::draw_status_box(state, ctx);
@@ -613,6 +651,9 @@ fn game_init ( state: &mut State)
     spawning_system::spawn_item_in_backpack(state, &"Ration".to_string(), state.player_ent.unwrap());
 
     spawning_system::spawn_item_equipped(state, &"Rusted Knuckle Duster".to_string(), state.player_ent.unwrap());
+
+
+    spawning_system::spawn_item_equipped(state, &"Light Pistol".to_string(), state.player_ent.unwrap());
 
 }
 

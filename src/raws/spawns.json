@@ -73,7 +73,8 @@
       "ranged": 6,
       "equippable": {
         "slot": "ranged"
-      }
+      },
+      "rangedprojectile" : "*;#ffffff;#000000;85."
     },
     {
       "name": "Rusted Knuckle Duster",

@@ -70,11 +70,14 @@
         "bg": "#000000",
         "order": 2
       },
-      "ranged": 6,
+      "ranged": {
+        "range" : 6,
+        "damage" : "1d8+1"
+      },
       "equippable": {
         "slot": "ranged"
       },
-      "rangedprojectile" : "*;#ffffff;#000000;105."
+      "rangedprojectile" : "*;#ffffff;#000000;60."
     },
     {
       "name": "Rusted Knuckle Duster",

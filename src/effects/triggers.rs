@@ -1,7 +1,7 @@
 use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
-use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, State, MAPWIDTH};
+use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State, MAPWIDTH};
 
 use super::{add_effect, animation::Animation, EffectType, ParticleAnimation, ParticleBurst, ParticleLine, Targets, ANIMATIONQUEUE};
 
@@ -115,14 +115,18 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
                 if end_pos != Point::zero()
                 {
+
+
                     let path = bracket_lib::geometry::BresenhamInclusive::new(start_pos, end_pos).skip(1).collect::<Vec<_>>();
 
                     let anim = Animation{step_time: p.particle.lifetime-20., particle: p.particle.clone(), path: path,
-                        index: 0, current_step_time : p.particle.lifetime-20. };
+                        index: 0, current_step_time : p.particle.lifetime-20., creator : creator.expect("No projectile creator") };
                     
                     //std::mem::drop(p);
                     //std::mem::drop(pos);
-                    ANIMATIONQUEUE.lock().unwrap().push(anim);
+                    ANIMATIONQUEUE.lock().unwrap().push((anim, Projectile{damage:
+                        state.world.get::<&RangedWeapon>(item)
+                        .expect("Couldn't get RangedWeapon component!").damage}));
                     //return;
                 }
             }

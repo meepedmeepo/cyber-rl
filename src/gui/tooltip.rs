@@ -26,10 +26,16 @@ pub fn draw_tooltip(state : &mut State, ctx : &mut BTerm, cursor_pos : Point )
 
     for ent in content_id.iter()
     {
-        let (name, rend) = 
-            state.world.query_one_mut::<(&Name, &Renderable)>(*ent).unwrap();
         
-        content.push((name.name.clone(), rend.order));
+        if let Ok((name, rend)) = state.world.query_one_mut::<(&Name, &Renderable)>(*ent)
+
+        {
+            content.push((name.name.clone(), rend.order));
+        }
+
+        
+        
+        
     }
     content.sort_by_key(|(name, _order)| 0 - name.chars().count() as i32);
     let tip_width = content[0].0.chars().count() as i32 + 5;

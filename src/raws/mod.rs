@@ -25,6 +25,12 @@ pub struct Raws
 }
 
 #[derive(Deserialize, Debug)]
+pub struct RangedWeapon
+{
+    pub range : i32,
+    pub damage : String
+}
+#[derive(Deserialize, Debug)]
 pub struct Item
 {
     pub name :String,
@@ -32,7 +38,7 @@ pub struct Item
     pub consumable : Option<Consumable>,
     pub equippable: Option<EquipmentStats>,
     pub weapon: Option <Weapon>,
-    pub ranged: Option<i32>,
+    pub ranged: Option<RangedWeapon>,
     pub wearable: Option<Wearable>,
     pub rangedprojectile : Option<String>,
 }

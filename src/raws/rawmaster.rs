@@ -1,6 +1,6 @@
 use std::{borrow::Borrow, clone, collections::HashMap, hash::Hash, string};
 
-use bracket_lib::{color::RGB, random::DiceType};
+use bracket_lib::{color::RGB, random::{parse_dice_string, DiceType}};
 use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
@@ -318,7 +318,8 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
 
         if let Some(range) = &item_template.ranged
         {
-            eb.add(RangedWeapon{range: *range});
+            eb.add(RangedWeapon{range: range.range, damage: parse_dice_string(&range.damage)
+                .expect("Not valid dice string for ranged weapon!")});
         }
 
         if let Some(consumable) = &item_template.consumable

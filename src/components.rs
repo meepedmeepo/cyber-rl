@@ -1,7 +1,17 @@
-use bracket_lib::prelude::Point;
+use bracket_lib::{prelude::Point, random::DiceType};
 use hecs::Entity;
 use serde::Deserialize;
 
+#[derive(Debug, Clone, Copy)]
+pub struct Projectile
+{
+    pub damage : DiceType,
+}
+
+pub struct Creator
+{
+    pub ent : Entity,
+}
 #[derive(Debug, Clone)]
 pub struct WantsToApproach
 {
@@ -82,7 +92,9 @@ pub struct Weapon
 
 pub struct RangedWeapon
 {
-    pub range: i32
+    pub range: i32,
+
+    pub damage: DiceType,
 }
 pub struct Usable
 {}

@@ -4,7 +4,7 @@ use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
 use triggers::{entry_trigger_fire, item_trigger, ranged_trigger};
-use crate::{particles::ParticleBuilder, State, MAPWIDTH};
+use crate::{particles::ParticleBuilder, Projectile, State, MAPWIDTH};
 
 mod damage;
 mod targetting;
@@ -21,7 +21,7 @@ pub use animation::*;
 lazy_static!
 {
     pub static ref EFFECTQUEUE : Mutex<VecDeque<EffectSpawner>> = Mutex::new(VecDeque::new());
-    pub static ref ANIMATIONQUEUE : Mutex<Vec<Animation>> = Mutex::new(Vec::new());
+    pub static ref ANIMATIONQUEUE : Mutex<Vec<(Animation, Projectile)>> = Mutex::new(Vec::new());
 }
 
 #[derive(Debug, PartialEq)]

@@ -1,6 +1,7 @@
 use bracket_lib::prelude::{BTerm, Point};
+use hecs::Entity;
 
-use crate::{projectile::{projectile_system::*, ProjectileType}, Hidden, Map, ProgramState, State};
+use crate::{projectile::{projectile_system::*, ProjectileType}, Creator, Hidden, Map, ProgramState, Projectile, State};
 
 use super::{add_effect, Particle, ANIMATIONQUEUE};
 
@@ -8,19 +9,20 @@ use super::{add_effect, Particle, ANIMATIONQUEUE};
 #[derive(Clone, PartialEq)]
 pub struct Animation
 {
-    pub  particle : Particle,
+    pub particle : Particle,
     pub path : Vec<Point>,
     pub index : usize,
     pub step_time : f32,
     pub current_step_time : f32,
+    pub creator : Entity,
 }
 
 pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
 {
     //spawns animations added from effect queue
-    for anim in ANIMATIONQUEUE.lock().unwrap().iter()
+    for (anim, ranged) in ANIMATIONQUEUE.lock().unwrap().iter()
     {
-        state.world.spawn((anim.clone(), ProjectileType::Missile, ProjectileUpdated{}));
+        state.world.spawn((anim.clone(), ProjectileType::Missile, ProjectileUpdated{}, Projectile{damage: ranged.damage}));
     }
     //clears animation queue list
     ANIMATIONQUEUE.lock().unwrap().clear();

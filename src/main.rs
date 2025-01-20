@@ -655,6 +655,9 @@ fn game_init ( state: &mut State)
 
     spawning_system::spawn_item_equipped(state, &"Light Pistol".to_string(), state.player_ent.unwrap());
 
+
+
+
 }
 
 fn render_system(state:&mut State, ctx: &mut BTerm)
@@ -666,8 +669,6 @@ fn render_system(state:&mut State, ctx: &mut BTerm)
     //entities/
     particle_system::spawn_system(state);
     particle_system::update(state, ctx);
-    projectile_system::spawn_projectiles(state);
-    projectile_system::update_projectiles(state, ctx);
 
     let mut entities_to_render  = 
         state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()

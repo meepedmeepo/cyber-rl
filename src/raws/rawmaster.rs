@@ -1,7 +1,7 @@
 use std::{borrow::Borrow, clone, collections::HashMap, hash::Hash, string};
 
 use bracket_lib::{color::RGB, random::DiceType};
-use hecs::{BuiltEntity, Entity, EntityBuilder};
+use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
 use crate::{ai::Energy, components, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
@@ -364,7 +364,7 @@ pub fn spawn_named_item<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
         {
             eb.add(ParticleAnimation{particle: RawMaster::parse_particle_string(proj.clone())});
         }
-
+        
         return Some(Box::new(eb) );
     }
 

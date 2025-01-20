@@ -1,5 +1,4 @@
 use std::{collections::VecDeque, sync::Mutex};
-use animation::Animation;
 use bracket_lib::color::RGB;
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;

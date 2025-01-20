@@ -115,10 +115,10 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
                 if end_pos != Point::zero()
                 {
-                    let path = bracket_lib::geometry::BresenhamInclusive::new(start_pos, end_pos).collect::<Vec<_>>();
+                    let path = bracket_lib::geometry::BresenhamInclusive::new(start_pos, end_pos).skip(1).collect::<Vec<_>>();
 
-                    let anim = Animation{step_time: p.particle.lifetime-30., particle: p.particle.clone(), path: path,
-                        index: 0, current_step_time : p.particle.lifetime };
+                    let anim = Animation{step_time: p.particle.lifetime-20., particle: p.particle.clone(), path: path,
+                        index: 0, current_step_time : p.particle.lifetime-20. };
                     
                     //std::mem::drop(p);
                     //std::mem::drop(pos);

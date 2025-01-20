@@ -1,6 +1,7 @@
 use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
+use hecs::Entity;
 
-use crate::{gui::{self, TargettingMode}, FoV, Map, Position, State};
+use crate::{gui::{self, TargettingMode}, raws::{faction_reaction, Reaction, RAWS}, Faction, FoV, Hidden, Map, Position, State};
 
 pub enum TargettingState
 {
@@ -21,6 +22,14 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
                 VirtualKeyCode::Escape => 
                 {
                     return TargettingState::Cancel;
+                }
+                VirtualKeyCode::Tab =>
+                {
+                    if let TargettingMode::Keyboard { cursor_pos } = state.target_mode
+                    {
+                        state.target_mode = TargettingMode::Keyboard { cursor_pos: 
+                            select_nearest_target_pos(state, state.player_ent.unwrap(), cursor_pos) }
+                    }
                 }
                 _ => {}
             }
@@ -60,6 +69,10 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
             {
                 if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
                 {
+                    if point == state.player_pos
+                    {
+                        return TargettingState::None;
+                    }
                     let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
                     return TargettingState::Selected { path:targets, end: point };
                 }
@@ -116,4 +129,49 @@ fn targetting_viewshed(valid_tiles : &mut Vec<Point>, state : &mut State, range:
         }
     }
     
+}
+
+pub fn select_nearest_target_pos(state : &mut State, ent : Entity, current_pos : Point ) -> Point
+{
+    let pos  = *state.world.get::<&Position>(ent).unwrap().clone();
+    let mut point = pos.into();
+    
+    let faction = state.world.get::<&Faction>(ent).unwrap().name.clone();
+
+    let fov = state.world.get::<&FoV>(ent).unwrap().visible_tiles.clone();
+
+    let mut closest = Point::zero();
+
+    for i in fov.iter()
+    {
+        let cont = state.map.get_mob_entities_at_position(state, *i);
+        for mob in cont.iter()
+        {
+            if let Ok(_) = state.world.get::<&Hidden>(*mob)
+            {
+                continue;
+            }
+            let their_fac = state.world.get::<&Faction>(*mob).unwrap().name.clone();
+            let their_pos  = *state.world.get::<&Position>(*mob).unwrap().clone();
+            let their_point = their_pos.into();
+            let react = faction_reaction(&their_fac, &faction, &RAWS.lock().unwrap());
+
+            if react == Reaction::Attack && their_point != current_pos && (closest == Point::zero() || 
+                bracket_lib::pathfinding::DistanceAlg::Pythagoras.distance2d(point, their_point) < 
+                bracket_lib::pathfinding::DistanceAlg::Pythagoras.distance2d(point, closest) )
+            {
+                closest = their_point;
+            }
+        }
+        
+    }
+
+    if closest != Point::zero()
+    {
+        point = closest;
+    }
+
+
+
+    point
 }

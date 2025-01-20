@@ -491,10 +491,7 @@ impl GameState for State{
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
 
-                if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
-                {
-                    gui::draw_tooltip(self, ctx, cursor_pos );
-                }
+                
                 
                 let target_state = ranged_aim::aim_projectile(self, ctx, self.player_pos, range);
 
@@ -531,6 +528,11 @@ impl GameState for State{
                         let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
                         self.current_state = ProgramState::PlayAnimation;
                     }
+                }
+
+                if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
+                {
+                    gui::draw_tooltip(self, ctx, cursor_pos );
                 }
 
             }

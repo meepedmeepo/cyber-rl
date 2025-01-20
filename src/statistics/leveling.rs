@@ -4,7 +4,7 @@ use crate::State;
 
 use super::{BaseStatistics, Pools};
 
-const LEVEL_SCALING_FACTOR: f32 = 0.087;
+const LEVEL_SCALING_FACTOR: f32 = 0.17;
 
 
 pub fn level_up(stats: &BaseStatistics, pools : &mut Pools
@@ -22,12 +22,12 @@ pub fn level_up(stats: &BaseStatistics, pools : &mut Pools
 
 pub fn monster_xp_drop( level : i32) -> i32
 {
-     level*30
+    level*30
 }
 
 pub fn calculate_xp_from_level(level : i32) -> i32
 {
-   let base_xp =  level as f32/LEVEL_SCALING_FACTOR;
+    let base_xp =  level as f32/LEVEL_SCALING_FACTOR;
 
     base_xp.powf(2.) as i32
 }

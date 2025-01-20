@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, menus::MenuType, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -99,7 +99,12 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
                     let range = state.world.query_one_mut::<&RangedWeapon>(query[0])
                             .expect("Couldn't get range of players ranged weapon for range combat").range;
-
+                    
+                    if let TargettingMode::Keyboard { cursor_pos} = state.target_mode
+                    {
+                        state.target_mode = TargettingMode::Keyboard { cursor_pos: 
+                            select_nearest_target_pos(state, state.player_ent.unwrap(), cursor_pos) }
+                    }
                     return ProgramState::RangedCombat { range, dmg  };
                 }
             

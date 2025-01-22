@@ -1,4 +1,4 @@
-use crate::{Player, State, Map,MAPHEIGHT,MAPWIDTH};
+use crate::{networks::{ControlNode, NodeOwned}, Map, Player, State, MAPHEIGHT, MAPWIDTH};
 
 
 use super::{FoV, Position};
@@ -36,6 +36,19 @@ impl VisibilitySystem
                 None => continue,
 
             }
+            }
+        }
+
+        for (_id, (_node, fov, _owned)) in 
+            state.world.query_mut::<(&ControlNode, &FoV, &NodeOwned)>().into_iter()
+            .filter(|(_id,(_node, _fov, owned))| owned.owner == state.player_ent.unwrap())
+        {
+            for tile in fov.visible_tiles.iter()
+            {
+                let idx = Map::xy_id(tile.x, tile.y);
+
+                state.map.visible_tiles[idx] = true;
+                state.map.revealed_tiles[idx] = true;
             }
         }
     }

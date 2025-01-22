@@ -26,6 +26,8 @@ use menus::menu_input;
 use menus::select_menu_functions;
 use menus::MenuSelections;
 use menus::MenuType;
+use networks::ControlNode;
+use networks::NodeOwned;
 use particles::particle_system;
 use particles::ParticleBuilder;
 use projectile::projectile_system;
@@ -75,6 +77,7 @@ pub mod effects;
 mod entry_trigger_system;
 mod prop_trigger_system;
 mod ai;
+mod networks;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -353,7 +356,6 @@ impl GameState for State{
                 gui::draw_gamelog(self, ctx);
                 gui::draw_inventory(self, ctx);
             }
-
             ProgramState::SelectionMenu { mut items, menu  } =>
             {
                 ctx.cls();
@@ -604,8 +606,6 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     ClearDeadSystem::run(state);
     
 
-    
-
     map_indexing_system::MapIndexingSystem::run(state);
 
     
@@ -657,7 +657,8 @@ fn game_init ( state: &mut State)
 
     spawning_system::spawn_item_equipped(state, &"Light Pistol".to_string(), state.player_ent.unwrap());
 
-
+    state.world.spawn((FoV::new(10), ControlNode{level: 3}, NodeOwned {owner: state.player_ent.unwrap()}
+        , Position{x: xy.x, y: xy.y}));
 
 
 }

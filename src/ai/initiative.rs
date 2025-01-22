@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::{hunger::hunger_system, statistics::BaseStatistics, time_system, Position, ProgramState, State};
+use crate::{hunger::hunger_system, statistics::BaseStatistics, time_system, Map, Position, ProgramState, State};
 
 use super::{ Energy, MyTurn};
 use bracket_lib::prelude::Point;
@@ -67,6 +67,7 @@ pub fn run_initiative(state : &mut State) -> ProgramState
         {
             if bracket_lib::geometry::DistanceAlg::Pythagoras
                 .distance2d(state.player_pos, Point::new(pos.x, pos.y)) < 30. || ent == state.player_ent.unwrap()
+                || state.map.visible_tiles[Map::xy_id(pos.x, pos.y)]
             {
                 let mut energy_gain = 50;
                 energy_gain += std::cmp::max(0,stats.dexterity.get_modifier() * 5);

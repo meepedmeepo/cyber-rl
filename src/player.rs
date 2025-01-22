@@ -202,7 +202,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
         {
             state.world.insert_one(state.player_ent.unwrap(), HasMoved{}).unwrap();
             apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
-            state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+            let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
         }
 
         if state.map.tile_contents[destination_id].len() > 0 && !moved

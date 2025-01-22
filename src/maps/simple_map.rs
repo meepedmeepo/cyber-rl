@@ -7,57 +7,36 @@ use crate::TileType;
 use crate::common::*;
 use crate::MAPHEIGHT;
 use crate::MAPWIDTH;
+use super::BuilderMap;
+use super::InitialMapBuilder;
 use super::MAPSIZE;
 use super::{map, MapBuilder, Map};
 
 pub struct SimpleMapBuilder
 {
-    map : Map,
-    starting_position : Point,
-    depth : i32,
-    rooms : Vec<Rect>,
 }
 
-impl MapBuilder for SimpleMapBuilder
+impl InitialMapBuilder for SimpleMapBuilder
 {
-    fn build(&mut self) -> Map 
-    {
-        self.map = map::new(self.depth);
-
-        self.rooms_and_corridors();
-        self.map.clone()
-    }
-    
-    fn spawn_entities(&mut self, state : &mut crate::State) 
-    {
-        for room in self.rooms.iter()
-        {
-            spawn_room(state, *room, self.depth);
-        }
-    }
-    
-    fn get_map(&mut self) -> Map 
-    {
-        self.map.clone()
-    }
-    
-    fn get_starting_position(&mut self) -> bracket_lib::prelude::Point 
-    {
-        self.starting_position
+    #[allow(dead_code)]
+    fn build_map(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut super::BuilderMap) {
+        self.rooms_and_corridors(rng, build_data);
     }
 }
 
 impl SimpleMapBuilder {
-    pub fn new(new_depth : i32) -> SimpleMapBuilder
+    pub fn new(new_depth : i32) -> Box<SimpleMapBuilder>
     {
-        SimpleMapBuilder{depth: new_depth, map : Map::new(new_depth), starting_position : Point::zero(), rooms : Vec::new()}
+        Box::new(SimpleMapBuilder{})
     }
-    fn rooms_and_corridors(&mut self) {
+    fn rooms_and_corridors(&mut self,rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap) 
+    {
         const MAX_ROOMS : i32 = 30;
         const MIN_SIZE : i32 = 6;
         const MAX_SIZE : i32 = 10;
 
-        let mut rng = RandomNumberGenerator::new();
+        let mut rooms : Vec<Rect> = Vec::new();
+
 
         for i in 0..MAX_ROOMS {
             let w = rng.range(MIN_SIZE, MAX_SIZE);
@@ -66,36 +45,35 @@ impl SimpleMapBuilder {
             let y = rng.roll_dice(1, MAPHEIGHT - h - 1) - 1;
             let new_room = Rect::with_size(x, y, w, h);
             let mut ok = true;
-            for other_room in self.rooms.iter() {
+            for other_room in rooms.iter() {
                 if new_room.intersect(other_room) { ok = false }
             }
             if ok {
-                apply_room_to_map(&mut self.map, &new_room);
+                apply_room_to_map(&mut build_data.map, &new_room);
 
-                if !self.rooms.is_empty() {
+                if !rooms.is_empty() {
                     let new_pos = new_room.center();
                     let new_x = new_pos.x;
                     let new_y = new_pos.y;
-                    let prev_pos = self.rooms[self.rooms.len()-1].center();
+
+                    let prev_pos = rooms[rooms.len()-1].center();
                     let prev_x = prev_pos.x;
                     let prev_y = prev_pos.y;
-                    if rng.range(0,2) == 1 {
-                        apply_horizontal_tunnel(&mut self.map, prev_x, new_x, prev_y);
-                        apply_vertical_tunnel(&mut self.map, prev_y, new_y, new_x);
-                    } else {
-                        apply_vertical_tunnel(&mut self.map, prev_y, new_y, prev_x);
-                        apply_horizontal_tunnel(&mut self.map, prev_x, new_x, new_y);
+                    if rng.range(0,2) == 1 
+                    {
+                        apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, prev_y);
+                        apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, new_x);
+                    } else 
+                    {
+                        apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, prev_x);
+                        apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, new_y);
                     }
                 }
 
-                self.rooms.push(new_room);
+                rooms.push(new_room);
             }
         }
 
-        let stairs_position = self.rooms[self.rooms.len()-1].center();
-        let stairs_idx = Map::xy_id(stairs_position.x, stairs_position.y);
-        self.map.map[stairs_idx] = TileType::DownStairs;
-
-        self.starting_position = self.rooms[0].center();
+        build_data.rooms = Some(rooms);
     }
 }

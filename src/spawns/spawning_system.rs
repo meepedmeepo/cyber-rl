@@ -7,6 +7,7 @@ use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usa
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::{console, Rect};
+use bracket_lib::random::RandomNumberGenerator;
 use bracket_lib::terminal::Point;
 use hecs::Entity;
 
@@ -167,59 +168,79 @@ fn room_table(state : &mut State) -> RandomTable
     get_spawn_table_for_depth(&RAWS.lock().unwrap(), state.map.depth)
 }
 
-pub fn spawn_room(state : &mut State, room : Rect, depth :i32)
+pub fn roll_spawn_table( depth : i32) -> (String, EntityType)
 {
-    //let mob_names = &RAWS.lock().unwrap().get_mob_name_list();
-
-    let mobguard = RAWS.lock().unwrap();
-    let mob_names = mobguard.get_mob_name_list();
-    std::mem::drop(mobguard);
-    let itemguard =  RAWS.lock().unwrap();
-    let item_names =itemguard.get_item_name_list();
-    std::mem::drop(itemguard);
-
+    let mob_names = RAWS.lock().unwrap().get_mob_name_list();
+    let item_names = RAWS.lock().unwrap().get_item_name_list();
     let prop_names = RAWS.lock().unwrap().get_prop_name_list();
+
+    let table =  get_spawn_table_for_depth(&RAWS.lock().unwrap(), depth);
+
+    let mut rng = RandomNumberGenerator::new();
+    let name = table.roll(&mut rng);
+    let entity_type = get_entity_type(&name);
+
+    
+
+        (name.clone(), entity_type)
+}
+
+pub fn get_entity_type( name : &String) -> EntityType
+{
+    let mob_names = RAWS.lock().unwrap().get_mob_name_list();
+    let item_names = RAWS.lock().unwrap().get_item_name_list();
+    let prop_names = RAWS.lock().unwrap().get_prop_name_list();
+
+    let mut entity_type = EntityType::Mob;
+
+    if mob_names.contains(&name)
+    {
+        entity_type = EntityType::Mob;
+    } else if item_names.contains(&name)
+    {
+        entity_type = EntityType::Item;
+    }else if prop_names.contains(&name)
+    {
+        entity_type = EntityType::Prop;
+    }
+    else
+    {
+        panic!("{} is not a valid item, mob or prop name so can't be spawned", name);    
+    }
+
+    entity_type
+    
+}
+
+pub fn spawn_room( room : Rect, depth :i32, spawn_list: &mut Vec<(usize, String)>, map : &Map)
+{
 
     
     let mut num_mobs = 0;
     let mut num_items = 0;
     let mut ent_type  = EntityType::Mob;
 
-    let table = room_table(state);
+    let mut rng = RandomNumberGenerator::new();
     
     let mut attempts = 20;
 
-    let mut num_spawns = state.rng.range(0, MAXMOBS+1);
+    let mut num_spawns = rng.range(0, MAXMOBS+1);
 
     let mut spawn_points : HashSet<usize> = HashSet::new();
 
     
     while attempts > 0 && num_spawns > 0
     {
-        let name = table.roll(&mut state.rng);
-        
-        if mob_names.contains(&name)
-        {
-            ent_type = EntityType::Mob;
-        } else if item_names.contains(&name)
-        {
-            ent_type = EntityType::Item;
-        }else if prop_names.contains(&name)
-        {
-            ent_type = EntityType::Prop;
-        }
-        else
-        {
-            panic!("{} is not a valid item, mob or prop name so can't be spawned", name);    
-        }
+        let (name, _) = roll_spawn_table(depth);
 
         let pos_set = room.point_set();
         let point = pos_set.iter().next().unwrap();
         let pos = Map::xy_id(point.x, point.y);
-        if !spawn_points.contains(&pos) && state.map.map[pos] != TileType::Wall
+        if !spawn_points.contains(&pos) && map.map[pos] != TileType::Wall
         {
-            spawn_entity(state, &(&0, &name), point.x, point.y, ent_type);
+            //spawn_entity(state, &(&0, &name), point.x, point.y, ent_type);
             spawn_points.insert(pos);
+            spawn_list.push((pos,name));
             num_spawns -= 1;
         }
         else 

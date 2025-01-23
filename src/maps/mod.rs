@@ -31,8 +31,6 @@ pub trait MapBuilder
 
 pub fn random_map_builder(new_depth : i32) -> BuilderChain
 {
-
-    //Box::new(CellularAutomataBuilder::new(new_depth))
     let mut builder = BuilderChain::new(new_depth);
     builder.start_with(CellularAutomataBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));

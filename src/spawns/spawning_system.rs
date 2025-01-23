@@ -254,55 +254,33 @@ pub fn spawn_room( room : Rect, depth :i32, spawn_list: &mut Vec<(usize, String)
 }
 
 
-pub fn spawn_region(state : &mut State, area : &[usize], map_depth : i32)
+pub fn spawn_region( area : &[usize], map_depth : i32, spawn_list: &mut Vec<(usize, String)>)
 {
     let mut areas = Vec::from(area);
-    let mobguard = RAWS.lock().unwrap();
-    let mob_names = mobguard.get_mob_name_list();
-    std::mem::drop(mobguard);
-    let itemguard =  RAWS.lock().unwrap();
-    let item_names =itemguard.get_item_name_list();
-    std::mem::drop(itemguard);
 
-    let prop_names = RAWS.lock().unwrap().get_prop_name_list();
-
-    let mut ent_type  = EntityType::Mob;
-
+    let mut rng = RandomNumberGenerator::new();
     
     let mut attempts = 20;
 
-    let mut num_spawns = std::cmp::min(state.rng.range(0, MAXMOBS+1), area.len() as i32);
+    let mut num_spawns = std::cmp::min(rng.range(0, MAXMOBS+1), area.len() as i32);
 
     let mut spawn_points : HashMap<usize, String> = HashMap::new();
 
 
     for _i in 0..num_spawns
     {
-        let array_index = if areas.len() == 1 {0usize} else {(state.rng.roll_dice(1, areas.len() as i32) -1) as usize};
+        let array_index = if areas.len() == 1 {0usize} else {(rng.roll_dice(1, areas.len() as i32) -1) as usize};
 
         let map_idx = areas[array_index];
         areas.remove(array_index);
-        spawn_points.insert(map_idx, room_table(state).roll(&mut state.rng));
+        let (name, _) = roll_spawn_table(map_depth);
+        spawn_points.insert(map_idx, name);
     }
 
     for (idx, name) in spawn_points.iter()
     {
-        if mob_names.contains(name)
-        {
-            ent_type = EntityType::Mob;
-        } else if item_names.contains(name)
-        {
-            ent_type = EntityType::Item;
-        }else if prop_names.contains(name)
-        {
-            ent_type = EntityType::Prop;
-        }
-        else
-        {
-            panic!("{} is not a valid item, mob or prop name so can't be spawned", name);    
-        }
-
-        spawn_entity(state, &(&0usize, name), *idx as i32  % MAPWIDTH, *idx as i32 / MAPWIDTH, ent_type);
+        spawn_list.push((*idx, name.clone()));
+        //spawn_entity(state, &(&0usize, name), *idx as i32  % MAPWIDTH, *idx as i32 / MAPWIDTH, ent_type);
     }
 
 

@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use bracket_lib::{noise::{CellularDistanceFunction, FastNoise}, random::RandomNumberGenerator};
 
-use super::{BuilderMap, Map, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use crate::spawns::spawning_system::spawn_region;
 
+use super::{BuilderMap, Map, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
 
 
 pub struct VoronoiSpawning {}
@@ -57,6 +58,7 @@ impl VoronoiSpawning
         for area in noise_areas.iter()
         {
             //todo add spawn region code when finished!
+            spawn_region( &area.1, build_data.map.depth, &mut build_data.spawn_list);
         }
     }
 

@@ -8,6 +8,7 @@ mod room_based_stairs;
 mod area_starting_pos;
 mod cull_unreachable;
 mod  voronoi_spawning;
+mod distant_exit;
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
 use cellular_automata::CellularAutomataBuilder;
@@ -18,6 +19,7 @@ use room_based_stairs::*;
 use area_starting_pos::*;
 use cull_unreachable::*;
 use voronoi_spawning::*;
+use distant_exit::*;
 //
 pub trait MapBuilder
 {
@@ -27,11 +29,18 @@ pub trait MapBuilder
     fn get_starting_position(&mut self) -> Point;
 }
 
-pub fn random_map_builder(new_depth : i32) -> Box<dyn MapBuilder>
+pub fn random_map_builder(new_depth : i32) -> BuilderChain
 {
 
     //Box::new(CellularAutomataBuilder::new(new_depth))
-    todo!()
+    let mut builder = BuilderChain::new(new_depth);
+    builder.start_with(CellularAutomataBuilder::new());
+    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    builder.with(CullUnreachable::new());
+    builder.with(VoronoiSpawning::new());
+    builder.with(DistantExitBuilder::new());
+
+    builder
 }
 
 

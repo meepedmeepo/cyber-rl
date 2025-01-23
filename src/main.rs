@@ -157,15 +157,12 @@ impl Position
 
 }
 
+
 pub fn go_down_stairs(state: &mut State)
 {
     cleanup_ECS(state);
     //Map::generate_map_checked(state);
-    let mut builder = random_map_builder(state.map.depth + 1);
-    builder.build();
-    builder.spawn_entities(state);
-    state.map = builder.get_map();
-    state.player_pos = builder.get_starting_position();
+    state.generate_world_map(state.map.depth + 1);
 
     for (_id,(_player, pos , fov)) 
         in state.world.query_mut::<(&Player,&mut Position, &mut FoV)>()
@@ -225,6 +222,27 @@ fn cleanup_ECS(state: &mut State)
     {
         state.world.despawn(entity)
         .expect("Can't delete entity that has been marked for removal when cleaning up ECS!");
+    }
+}
+
+impl State
+{
+    fn generate_world_map(&mut self, new_depth : i32)
+    {
+        let mut builder = random_map_builder(new_depth);
+
+        builder.build_map(&mut self.rng);
+
+        self.map = builder.build_data.map.clone();
+        self.player_pos = builder.build_data.starting_position.unwrap().clone();
+
+        if new_depth != 0
+        {
+            self.world.insert_one(self.player_ent.unwrap(), Position{x: self.player_pos.x, y: self.player_pos.y});
+        }
+
+        builder.spawn_entities(self);
+
     }
 }
 
@@ -624,15 +642,12 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 fn game_init ( state: &mut State)
 {
     raws::run();
-    let mut builder = random_map_builder(0);
     
-    
-
-    state.map = builder.build();
-    builder.spawn_entities(state);
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
-    let xy = builder.get_starting_position();
+    state.generate_world_map(0);
+
+    let xy = state.player_pos;
     
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),

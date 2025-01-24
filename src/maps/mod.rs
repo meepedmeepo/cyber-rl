@@ -11,6 +11,10 @@ mod  voronoi_spawning;
 mod distant_exit;
 mod prefab_builder;
 mod dogleg_corridors;
+mod bsp_dungeon;
+mod bsp_corridors;
+
+
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
 use cellular_automata::CellularAutomataBuilder;
@@ -24,6 +28,8 @@ use voronoi_spawning::*;
 use distant_exit::*;
 use prefab_builder::*;
 use dogleg_corridors::*;
+use bsp_dungeon::*;
+use bsp_corridors::*;
 //
 pub trait MapBuilder
 {
@@ -36,11 +42,18 @@ pub trait MapBuilder
 pub fn random_map_builder(new_depth : i32) -> BuilderChain
 {
     let mut builder = BuilderChain::new(new_depth);
-    builder.start_with(CellularAutomataBuilder::new());
-    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // builder.start_with(CellularAutomataBuilder::new());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // builder.with(CullUnreachable::new());
+    // builder.with(VoronoiSpawning::new());
+    // builder.with(DistantExitBuilder::new());
+
+    builder.start_with(BspDungeon::new());
+    builder.with(BspCorridors::new());
+    builder.with(RoomBasedStartingPosition::new());
     builder.with(CullUnreachable::new());
-    builder.with(VoronoiSpawning::new());
-    builder.with(DistantExitBuilder::new());
+    builder.with(RoomBasedSpawns::new());
+    builder.with(RoomBasedStairs::new());
 
     builder
 }

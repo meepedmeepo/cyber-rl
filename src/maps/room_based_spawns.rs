@@ -19,7 +19,7 @@ impl MetaMapBuilder for RoomBasedSpawns
 
 impl RoomBasedSpawns
 {
-    fn new() -> Box<RoomBasedSpawns>
+    pub fn new() -> Box<RoomBasedSpawns>
     {
         Box::new(RoomBasedSpawns{})
     }

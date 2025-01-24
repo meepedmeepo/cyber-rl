@@ -1,6 +1,6 @@
 use bracket_lib::prelude::Rect;
 
-use super::{TileType, MAPHEIGHT, MAPWIDTH};
+use super::{Map, TileType, MAPHEIGHT, MAPWIDTH};
 
 pub fn apply_room_to_map(map : &mut super::Map, room : &Rect) {
     for y in room.y1 +1 ..= room.y2 {
@@ -26,5 +26,25 @@ pub fn apply_vertical_tunnel(map : &mut super::Map, y1:i32, y2:i32, x:i32) {
         if idx > 0 && idx < MAPWIDTH as usize * MAPHEIGHT as usize {
             map.map[idx as usize] = TileType::Floor;
         }
+    }
+}
+
+pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) {
+    let mut x = x1;
+    let mut y = y1;
+
+    while x != x2 || y != y2 {
+        if x < x2 {
+            x += 1;
+        } else if x > x2 {
+            x -= 1;
+        } else if y < y2 {
+            y += 1;
+        } else if y > y2 {
+            y -= 1;
+        }
+
+        let idx = Map::xy_id(x, y);
+        map.map[idx] = TileType::Floor;
     }
 }

@@ -1,13 +1,24 @@
 use bracket_lib::random::RandomNumberGenerator;
 
-use super::{BuilderMap, Map, TileType};
+use super::{BuilderMap, Map, MetaMapBuilder, TileType};
 
 
 
 pub struct RoomBasedStairs {}
 
+impl MetaMapBuilder for RoomBasedStairs
+{
+    fn build_map(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+        self.build(rng, build_data);
+    }
+}
+
 impl RoomBasedStairs
 {
+    pub fn new() -> Box<RoomBasedStairs>
+    {
+        Box::new(RoomBasedStairs {})
+    }
     fn build(&mut self, _rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap)
     {
         if let Some(rooms) = &build_data.rooms

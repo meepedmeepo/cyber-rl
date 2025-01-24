@@ -57,7 +57,6 @@ impl VoronoiSpawning
         //spawn entities
         for area in noise_areas.iter()
         {
-            //todo add spawn region code when finished!
             spawn_region( &area.1, build_data.map.depth, &mut build_data.spawn_list);
         }
     }

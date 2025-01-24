@@ -10,31 +10,6 @@ pub struct ProjectileUpdated
 {}
 
 
-pub fn spawn_projectiles(state : &mut State)
-{
-    for projectile in state.projectile_builder.requests.iter()
-    {
-        //let proj = 
-            //Projectile{frame_time: projectile.frame_time, path: projectile.path.}
-        let path = projectile.path.clone();
-        //path.reverse();
-
-        let mut projectile_path: Queue<Point> = queue![];
-        for p in path.iter()
-        {
-            projectile_path.add(p.clone()).unwrap();
-        }
-
-        state.world.spawn((Projectile{frame_time : projectile.frame_time, current_frame_time: projectile.frame_time,
-            path: projectile_path, dmg : projectile.dmg}, 
-            Renderable::new(projectile.glyph, projectile.fg, projectile.bg, projectile.order), projectile.projectile_type));
-
-        //let queue: Queue<Point> = queue![projectile.path.];
-    }
-
-    state.projectile_builder.requests.clear();
-}
-
 pub fn projectile_system(state : &mut State, ctx: &mut BTerm)
 {
     let mut proj_to_update = Vec::new();

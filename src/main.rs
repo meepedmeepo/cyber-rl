@@ -27,6 +27,7 @@ use menus::select_menu_functions;
 use menus::MenuSelections;
 use menus::MenuType;
 use networks::ControlNode;
+use networks::NetworkMap;
 use networks::NodeOwned;
 use particles::particle_system;
 use particles::ParticleBuilder;
@@ -47,8 +48,6 @@ mod components;
 use components::*;
 mod visibility_system;
 use visibility_system::*;
-mod monster_ai_system;
-use monster_ai_system::*;
 mod map_indexing_system;
 mod attack_system;
 mod damage_system;
@@ -93,9 +92,9 @@ pub struct State
     player_ent :Option<Entity>,
     game_log : GameLog,
     particle_builder : ParticleBuilder,
-    projectile_builder : ProjectileBuilder,
     target_mode : TargettingMode,
     turn_number : i32,
+    network_map : NetworkMap
 }
 
 
@@ -238,7 +237,7 @@ impl State
 
         if new_depth != 0
         {
-            self.world.insert_one(self.player_ent.unwrap(), Position{x: self.player_pos.x, y: self.player_pos.y});
+            let _ = self.world.insert_one(self.player_ent.unwrap(), Position{x: self.player_pos.x, y: self.player_pos.y});
         }
 
         builder.spawn_entities(self);
@@ -304,7 +303,6 @@ impl GameState for State{
                     {
                         //makes sure all the visual information for the ai is up to date!
                         
-
                         //todo: in all of the systems that can end a turn apply the energy costs to the entities!
                         //check adjacent reactions
                         ai::adjacent_ai_system(self);
@@ -623,11 +621,8 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     effects::run_effect_queue(state);
     ClearDeadSystem::run(state);
     
-
     map_indexing_system::MapIndexingSystem::run(state);
 
-    
-    
     state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
     draw_map(ctx, &state.map);
@@ -636,7 +631,6 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
     gui::draw_ui(state, ctx);
     gui::draw_status_box(state, ctx);
     gui::draw_gamelog(state, ctx);
-    //state.current_state = ProgramState::Paused;
 }
 
 fn game_init ( state: &mut State)
@@ -735,9 +729,9 @@ fn main() ->BError
         player_ent: None,
         game_log : GameLog::new(),
         particle_builder : ParticleBuilder::new(),
-        projectile_builder : ProjectileBuilder::new(),
         target_mode: TargettingMode::Keyboard{cursor_pos: Point::zero()},
         turn_number: 0,
+        network_map: NetworkMap::empty(),
     };
     
     //context.with_post_scanlines(true);

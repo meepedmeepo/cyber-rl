@@ -85,4 +85,9 @@ impl NetworkMap
             Err(())   
         }
     }
+
+    pub fn empty() -> NetworkMap
+    {
+        NetworkMap{ graph: HashMap::new(), alert : 0}
+    }
 }

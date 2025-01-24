@@ -1,12 +1,13 @@
 use std::collections::HashSet;
-
 use hecs::Entity;
 
 mod network_map;
+mod network_builder;
+
 pub use network_map::*;
+pub use network_builder::*;
 
-
-
+pub struct Root {}
 pub struct RootNode
 {
     pub difficulty : i32,

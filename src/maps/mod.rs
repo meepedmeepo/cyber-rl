@@ -9,6 +9,8 @@ mod area_starting_pos;
 mod cull_unreachable;
 mod  voronoi_spawning;
 mod distant_exit;
+mod prefab_builder;
+mod dogleg_corridors;
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
 use cellular_automata::CellularAutomataBuilder;
@@ -20,6 +22,8 @@ use area_starting_pos::*;
 use cull_unreachable::*;
 use voronoi_spawning::*;
 use distant_exit::*;
+use prefab_builder::*;
+use dogleg_corridors::*;
 //
 pub trait MapBuilder
 {

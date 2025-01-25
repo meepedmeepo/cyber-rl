@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, TileType, WantsToPickupItem, WantsToRest};
+use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
@@ -184,13 +184,13 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
         destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
         if !state.map.blocked[destination_id]
         {
-        position.x = min(MAPWIDTH -1,max(0,position.x+delta_x));
-        position.y = min(MAPHEIGHT - 1,max(0,position.y+delta_y));
-        state.player_pos = Point::new(position.x, position.y);
-        fov.dirty = true;
-        moved = true;
-        attacker = _id;
-        break;
+            position.x = min(MAPWIDTH -1,max(0,position.x+delta_x));
+            position.y = min(MAPHEIGHT - 1,max(0,position.y+delta_y));
+            state.player_pos = Point::new(position.x, position.y);
+            fov.dirty = true;
+            moved = true;
+            attacker = _id;
+            break;
         }
         else if state.map.map[destination_id] == TileType::Wall
         {
@@ -198,6 +198,28 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
         }
         
     }
+
+        let mut door_to_open = Vec::new();
+
+            for (ent, (door, pos)) in state.world.query_mut::<(&Door, &Position)>()
+            {
+                if Map::xy_id(pos.x, pos.y) == destination_id && door.open == false
+                {
+                    door_to_open.push(ent);
+                }
+            }
+
+            for door in door_to_open.iter()
+            {
+                let _ =state.world.remove_one::<BlocksTiles>(*door);
+                let _ =state.world.remove_one::<BlocksVisibility>(*door);
+                state.world.query_one_mut::<&mut Renderable>(*door).unwrap().glyph = '/';
+                state.world.query_one_mut::<&mut FoV>(state.player_ent.unwrap()).unwrap().dirty = true;
+
+                apply_energy_cost(state, crate::ai::ActionType::OpenDoor, state.player_ent.unwrap());
+                let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                return true;
+            }
         if moved
         {
             state.world.insert_one(state.player_ent.unwrap(), HasMoved{}).unwrap();
@@ -211,12 +233,6 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
             let mut found_target = false;
             for potential_target in state.map.tile_contents[destination_id].iter()
             {
-                // for (entity,(_stats,name,_pos)) in 
-                // state.world.query::<(&Statistics,&Name,&Position)>().
-                // {
-                //     target = entity;
-                //     console::log(&format!("I will stab thee now, {}!",name.name));
-                // }
                 let query = state.world.query_one_mut::<(&Pools,
                 &Name)>(*potential_target);
                 match query
@@ -230,13 +246,16 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
                     Err(_) =>{return false;}
                 }
             }
+
+            
+
             if found_target
             {
                 //console::log(format!("Target found! {}",state.world.get::<&Name>(target).expect("No target name found!").name));
                 AttackSystem::add_attack(attacker, target, state);
                 apply_energy_cost(state, crate::ai::ActionType::Attack, state.player_ent.unwrap());
 
-                state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+                let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
 
                 return true;
             }

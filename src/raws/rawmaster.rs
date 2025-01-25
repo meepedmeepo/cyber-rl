@@ -4,7 +4,7 @@ use bracket_lib::{color::RGB, random::{parse_dice_string, DiceType}};
 use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
-use crate::{ai::Energy, components, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, DamageEffect, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{ai::Energy, components, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -393,6 +393,11 @@ pub fn spawn_named_prop<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
             eb.add(Hidden{});
             eb.add(Trigger{});
             eb.add(TriggerOnEnter{});
+        }
+
+        if let Some(_) = &prop_template.door
+        {
+            eb.add_bundle((BlocksTiles{},BlocksVisibility{}, Door{open: false}));
         }
 
         let effects = prop_template.consumable.effects.clone();

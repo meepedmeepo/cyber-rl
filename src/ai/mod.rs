@@ -30,6 +30,8 @@ pub enum ActionType
     Attack,
     Equip,
     Pickup,
+    UseItem,
+    OpenDoor,
 }
 
 impl ActionType
@@ -42,6 +44,8 @@ impl ActionType
             ActionType::Equip => 200,
             ActionType::Attack => 150,
             ActionType::Pickup => 50,
+            ActionType::OpenDoor => 50,
+            ActionType::UseItem => 100,
         }
     }
 }

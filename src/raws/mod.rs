@@ -109,6 +109,7 @@ pub struct Prop
     pub single_activation : Option<bool>,
     pub entry_trigger : Option<bool>,
     pub consumable : Consumable,
+    pub door : Option<bool>,
 }
 
 pub fn run()

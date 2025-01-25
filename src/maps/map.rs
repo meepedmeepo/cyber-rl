@@ -1,5 +1,5 @@
 
-use std::collections::{hash_map, HashMap};
+use std::collections::{hash_map, HashMap, HashSet};
 
 use hecs::Entity;
 use bracket_lib::prelude::*;
@@ -25,6 +25,7 @@ pub fn new(new_depth : i32) -> Map
         tile_contents : vec![Vec::new(); MAPSIZE],
         depth: new_depth,
         props: HashMap::new(),
+        view_blocked : HashSet::new()
         
     }
 }
@@ -46,12 +47,14 @@ pub struct Map
     pub tile_contents: Vec<Vec<Entity>>,
     pub depth : i32,
     pub props : HashMap<i32,Entity>,
+    pub view_blocked : HashSet<usize>
 }
 
 impl BaseMap for Map
 {
-    fn is_opaque(&self, _idx: usize) -> bool {
-        if self.map[_idx as usize] == TileType::Wall { true}
+    fn is_opaque(&self, _idx: usize) -> bool 
+    {
+        if self.map[_idx as usize] == TileType::Wall  || self.view_blocked.contains(&_idx) { true}
         else 
         {false}
     }   
@@ -111,6 +114,7 @@ impl Map
             tile_contents : vec![Vec::new(); MAPSIZE] , 
             depth: new_depth,
             props: HashMap::new(),
+            view_blocked : HashSet::new()
         }
 
     }

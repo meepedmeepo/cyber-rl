@@ -42,6 +42,8 @@ use statistics::StatPool;
 use time_system::time_system;
 use std::cmp::*;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::hash::Hash;
 use maps::*;
 pub mod maps;
 mod components;
@@ -489,7 +491,7 @@ impl GameState for State{
                             self.world.insert_one(self.player_ent.expect("Couldn't find player"),
                             WantsToUseItem{item:item, target: Some(point)})
                             .expect("Couldn't insert WantsToUseItem onto player for ranged targeting!");
-                            apply_energy_cost(self, ai::ActionType::Attack, self.player_ent.unwrap());
+                            apply_energy_cost(self, ai::ActionType::UseItem, self.player_ent.unwrap());
                             let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
                             self.current_state = ProgramState::Ticking;
                         }
@@ -718,11 +720,17 @@ fn main() ->BError
 
     let mut gs: State = State{
         world: World::new(),
-        map : Map {map :Vec::new()
-        ,revealed_tiles : vec![false;MAPSIZE]
-        ,visible_tiles : vec![false;MAPSIZE]
-        ,blocked : vec![false;MAPSIZE]
-        ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()},
+
+        map : Map 
+        {
+            map :Vec::new()
+            ,revealed_tiles : vec![false;MAPSIZE]
+            ,visible_tiles : vec![false;MAPSIZE]
+            ,blocked : vec![false;MAPSIZE]
+            ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()
+            , view_blocked : HashSet::new()
+        },
+
         rng : bracket_lib::random::RandomNumberGenerator::new(),
         current_state : ProgramState::Ticking,
         player_pos : Point::zero(),

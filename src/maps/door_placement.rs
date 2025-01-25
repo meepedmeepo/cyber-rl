@@ -45,9 +45,15 @@ impl DoorPlacement
             {
                 if *tile == TileType::Floor && self.door_possible(build_data, i)
                 {
-                    build_data.spawn_list.push((i, "Door".to_string()));
+                    let roll = _rng.roll_dice(1, 3);
+
+                    if roll == 3
+                    {
+                        build_data.spawn_list.push((i, "Door".to_string()));
+                    }
                 }
             }
+
         }
     }
 

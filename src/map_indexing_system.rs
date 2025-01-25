@@ -30,13 +30,11 @@ impl MapIndexingSystem
             {
                 Some(_) =>
                 {
-
                     state.map.props.insert(idx as i32, _id);
                     //console::log(format!("after insertion {} on map",state.map.props.len()));
                 }
                 None => {}
-            }
-            
+            }  
         }
     }
 }

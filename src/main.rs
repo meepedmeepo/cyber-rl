@@ -180,6 +180,7 @@ pub fn go_down_stairs(state: &mut State)
     console::log(msg.clone());
 
     state.game_log.add_log(msg);
+    state.world.query_one_mut::<&mut Energy>(state.player_ent.unwrap()).unwrap().value = 100;
 
     state.current_state = ProgramState::Ticking;
 
@@ -188,6 +189,16 @@ pub fn go_down_stairs(state: &mut State)
 #[allow(non_snake_case)]
 fn cleanup_ECS(state: &mut State)
 {
+    let mut turns = Vec::new();
+    for (ent, _turn)  in state.world.query_mut::<&MyTurn>()
+    {
+        turns.push(ent);
+    }
+    for turn in turns.iter()
+    {
+        let _ = state.world.remove_one::<MyTurn>(*turn);
+    }
+    
     let mut entities_to_delete = Vec::new();
     for entity in state.world.iter()
     {

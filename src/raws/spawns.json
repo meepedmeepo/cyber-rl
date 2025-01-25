@@ -414,6 +414,20 @@
   ],
   "props": [
     {
+      "name": "Door",
+      "renderable": {
+        "glyph": "+",
+        "fg": "#8b4513",
+        "bg": "#000000",
+        "order": 2
+      },
+      "consumable": {
+        "effects": {
+        }
+
+      }
+    },
+    {
       "name": "Bear Trap",
       "renderable": {
         "glyph": "^",

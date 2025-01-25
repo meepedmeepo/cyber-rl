@@ -1,3 +1,5 @@
+use std::vec;
+
 use bracket_lib::{prelude::Rect, random::RandomNumberGenerator};
 
 use super::{common::{apply_horizontal_tunnel, apply_vertical_tunnel}, BuilderMap, MetaMapBuilder};
@@ -34,6 +36,7 @@ impl DoglegCorridors
             panic!("Dogleg corridors requires a builder that generates rooms to have been ran first!")    
         }
 
+        let mut corridors : Vec<Vec<usize>> = Vec::new();
         for (i, room) in rooms.iter().enumerate()
         {
                 if i > 0
@@ -43,15 +46,21 @@ impl DoglegCorridors
                     let (prev_x, prev_y) = rooms[rooms.len()-1].center().to_tuple();
                     if rng.range(0,2) == 1 
                     {
-                        apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, prev_y);
-                        apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, new_x);
+                        let mut c1 = apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, prev_y);
+                        let mut c2 = apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, new_x);
+                        c1.append(&mut c2);
+                        corridors.push(c1);
+
                     } else 
                     {
-                        apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, prev_x);
-                        apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, new_y);
+                        let mut c1 =apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, prev_x);
+                        let mut c2 = apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, new_y);
+                        c1.append(&mut c2);
+                        corridors.push(c1);
                     }
                 }
         
         }
+        build_data.corridors = Some(corridors);
     }
 }

@@ -28,7 +28,7 @@ impl RoomBasedSpawns
     {
         if let Some(rooms) = &build_data.rooms
         {
-            for room in rooms.iter()
+            for room in rooms.iter().skip(1)
             {
                 spawn_room( *room, build_data.map.depth, &mut build_data.spawn_list, &build_data.map);
             }

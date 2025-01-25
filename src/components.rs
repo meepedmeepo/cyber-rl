@@ -3,6 +3,16 @@ use hecs::Entity;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Copy)]
+pub struct BlocksVisibility {}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Door
+{
+    pub open: bool,
+}
+
+
+#[derive(Debug, Clone, Copy)]
 pub struct Projectile
 {
     pub damage : DiceType,

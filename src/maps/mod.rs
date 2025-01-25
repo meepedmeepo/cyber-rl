@@ -13,6 +13,10 @@ mod prefab_builder;
 mod dogleg_corridors;
 mod bsp_dungeon;
 mod bsp_corridors;
+mod room_sorter;
+mod corridors_nearest_neighbour;
+mod corridor_spawner;
+mod door_placement;
 
 
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
@@ -30,6 +34,10 @@ use prefab_builder::*;
 use dogleg_corridors::*;
 use bsp_dungeon::*;
 use bsp_corridors::*;
+use room_sorter::*;
+use corridors_nearest_neighbour::*;
+use corridor_spawner::*;
+use door_placement::*;
 //
 pub trait MapBuilder
 {
@@ -49,10 +57,14 @@ pub fn random_map_builder(new_depth : i32) -> BuilderChain
     // builder.with(DistantExitBuilder::new());
 
     builder.start_with(BspDungeon::new());
+    builder.with(RoomSorter::new());
     builder.with(BspCorridors::new());
+    //builder.with(CorridorsNearestNeighbour::new());
     builder.with(RoomBasedStartingPosition::new());
     builder.with(CullUnreachable::new());
     builder.with(RoomBasedSpawns::new());
+    //builder.with(CorridorSpawner::new());
+    builder.with(DoorPlacement::new());
     builder.with(RoomBasedStairs::new());
 
     builder
@@ -65,6 +77,7 @@ pub struct BuilderMap
     pub map : Map,
     pub starting_position : Option<Point>,
     pub rooms : Option<Vec<Rect>>,
+    pub corridors :Option<Vec<Vec<usize>>>,
 }
 
 pub struct BuilderChain
@@ -88,6 +101,7 @@ impl BuilderChain
                 map: Map::new(new_depth),
                 starting_position: None,
                 rooms: None,
+                corridors: None,
             }
         }
     }

@@ -11,25 +11,40 @@ pub fn apply_room_to_map(map : &mut super::Map, room : &Rect) {
     }
 }
 
-pub fn apply_horizontal_tunnel(map : &mut super::Map, x1:i32, x2:i32, y:i32) {
+pub fn apply_horizontal_tunnel(map : &mut super::Map, x1:i32, x2:i32, y:i32) -> Vec<usize>
+{   
+    let mut corridor = Vec::new();
+
     for x in std::cmp::min(x1,x2) ..= std::cmp::max(x1,x2) {
         let idx = super::Map::xy_id(x, y);
         if idx > 0 && idx < MAPWIDTH as usize * MAPHEIGHT as usize {
             map.map[idx as usize] = TileType::Floor;
+
+            corridor.push(idx as usize);
         }
     }
+
+    corridor
 }
 
-pub fn apply_vertical_tunnel(map : &mut super::Map, y1:i32, y2:i32, x:i32) {
+pub fn apply_vertical_tunnel(map : &mut super::Map, y1:i32, y2:i32, x:i32) -> Vec<usize>
+{
+    let mut corridor = Vec::new();
+    
     for y in std::cmp::min(y1,y2) ..= std::cmp::max(y1,y2) {
         let idx = super::Map::xy_id(x, y);
         if idx > 0 && idx < MAPWIDTH as usize * MAPHEIGHT as usize {
             map.map[idx as usize] = TileType::Floor;
+            corridor.push(idx as usize);
         }
     }
+
+    corridor
 }
 
-pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) {
+pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) -> Vec<usize>
+{
+    let mut corridor = Vec::new();
     let mut x = x1;
     let mut y = y1;
 
@@ -45,6 +60,12 @@ pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) {
         }
 
         let idx = Map::xy_id(x, y);
-        map.map[idx] = TileType::Floor;
+        if map.map[idx] != TileType::Floor
+        {
+            map.map[idx] = TileType::Floor;
+            corridor.push(idx);
+        }
     }
+
+    corridor
 }

@@ -17,6 +17,7 @@ mod room_sorter;
 mod corridors_nearest_neighbour;
 mod corridor_spawner;
 mod door_placement;
+mod rex_assests;
 
 
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
@@ -38,6 +39,8 @@ use room_sorter::*;
 use corridors_nearest_neighbour::*;
 use corridor_spawner::*;
 use door_placement::*;
+pub use rex_assests::*;
+
 //
 pub trait MapBuilder
 {

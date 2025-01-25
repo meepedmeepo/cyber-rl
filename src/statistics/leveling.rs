@@ -34,10 +34,10 @@ pub fn calculate_xp_from_level(level : i32) -> i32
 
 pub fn calculate_level_from_xp(xp: i32) -> i32
 {
-  let sqrt_xp = f32::sqrt(xp as f32); 
-  let level = LEVEL_SCALING_FACTOR*sqrt_xp;
+    let sqrt_xp = f32::sqrt(xp as f32); 
+    let level = LEVEL_SCALING_FACTOR*sqrt_xp;
 
-  level as i32
+    level as i32
 }
 
 pub fn xp_to_next_level(level : i32, xp: i32) -> i32

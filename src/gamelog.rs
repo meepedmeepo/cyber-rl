@@ -26,7 +26,7 @@ impl GameLog
 
     pub fn view_log(&self,num_entries: usize) -> Vec<String>
     {
-       self.entries.iter().rev().skip(self.index).take(num_entries ).map(|s|s.clone()).collect::<Vec<String>>()
+        self.entries.iter().rev().skip(self.index).take(num_entries ).map(|s|s.clone()).collect::<Vec<String>>()
     }
 
 

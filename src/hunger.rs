@@ -56,7 +56,7 @@ pub fn hunger_system(state: &mut State)
                 {
                     //pools.hitpoints.restore(2);
                     add_effect(None, EffectType::Healing { amount: 1 }, Targets::Single { target: _id });
-                    hunger.nutrition.damage(3);
+                    hunger.nutrition.damage(2);
 
                     ent_to_remove_rest.push(_id);
                 }

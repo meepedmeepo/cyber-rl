@@ -79,6 +79,7 @@ mod entry_trigger_system;
 mod prop_trigger_system;
 mod ai;
 mod networks;
+
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -653,7 +654,7 @@ fn game_init ( state: &mut State)
     //let item = raws::RawMaster::spawn_named_item(raws::RAWS.lock().unwrap()., new_entity, key, pos)
     //Spawn player object
     state.generate_world_map(0);
-
+    let _asset = maps::RexAssests::new();
     let xy = state.player_pos;
     
     state.player_pos = xy;

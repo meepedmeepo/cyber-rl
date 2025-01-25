@@ -32,11 +32,11 @@ impl DamageSystem
         }
     }
     
-   pub fn run(state : &mut State)
+pub fn run(state : &mut State)
     {
         let mut dmg_comps_to_remove : Vec<(Entity, Position)> = Vec::new();
         for  (id,(dmg_to_take,stats,name, pos))
-         in state.world.query_mut::<(&TakeDamage,&mut Pools, &Name, &Position)>()
+            in state.world.query_mut::<(&TakeDamage,&mut Pools, &Name, &Position)>()
         {
             //console::log("aaaaaaaaaaaaaaa");
             dmg_comps_to_remove.push((id, *pos));
@@ -54,7 +54,7 @@ impl DamageSystem
             state.world.remove_one::<TakeDamage>(*dmg_comp).expect("Couldn't remove damage comp from entity!");
 
             state.particle_builder.request(pos.x, pos.y, RGB::named(WHITE), RGB::named(RED),
-             '!', 200., Some(*dmg_comp));
+                '!', 200., Some(*dmg_comp));
         }
     }
 }

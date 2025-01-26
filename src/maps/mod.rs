@@ -18,7 +18,7 @@ mod corridors_nearest_neighbour;
 mod corridor_spawner;
 mod door_placement;
 mod rex_assests;
-
+mod waveform_collapse;
 
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
@@ -40,7 +40,7 @@ use corridors_nearest_neighbour::*;
 use corridor_spawner::*;
 use door_placement::*;
 pub use rex_assests::*;
-
+use waveform_collapse::*;
 //
 pub trait MapBuilder
 {

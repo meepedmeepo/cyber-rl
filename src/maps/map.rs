@@ -32,7 +32,7 @@ pub fn new(new_depth : i32) -> Map
 
 
 
-#[derive(PartialEq,Clone, Copy, Debug)]
+#[derive(PartialEq,Clone, Copy, Debug, Hash, Eq)]
 pub enum TileType
 {
     Floor, Wall, DownStairs,

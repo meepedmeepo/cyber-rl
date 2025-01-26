@@ -32,7 +32,7 @@ impl WaveformCollapseBuilder
 
     fn build(&mut self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap)
     {
-        const CHUNK_SIZE : i32 = 8;
+        const CHUNK_SIZE : i32 = 5;
 
         let patterns = build_patterns(&build_data.map, CHUNK_SIZE, true, true);
         let constraints = patterns_to_constraints(patterns, CHUNK_SIZE);

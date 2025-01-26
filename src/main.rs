@@ -79,6 +79,7 @@ mod entry_trigger_system;
 mod prop_trigger_system;
 mod ai;
 mod networks;
+pub mod camera;
 
 //use map_indexing_system;
 #[macro_use]

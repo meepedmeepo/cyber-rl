@@ -4,7 +4,7 @@ use bracket_lib::{prelude::Point, random::RandomNumberGenerator};
 
 use crate::{spawns::spawning_system::spawn_region, Position};
 
-use super::{BuilderMap, InitialMapBuilder, Map, MapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, InitialMapBuilder, Map, MapBuilder, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
 
 
 
@@ -17,6 +17,14 @@ impl InitialMapBuilder for CellularAutomataBuilder
 {
     fn build_map(&mut self, rng: &mut bracket_lib::prelude::RandomNumberGenerator, build_data: &mut super::BuilderMap) {
         self.build(rng, build_data);
+    }
+}
+
+impl MetaMapBuilder for CellularAutomataBuilder
+{
+    fn build_map(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) 
+    {
+        self.apply_iteration(build_data);
     }
 }
 
@@ -41,6 +49,12 @@ impl CellularAutomataBuilder
         }
         //Iteratively apply cellular automata rules
         for _i in 0..15
+        {
+            self.apply_iteration( build_data);
+        }
+    }
+
+        fn apply_iteration(&mut self, build_data : &mut BuilderMap)
         {
             let mut newtiles = build_data.map.map.clone();
 
@@ -72,6 +86,6 @@ impl CellularAutomataBuilder
 
             build_data.map.map = newtiles.clone();
         }
-}
+
 }
 

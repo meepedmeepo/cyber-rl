@@ -19,6 +19,7 @@ mod corridor_spawner;
 mod door_placement;
 mod rex_assests;
 mod waveform_collapse;
+mod voronoi;
 
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
@@ -41,6 +42,7 @@ use corridor_spawner::*;
 use door_placement::*;
 pub use rex_assests::*;
 use waveform_collapse::*;
+use voronoi::*;
 //
 pub trait MapBuilder
 {
@@ -53,22 +55,25 @@ pub trait MapBuilder
 pub fn random_map_builder(new_depth : i32) -> BuilderChain
 {
     let mut builder = BuilderChain::new(new_depth);
-    // builder.start_with(CellularAutomataBuilder::new());
-    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    // builder.with(CullUnreachable::new());
-    // builder.with(VoronoiSpawning::new());
-    // builder.with(DistantExitBuilder::new());
-
-    builder.start_with(BspDungeon::new());
-    builder.with(RoomSorter::new());
-    builder.with(BspCorridors::new());
-    //builder.with(CorridorsNearestNeighbour::new());
-    builder.with(RoomBasedStartingPosition::new());
+    //builder.start_with(CellularAutomataBuilder::new());
+    builder.start_with(VoronoiCellBuilder::pythagoras());
+    builder.with(WaveformCollapseBuilder::new());
+    //builder.with(CellularAutomataBuilder::new());
+    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     builder.with(CullUnreachable::new());
-    builder.with(RoomBasedSpawns::new());
+    builder.with(VoronoiSpawning::new());
+    builder.with(DistantExitBuilder::new());
+
+    //builder.start_with(BspDungeon::new());
+    //builder.with(RoomSorter::new());
+    //builder.with(BspCorridors::new());
+    //builder.with(CorridorsNearestNeighbour::new());
+    //builder.with(RoomBasedStartingPosition::new());
+    //builder.with(CullUnreachable::new());
+    //builder.with(RoomBasedSpawns::new());
     //builder.with(CorridorSpawner::new());
     builder.with(DoorPlacement::new());
-    builder.with(RoomBasedStairs::new());
+    //builder.with(RoomBasedStairs::new());
 
     builder
 }

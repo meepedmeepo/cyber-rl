@@ -1,6 +1,6 @@
 use std::arch::x86_64;
 
-use crate::{networks::{ControlNode, NodeOwned}, BlocksVisibility, Map, Player, State, MAPHEIGHT, MAPWIDTH};
+use crate::{networks::{ControlNode, NodeOwned}, BlocksVisibility, Map, Player, State};
 
 
 use super::{FoV, Position};
@@ -16,7 +16,7 @@ impl VisibilitySystem
         state.map.view_blocked.clear();
         for (id,(block_pos, _block)) in state.world.query_mut::<(&Position, &BlocksVisibility)>()
         {
-            let idx = Map::xy_id(block_pos.x, block_pos.y);
+            let idx = state.map.xy_idx(block_pos.x, block_pos.y);
             state.map.view_blocked.insert(idx);
         }
 
@@ -27,7 +27,7 @@ impl VisibilitySystem
                 fov.dirty = false;
                 fov.visible_tiles.clear();
                 fov.visible_tiles = field_of_view(Point::new(pos.x,pos.y), fov.range, &state.map);
-                fov.visible_tiles.retain(|p| p.x >= 0 && p.x < MAPWIDTH && p.y >= 0 && p.y < MAPHEIGHT );
+                fov.visible_tiles.retain(|p| p.x >= 0 && p.x < state.map.map_width && p.y >= 0 && p.y < state.map.map_height );
 
             //let p: Option<&Player> = state.world.entity(_id).
             match player
@@ -37,7 +37,7 @@ impl VisibilitySystem
                     for rev in state.map.visible_tiles.iter_mut(){*rev = false;}
                     for vis in fov.visible_tiles.iter() 
                     {
-                        let idx = Map::xy_id(vis.x, vis.y);
+                        let idx = state.map.xy_idx(vis.x, vis.y);
                         state.map.visible_tiles[idx] = true;
                         state.map.revealed_tiles[idx] = true;
                     }
@@ -54,7 +54,7 @@ impl VisibilitySystem
         {
             for tile in fov.visible_tiles.iter()
             {
-                let idx = Map::xy_id(tile.x, tile.y);
+                let idx = state.map.xy_idx(tile.x, tile.y);
 
                 state.map.visible_tiles[idx] = true;
                 state.map.revealed_tiles[idx] = true;

@@ -1,6 +1,6 @@
 use bracket_lib::{prelude::DijkstraMap, random::RandomNumberGenerator};
 
-use super::{BuilderMap, Map, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, Map, MetaMapBuilder, TileType};
 
 
 
@@ -26,13 +26,13 @@ impl DistantExitBuilder
     fn build(&mut self, _rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap)
     {
         let starting_pos = build_data.starting_position.as_ref().unwrap().clone();
-        let start_idx = Map::xy_id(starting_pos.x, starting_pos.y);
+        let start_idx = build_data.map.xy_idx(starting_pos.x, starting_pos.y);
 
         build_data.map.populate_blocked();
 
         let mut exit_tile = (0, 0.0f32);
         let map_starts = vec![start_idx];
-        let dijkstra_map = DijkstraMap::new(MAPWIDTH as usize, MAPHEIGHT as usize, &map_starts
+        let dijkstra_map = DijkstraMap::new(build_data.map.map_width as usize, build_data.map.map_height as usize, &map_starts
             , &build_data.map, 1000.0);
 
         for (i, tile) in build_data.map.map.iter_mut().enumerate()

@@ -1,6 +1,6 @@
 use bracket_lib::prelude::Point;
 
-use crate::{effects::{self, add_effect, EffectType, Targets}, AoE, Hidden, SingleActivation, State, Trigger, Triggered, MAPWIDTH};
+use crate::{effects::{self, add_effect, EffectType, Targets}, AoE, Hidden, SingleActivation, State, Trigger, Triggered};
 
 
 
@@ -29,7 +29,7 @@ pub fn run(state: &mut State)
 
             add_effect(Some(*prop), EffectType::PropTriggered { prop: *prop },
                 Targets::Tiles { tiles: effects::get_aoe_tiles(state, radius,
-                Point::new(target.idx % MAPWIDTH, target.idx / MAPWIDTH)) });
+                Point::new(target.idx % state.map.map_width, target.idx / state.map.map_width)) });
 
         } else
         {

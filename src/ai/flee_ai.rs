@@ -1,7 +1,7 @@
 use bracket_lib::prelude::{console, DijkstraMap};
 use hecs::Entity;
 
-use crate::{FoV, HasMoved, Map, Player, Position, State, WantsToApproach, WantsToFlee, MAPHEIGHT, MAPWIDTH};
+use crate::{FoV, HasMoved, Map, Player, Position, State, WantsToApproach, WantsToFlee};
 
 use super::{apply_energy_cost, MyTurn};
 
@@ -18,11 +18,11 @@ pub fn flee_ai_system(state : &mut State)
     {
         turn_done.push(ent);
 
-        let my_idx = Map::xy_id(pos.x, pos.y);
+        let my_idx = state.map.xy_idx(pos.x, pos.y);
         state.map.populate_blocked();
 
-        let flee_map = bracket_lib::pathfinding::DijkstraMap::new(MAPWIDTH as usize
-            , MAPHEIGHT as usize, &flee.indices, &state.map, 100.0);
+        let flee_map = bracket_lib::pathfinding::DijkstraMap::new(state.map.map_width as usize
+            , state.map.map_height as usize, &flee.indices, &state.map, 100.0);
 
         let flee_target = DijkstraMap::find_highest_exit(&flee_map, my_idx, &state.map);
 
@@ -34,8 +34,8 @@ pub fn flee_ai_system(state : &mut State)
                 state.map.blocked[flee_target as usize] = true;
 
                 fov.dirty = true;
-                pos.x = flee_target as i32 % MAPWIDTH;
-                pos.y = flee_target as i32 / MAPWIDTH;
+                pos.x = flee_target as i32 % state.map.map_width;
+                pos.y = flee_target as i32 / state.map.map_width;
                 has_moved.push(ent);
             }
         }

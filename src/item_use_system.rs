@@ -34,7 +34,7 @@ pub fn run(state : &mut State)
                     Err(_) =>
                     {
                         add_effect(Some(*entity), EffectType::ItemUse { item: *item },
-                            Targets::Tile { tile_idx: Map::xy_id(target.x, target.y) as i32 });
+                            Targets::Tile { tile_idx: state.map.xy_idx(target.x, target.y) as i32 });
                     }
                 }
                 

@@ -1,6 +1,6 @@
 use bracket_lib::{prelude::{DistanceAlg, Point}, random::RandomNumberGenerator};
 
-use super::{BuilderMap, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, MetaMapBuilder, TileType};
 
 #[allow(dead_code)]
 pub enum XStart {LEFT, CENTER, RIGHT}
@@ -37,15 +37,15 @@ impl AreaStartingPosition
 
         match self.x {
             XStart::LEFT => seed_x = 1,
-            XStart::CENTER => seed_x = MAPWIDTH / 2,
-            XStart::RIGHT => seed_x = MAPWIDTH - 2
+            XStart::CENTER => seed_x = build_data.map.map_width / 2,
+            XStart::RIGHT => seed_x = build_data.map.map_width - 2
         }
 
         match self.y 
         {
             YStart::TOP => seed_y = 1,
-            YStart::CENTER => seed_y = MAPHEIGHT / 2,
-            YStart::BOTTOM => seed_y = MAPHEIGHT - 2
+            YStart::CENTER => seed_y = build_data.map.map_height / 2,
+            YStart::BOTTOM => seed_y = build_data.map.map_height - 2
         }
 
         let mut available_floors : Vec<(usize, f32)> = Vec::new();
@@ -55,7 +55,7 @@ impl AreaStartingPosition
             {
                 available_floors.push((idx, 
                     DistanceAlg::PythagorasSquared
-                    .distance2d(Point::new(idx as i32 % MAPWIDTH, idx as i32 / MAPWIDTH)
+                    .distance2d(Point::new(idx as i32 % build_data.map.map_width, idx as i32 / build_data.map.map_width)
                     , Point::new(seed_x, seed_y) )));
             }
         }
@@ -67,8 +67,8 @@ impl AreaStartingPosition
 
         available_floors.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
 
-        let start_x = available_floors[0].0 as i32 % MAPWIDTH;
-        let start_y = available_floors[0].0 as i32 / MAPWIDTH;
+        let start_x = available_floors[0].0 as i32 % build_data.map.map_width;
+        let start_y = available_floors[0].0 as i32 / build_data.map.map_width;
 
         build_data.starting_position = Some(Point{x : start_x, y: start_y});
     }

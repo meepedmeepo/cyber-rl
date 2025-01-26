@@ -1,6 +1,6 @@
 use hecs::Entity;
 
-use crate::{FoV, HasMoved, Map, Position, State, WantsToApproach, MAPWIDTH};
+use crate::{FoV, HasMoved, Map, Position, State, WantsToApproach};
 
 use super::{apply_energy_cost, MyTurn};
 
@@ -19,20 +19,20 @@ pub fn approach_ai_system(state : &mut State)
         turn_done.push(ent);
 
         let path = bracket_lib::pathfinding::a_star_search
-            (Map::xy_id(pos.x, pos.y) as i32
-            , Map::xy_id(approach.target % MAPWIDTH, approach.target / MAPWIDTH) as i32, &state.map);
+            (state.map.xy_idx(pos.x, pos.y) as i32
+            , state.map.xy_idx(approach.target % state.map.map_width, approach.target / state.map.map_width) as i32, &state.map);
 
         if path.success && path.steps.len() > 1
         {
-            let mut idx = Map::xy_id(pos.x, pos.y);
+            let mut idx = state.map.xy_idx(pos.x, pos.y);
             state.map.blocked[idx] = false;
 
-            pos.x = path.steps[1] as i32 % MAPWIDTH;
-            pos.y = path.steps[1] as i32 / MAPWIDTH;
+            pos.x = path.steps[1] as i32 % state.map.map_width;
+            pos.y = path.steps[1] as i32 / state.map.map_width;
 
             has_moved.push(ent);
 
-            idx = Map::xy_id(pos.x, pos.y);
+            idx = state.map.xy_idx(pos.x, pos.y);
             state.map.blocked[idx] = true;
 
             fov.dirty = true;

@@ -2,7 +2,7 @@
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
-use crate::{raws::{self, Reaction}, Attack, Faction, Map, Player, Position, State, MAPHEIGHT, MAPWIDTH};
+use crate::{raws::{self, Reaction}, Attack, Faction, Map, Player, Position, State};
 
 use super::{apply_energy_cost, MyTurn};
 
@@ -21,9 +21,9 @@ pub fn adjacent_ai_system(state : &mut State)
         
         let mut reactions: Vec<(Entity, raws::Reaction)> = Vec::new();
         let my_faction = &faction.name;
-        let idx = Map::xy_id(pos.x, pos.y);
-        let w = MAPWIDTH;
-        let h = MAPHEIGHT;
+        let idx = state.map.xy_idx(pos.x, pos.y);
+        let w = state.map.map_width;
+        let h = state.map.map_height;
 
         //checking possible reactions for each of the 8 cardinal directions
         if pos.x > 0 {evaluate(idx-1, state, my_faction, &mut reactions);}
@@ -68,7 +68,7 @@ pub fn adjacent_ai_system(state : &mut State)
 fn evaluate(idx : usize, state : &State , my_faction : &str, reactions : &mut Vec<(Entity, raws::Reaction)>)
 {
     for ent in state.map.get_mob_entities_at_position(state
-        , Point::new(idx as i32 % MAPWIDTH , idx as i32 / MAPWIDTH))
+        , Point::new(idx as i32 % state.map.map_width , idx as i32 / state.map.map_width))
     {
         if let Ok(faction) = state.world.get::<&Faction>(ent)
         {

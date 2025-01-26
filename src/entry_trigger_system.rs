@@ -13,7 +13,7 @@ pub fn run(state: &mut State)
     {
         queried_ents.push(ent);
         //console::log(format!("{} traps on map", state.map.props.len()));
-        let idx = Map::xy_id(pos.x, pos.y) as i32;
+        let idx = state.map.xy_idx(pos.x, pos.y) as i32;
 
         match state.map.props.get(&idx)
         {

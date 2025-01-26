@@ -1,6 +1,6 @@
 use bracket_lib::random::RandomNumberGenerator;
 
-use super::{BuilderMap, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, MetaMapBuilder, TileType};
 
 
 
@@ -59,14 +59,14 @@ impl DoorPlacement
 
     fn door_possible(&self, build_data : &mut BuilderMap, idx : usize) -> bool
     {
-        let x = idx % MAPWIDTH as usize;
-        let y = idx / MAPWIDTH as usize;
+        let x = idx % build_data.map.map_width as usize;
+        let y = idx / build_data.map.map_width as usize;
 
         //check for east->west door possibility
         if build_data.map.map[idx] == TileType::Floor && (x > 1 && build_data.map.map[idx-1] == TileType::Floor) &&
-            (x < MAPWIDTH as usize -2 && build_data.map.map[idx+1] == TileType::Floor) &&
-            (y > 1 && build_data.map.map[idx - MAPWIDTH as usize] == TileType::Wall) &&
-            (y < MAPHEIGHT as usize-2 && build_data.map.map[idx + MAPWIDTH as usize] == TileType::Wall)
+            (x < build_data.map.map_width as usize -2 && build_data.map.map[idx+1] == TileType::Floor) &&
+            (y > 1 && build_data.map.map[idx - build_data.map.map_width as usize] == TileType::Wall) &&
+            (y < build_data.map.map_height as usize-2 && build_data.map.map[idx + build_data.map.map_width as usize] == TileType::Wall)
         {
             return true;
         }
@@ -74,9 +74,9 @@ impl DoorPlacement
         // Check for north-south door possibility
         if build_data.map.map[idx] == TileType::Floor &&
             (x > 1 && build_data.map.map[idx-1] == TileType::Wall) &&
-            (x < MAPWIDTH as usize -2 && build_data.map.map[idx+1] == TileType::Wall) &&
-            (y > 1 && build_data.map.map[idx - MAPWIDTH as usize] == TileType::Floor) &&
-            (y < MAPHEIGHT as usize-2 && build_data.map.map[idx + MAPWIDTH as usize] == TileType::Floor)
+            (x < build_data.map.map_width as usize -2 && build_data.map.map[idx+1] == TileType::Wall) &&
+            (y > 1 && build_data.map.map[idx - build_data.map.map_width as usize] == TileType::Floor) &&
+            (y < build_data.map.map_height as usize-2 && build_data.map.map[idx + build_data.map.map_width as usize] == TileType::Floor)
         {
             return true;
         }   

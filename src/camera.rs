@@ -1,7 +1,7 @@
 use bracket_lib::{color::{BLACK, GRAY, RGB}, prelude::{to_cp437, BTerm, FontCharType}};
 
 
-use crate::{Hidden, Map, Position, Renderable, State, TileType};
+use crate::{particles::particle_system, Hidden, Map, Position, Renderable, State, TileType};
 
 
 
@@ -47,6 +47,9 @@ pub fn render_camera(state : &mut State, ctx : &mut BTerm)
         y += 1;
     }
 
+    particle_system::spawn_system(state);
+    particle_system::update(state, ctx);
+
     let mut entities_to_render  = 
         state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
         .into_iter()
@@ -88,7 +91,7 @@ fn get_tile_glyph(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
         }
         TileType::Wall => 
         {
-            let x = idx as i32 / map.map_width;
+            let x = idx as i32 % map.map_width;
             let y = idx as i32 / map.map_width;
             glyph = wall_glyph(map, x, y);
             fg = RGB::from_f32(0., 1., 0.);

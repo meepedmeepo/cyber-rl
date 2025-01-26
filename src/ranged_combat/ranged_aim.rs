@@ -44,7 +44,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
 
     let (m_x,m_y) = gui::select_target_mode(state, ctx).to_tuple();
 
-    //let idx = Map::xy_id(m_x, m_y);
+    //let idx = state.map.xy_idx(m_x, m_y);
     //let mut is_valid_target = false;
 
     //draws preview of projectile path to targetted tile if the target is in range

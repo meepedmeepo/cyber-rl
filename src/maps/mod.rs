@@ -43,7 +43,7 @@ use door_placement::*;
 pub use rex_assests::*;
 use waveform_collapse::*;
 use voronoi::*;
-//
+//s
 pub trait MapBuilder
 {
     fn build(&mut self) -> Map;
@@ -52,13 +52,13 @@ pub trait MapBuilder
     fn get_starting_position(&mut self) -> Point;
 }
 
-pub fn random_map_builder(new_depth : i32) -> BuilderChain
+pub fn random_map_builder(new_depth : i32, width : i32, height : i32) -> BuilderChain
 {
-    let mut builder = BuilderChain::new(new_depth);
+    let mut builder = BuilderChain::new(new_depth, width, height);
     //builder.start_with(CellularAutomataBuilder::new());
     builder.start_with(VoronoiCellBuilder::pythagoras());
-    builder.with(WaveformCollapseBuilder::new());
-    //builder.with(CellularAutomataBuilder::new());
+    //builder.with(WaveformCollapseBuilder::new());
+    builder.with(CellularAutomataBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     builder.with(CullUnreachable::new());
     builder.with(VoronoiSpawning::new());
@@ -97,7 +97,7 @@ pub struct BuilderChain
 
 impl BuilderChain
 {
-    pub fn new(new_depth : i32) -> BuilderChain
+    pub fn new(new_depth : i32, width : i32, height : i32) -> BuilderChain
     {
         BuilderChain
         {
@@ -106,7 +106,7 @@ impl BuilderChain
             build_data: BuilderMap
             {
                 spawn_list: Vec::new(),
-                map: Map::new(new_depth),
+                map: Map::new(new_depth, width, height),
                 starting_position: None,
                 rooms: None,
                 corridors: None,
@@ -153,7 +153,7 @@ impl BuilderChain
             let entity_type = get_entity_type( &entity.1);
 
             spawning_system::spawn_entity(state, &(&entity.0, &entity.1)
-                ,entity.0 as i32 % MAPWIDTH, entity.0 as i32 / MAPWIDTH, entity_type);
+                ,entity.0 as i32 % state.map.map_width, entity.0 as i32 / state.map.map_width, entity_type);
         }
     }
 }

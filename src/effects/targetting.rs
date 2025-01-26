@@ -12,7 +12,7 @@ pub fn entity_position(state: &mut State, target: Entity) -> Option<i32>
     {
         Ok(pos) =>
         {
-            return Some(Map::xy_id(pos.x, pos.y) as i32);
+            return Some(state.map.xy_idx(pos.x, pos.y) as i32);
         }
         Err(_) => {None}
     }
@@ -22,7 +22,7 @@ pub fn get_aoe_tiles(state: &mut State, aoe : i32, pos : Point) -> Vec<i32>
 {
     field_of_view(pos , aoe, &state.map)
         .iter()
-        .map(|tile| Map::xy_id(tile.x, tile.y) as i32)
+        .map(|tile| state.map.xy_idx(tile.x, tile.y) as i32)
         .collect::<Vec<_>>()
         .clone()
 }

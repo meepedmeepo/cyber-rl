@@ -67,7 +67,7 @@ pub fn run_initiative(state : &mut State) -> ProgramState
         {
             if bracket_lib::geometry::DistanceAlg::Pythagoras
                 .distance2d(state.player_pos, Point::new(pos.x, pos.y)) < 30. || ent == state.player_ent.unwrap()
-                || state.map.visible_tiles[Map::xy_id(pos.x, pos.y)]
+                || state.map.visible_tiles[state.map.xy_idx(pos.x, pos.y)]
             {
                 let mut energy_gain = 50;
                 energy_gain += std::cmp::max(0,stats.dexterity.get_modifier() * 5);

@@ -2,7 +2,7 @@ use std::f32::MIN;
 
 use bracket_lib::{color::{BLACK, LIMEGREEN}, prelude::{BTerm, Point}};
 
-use crate::{camera, Map, Name, Renderable, State, MAPWIDTH};
+use crate::{camera, Map, Name, Renderable, State,};
 
 
 
@@ -20,7 +20,7 @@ pub fn draw_tooltip(state : &mut State, ctx : &mut BTerm, cursor_pos : Point )
     }
     let map_idx = state.map.xy_idx(cursor_map_pos.x, cursor_map_pos.y);
 
-    let idx = Map::xy_id(cursor_pos.x, cursor_pos.y);
+    let idx = state.map.xy_idx(cursor_pos.x, cursor_pos.y);
 
     if !state.map.visible_tiles[map_idx]
     {
@@ -60,7 +60,7 @@ pub fn draw_tooltip(state : &mut State, ctx : &mut BTerm, cursor_pos : Point )
     let tip_height = content.len() + 3;
     tip_pos.x += 2;
 
-    if tip_pos.x + tip_width >= MAPWIDTH
+    if tip_pos.x + tip_width >= state.map.map_width
     {
         //draw to the left of cursor
         tip_pos.x -= tip_width;

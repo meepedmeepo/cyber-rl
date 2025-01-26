@@ -7,26 +7,27 @@ use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
 use crate::statistics::Pools;
 use crate::State;
 
-
-pub const MAPWIDTH : i32 = 78;
-pub const MAPHEIGHT : i32 = 32;
-pub const MAPSIZE : usize = MAPWIDTH as usize * MAPHEIGHT as usize;
+//pub const MAPSIZE : usize = map.map_width as usize * map.map_height as usize;
 //use crate::rect;
-
-pub fn new(new_depth : i32) -> Map
+impl Map
 {
-    Map
+    pub fn new(new_depth : i32, width : i32, height : i32) -> Map
     {
-        map : vec![TileType::Wall; MAPSIZE],
+        Map
+        {
+            map : vec![TileType::Wall; (width*height) as usize],
 
-        revealed_tiles : vec![false; MAPSIZE],
-        visible_tiles : vec![false; MAPSIZE],
-        blocked : vec![false; MAPSIZE],
-        tile_contents : vec![Vec::new(); MAPSIZE],
-        depth: new_depth,
-        props: HashMap::new(),
-        view_blocked : HashSet::new()
-        
+            revealed_tiles : vec![false; (width*height) as usize],
+            visible_tiles : vec![false; (width*height) as usize],
+            blocked : vec![false; (width*height) as usize],
+            tile_contents : vec![Vec::new(); (width*height) as usize],
+            depth: new_depth,
+            props: HashMap::new(),
+            view_blocked : HashSet::new(),
+            map_width: width,
+            map_height: height,
+            
+        }
     }
 }
 
@@ -62,9 +63,9 @@ impl BaseMap for Map
     }   
     fn get_available_exits(&self, idx:usize) -> SmallVec<[(usize, f32); 10]> {
         let mut exits = SmallVec::new();
-        let x = idx as i32 % MAPWIDTH;
-        let y = idx as i32 / MAPWIDTH;
-        let w = MAPWIDTH as usize;
+        let x = idx as i32 % self.map_width;
+        let y = idx as i32 / self.map_width;
+        let w = self.map_width as usize;
     
         // Cardinal directions
         if self.is_exit_valid(x-1, y) { exits.push((idx-1, 1.0)) };
@@ -81,7 +82,7 @@ impl BaseMap for Map
         exits
     }
     fn get_pathing_distance(&self, idx1:usize, idx2:usize) -> f32 {
-        let w = MAPWIDTH as usize;
+        let w = self.map_width as usize;
         let p1 = Point::new(idx1 % w, idx1 / w);
         let p2 = Point::new(idx2 % w, idx2 / w);
         DistanceAlg::Pythagoras.distance2d(p1, p2)
@@ -92,7 +93,7 @@ impl BaseMap for Map
 impl Algorithm2D for Map
 {
     fn dimensions(&self) -> Point {
-        Point::new(MAPWIDTH,MAPHEIGHT)
+        Point::new(self.map_width,self.map_height)
     }
 
 }
@@ -104,29 +105,9 @@ impl Map
     }
 
     fn is_exit_valid(&self, x:i32, y:i32) -> bool {
-        if x < 1 || x > MAPWIDTH-1 || y < 1 || y > MAPHEIGHT-1 { return false; }
-        let idx = Map::xy_id(x, y);
+        if x < 1 || x > self.map_width-1 || y < 1 || y > self.map_height-1 { return false; }
+        let idx = self.xy_idx(x, y);
         !self.blocked[idx as usize]
-    }
-
-    pub fn new(new_depth : i32) -> Map
-    {
-        Map
-        {
-            map: vec![TileType::Wall; MAPSIZE],
-            revealed_tiles : vec![false;MAPSIZE],
-            visible_tiles: vec![false;MAPSIZE],
-            blocked : vec![false;MAPSIZE],
-            tile_contents : vec![Vec::new(); MAPSIZE] , 
-            depth: new_depth,
-            props: HashMap::new(),
-            view_blocked : HashSet::new()
-        }
-
-    }
-    pub fn xy_id(x:i32,y:i32) ->usize 
-    {
-    (y as usize * MAPWIDTH as usize)+ x as usize
     }
 
     pub fn populate_blocked(&mut self)
@@ -148,7 +129,7 @@ impl Map
 pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Vec<Entity>
     {
         let mut mobs = Vec::new();
-        for ent in self.tile_contents[Map::xy_id(position.x, position.y)].iter()
+        for ent in self.tile_contents[self.xy_idx(position.x, position.y)].iter()
         {
             if state.world.get::<&Pools>(*ent).is_ok()
             {
@@ -160,30 +141,16 @@ pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Ve
 
 }
 
-pub fn _create_map() -> Vec<TileType> 
-{
-let mut  map = vec![TileType::Floor; 80*50];
-for x in 0..80
-{
-    map[Map::xy_id(x, 0)] = TileType::Wall;
-    map[Map::xy_id(x,49)] = TileType::Wall;
-}
-for y in 0..50
-{
-    map[Map::xy_id(0,y)] = TileType::Wall;
-    map[Map::xy_id(79,y)] = TileType::Wall;
-}
-map
-}
 
-
-pub fn draw_map(ctx:&mut BTerm,map:&Map)
+impl Map
+{
+pub fn draw_map(&self, ctx:&mut BTerm)
 {
 let mut x = 0;
 let mut y = 0;
-for tile in map.map.iter()
+for tile in self.map.iter()
 {
-if map.revealed_tiles[Map::xy_id(x,y)] == true
+if self.revealed_tiles[self.xy_idx(x,y)] == true
 {
     let glyph : FontCharType;
     let mut fg;
@@ -196,7 +163,7 @@ match tile
     }// ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
     TileType::Wall => 
     {
-        glyph = wall_glyph(map, x, y);
+        glyph = wall_glyph(self, x, y);
         fg = RGB::from_f32(0.1,1.,0.);
     }//ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
     TileType::DownStairs =>
@@ -206,21 +173,21 @@ match tile
 
     }
 }
-if !map.visible_tiles[Map::xy_id(x, y)]
+if !self.visible_tiles[self.xy_idx(x, y)]
 {
     fg = fg.to_greyscale()
 }
 ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
 }
 x+= 1;
-if  x > MAPWIDTH - 1
+if  x > self.map_width - 1
 {
 x = 0;
 y += 1;
 }
 }
 }
-
+}
 
 impl Map
 {
@@ -229,7 +196,10 @@ fn apply_rooms(&mut self,rooms: &Vec<Rect>)
 {
     for r in rooms.iter()
     {
-        r.for_each(|xy| self.map[Map::xy_id(xy.x, xy.y)] = TileType::Floor);
+        r.for_each(|xy| {
+            let idx = self.xy_idx(xy.x, xy.y);
+            self.map[idx] = TileType::Floor});
+        
     }
     }
 
@@ -237,7 +207,7 @@ fn apply_rooms(&mut self,rooms: &Vec<Rect>)
 
 fn wall_glyph(map : &Map, x: i32, y: i32) -> FontCharType
 {
-    if x < 1 || x > MAPWIDTH-2 || y < 1 || y > MAPHEIGHT-2 as i32 { return 35; }
+    if x < 1 || x > map.map_width-2 || y < 1 || y > map.map_height-2 as i32 { return 35; }
     let mut mask : u8 = 0;
 
     if is_revealed_and_wall(map, x, y - 1) { mask +=1; }
@@ -268,7 +238,7 @@ fn wall_glyph(map : &Map, x: i32, y: i32) -> FontCharType
 
 fn is_revealed_and_wall(map : &Map, x: i32, y: i32) -> bool
 {
-    let idx = Map::xy_id(x, y);
+    let idx = map.xy_idx(x, y);
 
     map.map[idx] == TileType::Wall && map.revealed_tiles[idx]
 }

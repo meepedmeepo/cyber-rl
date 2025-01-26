@@ -4,7 +4,7 @@ use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
 use triggers::{entry_trigger_fire, item_trigger, ranged_trigger};
-use crate::{particles::ParticleBuilder, Projectile, State, MAPWIDTH};
+use crate::{particles::ParticleBuilder, Projectile, State};
 
 mod damage;
 mod targetting;

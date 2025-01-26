@@ -4,7 +4,7 @@ use bracket_lib::{prelude::Point, random::RandomNumberGenerator};
 
 use crate::{spawns::spawning_system::spawn_region, Position};
 
-use super::{BuilderMap, InitialMapBuilder, Map, MapBuilder, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, InitialMapBuilder, Map, MapBuilder, MetaMapBuilder, TileType};
 
 
 
@@ -37,12 +37,12 @@ impl CellularAutomataBuilder
 
     fn build(&mut self, rng: &mut RandomNumberGenerator, build_data : &mut BuilderMap)
     {
-        for y in 1..MAPHEIGHT-1
+        for y in 1..build_data.map.map_height-1
         {
-            for x in 1..MAPWIDTH-1
+            for x in 1..build_data.map.map_width-1
             {
                 let roll = rng.roll_dice(1, 100);
-                let idx = Map::xy_id(x, y);
+                let idx = build_data.map.xy_idx(x, y);
                 if roll > 55 {build_data.map.map[idx] = TileType::Floor}
                 else {build_data.map.map[idx] = TileType::Wall}
             }
@@ -58,21 +58,21 @@ impl CellularAutomataBuilder
         {
             let mut newtiles = build_data.map.map.clone();
 
-            for y in 1..MAPHEIGHT-1
+            for y in 1..build_data.map.map_height-1
             {
-                for x in 1..MAPWIDTH-1
+                for x in 1..build_data.map.map_width-1
                 {
-                    let idx = Map::xy_id(x, y);
+                    let idx = build_data.map.xy_idx(x, y);
                     let mut neighbors = 0;
 
                     if build_data.map.map[idx - 1] == TileType::Wall { neighbors += 1; }
                     if build_data.map.map[idx + 1] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx - MAPWIDTH as usize] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx + MAPWIDTH as usize] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx - (MAPWIDTH as usize - 1)] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx - (MAPWIDTH as usize + 1)] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx + (MAPWIDTH as usize - 1)] == TileType::Wall { neighbors += 1; }
-                    if build_data.map.map[idx + (MAPWIDTH as usize + 1)] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx - build_data.map.map_width as usize] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx + build_data.map.map_width as usize] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx - (build_data.map.map_width as usize - 1)] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx - (build_data.map.map_width as usize + 1)] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx + (build_data.map.map_width as usize - 1)] == TileType::Wall { neighbors += 1; }
+                    if build_data.map.map[idx + (build_data.map.map_width as usize + 1)] == TileType::Wall { neighbors += 1; }
 
                     if neighbors > 4 || neighbors == 0
                     {

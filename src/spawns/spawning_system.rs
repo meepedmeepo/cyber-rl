@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::ai::Energy;
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
-use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable, MAPWIDTH};
+use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usable};
 use crate::{DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting, Renderable, State,raws::RawMaster};
 use crate::components::Consumable;
 use bracket_lib::prelude::{console, Rect};
@@ -125,7 +125,7 @@ pub fn spawn_entity(state : &mut State, spawn: &(&usize,&String),x:i32,y:i32, en
                     {
                         spawn_item_equipped(state, eq, mob_ent);
                     }
-                    let idx = Map::xy_id(x, y);
+                    let idx = state.map.xy_idx(x, y);
                     state.map.blocked[idx] = true;
                 }
 
@@ -235,7 +235,7 @@ pub fn spawn_room( room : Rect, depth :i32, spawn_list: &mut Vec<(usize, String)
 
         let pos_set = room.point_set();
         let point = pos_set.iter().next().unwrap();
-        let pos = Map::xy_id(point.x, point.y);
+        let pos = map.xy_idx(point.x, point.y);
         if !spawn_points.contains(&pos) && map.map[pos] != TileType::Wall
         {
             //spawn_entity(state, &(&0, &name), point.x, point.y, ent_type);
@@ -280,7 +280,7 @@ pub fn spawn_region( area : &[usize], map_depth : i32, spawn_list: &mut Vec<(usi
     for (idx, name) in spawn_points.iter()
     {
         spawn_list.push((*idx, name.clone()));
-        //spawn_entity(state, &(&0usize, name), *idx as i32  % MAPWIDTH, *idx as i32 / MAPWIDTH, ent_type);
+        //spawn_entity(state, &(&0usize, name), *idx as i32  % map.map_width, *idx as i32 / map.map_width, ent_type);
     }
 
 

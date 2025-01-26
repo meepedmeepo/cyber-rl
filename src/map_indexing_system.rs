@@ -18,7 +18,7 @@ impl MapIndexingSystem
         for (_id,(pos, _blocks,trig)) in 
             state.world.query::<(&Position,Option<&BlocksTiles>, Option<&Trigger>)>().iter()
         {
-            let idx = Map::xy_id(pos.x, pos.y);
+            let idx = state.map.xy_idx(pos.x, pos.y);
             state.map.tile_contents[idx].push(_id);
             match _blocks
             {

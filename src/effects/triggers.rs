@@ -1,7 +1,7 @@
 use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
-use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State, MAPWIDTH};
+use crate::{gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State};
 
 use super::{add_effect, animation::Animation, EffectType, ParticleAnimation, ParticleBurst, ParticleLine, Targets, ANIMATIONQUEUE};
 
@@ -73,17 +73,17 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
                 if let Targets::Tile{tile_idx} = *targets
                 {
-                    end_pos = Point::new(tile_idx % MAPWIDTH, tile_idx / MAPWIDTH);
+                    end_pos = Point::new(tile_idx % state.map.map_width, tile_idx / state.map.map_width);
                 }
                 else if let Targets::Tiles { tiles } = targets.clone()
                 {
-                    end_pos = Point::new(tiles[0] % MAPWIDTH, tiles[0] / MAPWIDTH);
+                    end_pos = Point::new(tiles[0] % state.map.map_width, tiles[0] / state.map.map_width);
                 }
                 if end_pos != Point::zero()
                 {
                     //TODO: change this so that there is a staggered appearance and dissappearance of the particles!
                     let line = bracket_lib::geometry::Bresenham::new(Point{x:start_pos.x,y: start_pos.y}, end_pos);
-                    let tile_vec =line.skip(1).map(|point| Map::xy_id(point.x, point.y) as i32).collect::<Vec<_>>();
+                    let tile_vec =line.skip(1).map(|point| state.map.xy_idx(point.x, point.y) as i32).collect::<Vec<_>>();
 
                     add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph, fg: pl.particle.fg
                         , bg: pl.particle.bg, lifetime: pl.particle.lifetime }
@@ -104,13 +104,13 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
                 if let Targets::Tile { tile_idx } = targets
                 {
-                    end_pos.x = tile_idx % MAPWIDTH;
-                    end_pos.y = tile_idx / MAPWIDTH;
+                    end_pos.x = tile_idx % state.map.map_width;
+                    end_pos.y = tile_idx / state.map.map_width;
                 }
                 if let Targets::Tiles { tiles } = targets
                 {
-                    end_pos.x = tiles[0] % MAPWIDTH;
-                    end_pos.y = tiles[0] / MAPWIDTH;
+                    end_pos.x = tiles[0] % state.map.map_width;
+                    end_pos.y = tiles[0] / state.map.map_width;
                 }
 
                 if end_pos != Point::zero()

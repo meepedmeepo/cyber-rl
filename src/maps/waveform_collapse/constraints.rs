@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{maps::waveform_collapse::tile_idx_in_chunk, Map, TileType, MAPHEIGHT, MAPWIDTH};
+use crate::{maps::waveform_collapse::tile_idx_in_chunk, Map, TileType};
 
 use super::MapChunk;
 
@@ -9,8 +9,8 @@ use super::MapChunk;
 pub fn build_patterns(map : &Map, chunk_size : i32
     , include_flipping : bool, dedupe : bool) -> Vec<Vec<TileType>>
     {
-        let chunks_x = MAPWIDTH / chunk_size;
-        let chunks_y = MAPHEIGHT / chunk_size;
+        let chunks_x = map.map_width / chunk_size;
+        let chunks_y = map.map_height / chunk_size;
 
         let mut patterns = Vec::new();
 
@@ -29,7 +29,7 @@ pub fn build_patterns(map : &Map, chunk_size : i32
                 {
                     for x in start_x .. end_x
                     {
-                        let idx = Map::xy_id(x, y);
+                        let idx = map.xy_idx(x, y);
                         pattern.push(map.map[idx]);
                     }
                 }
@@ -42,7 +42,7 @@ pub fn build_patterns(map : &Map, chunk_size : i32
                     pattern = Vec::new();
                     for y in start_y .. end_y {
                         for x in start_x .. end_x {
-                            let idx = Map::xy_id(end_x - (x+1), y);
+                            let idx = map.xy_idx(end_x - (x+1), y);
                             pattern.push(map.map[idx]);
                         }
                     }
@@ -52,7 +52,7 @@ pub fn build_patterns(map : &Map, chunk_size : i32
                     pattern = Vec::new();
                     for y in start_y .. end_y {
                         for x in start_x .. end_x {
-                            let idx = Map::xy_id(x, end_y - (y+1));
+                            let idx = map.xy_idx(x, end_y - (y+1));
                             pattern.push(map.map[idx]);
                         }
                     }
@@ -62,7 +62,7 @@ pub fn build_patterns(map : &Map, chunk_size : i32
                     pattern = Vec::new();
                     for y in start_y .. end_y {
                         for x in start_x .. end_x {
-                            let idx = Map::xy_id(end_x - (x+1), end_y - (y+1));
+                            let idx = map.xy_idx(end_x - (x+1), end_y - (y+1));
                             pattern.push(map.map[idx]);
                         }
                     }
@@ -93,7 +93,7 @@ pub fn build_patterns(map : &Map, chunk_size : i32
 //     {
 //         for tile_x in 0..chunk_size
 //         {
-//             let map_idx = Map::xy_id(start_x+tile_x, start_y+tile_y);
+//             let map_idx = state.map.xy_idx(start_x+tile_x, start_y+tile_y);
 //             map.map[map_idx] = chunk.pattern[i];
 //             //map.vi
 //         }

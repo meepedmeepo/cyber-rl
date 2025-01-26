@@ -4,7 +4,7 @@ use bracket_lib::{noise::{CellularDistanceFunction, FastNoise}, random::RandomNu
 
 use crate::spawns::spawning_system::spawn_region;
 
-use super::{BuilderMap, Map, MetaMapBuilder, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{BuilderMap, Map, MetaMapBuilder, TileType};
 
 
 pub struct VoronoiSpawning {}
@@ -33,11 +33,11 @@ impl VoronoiSpawning
         noise.set_frequency(0.08);
         noise.set_cellular_distance_function(CellularDistanceFunction::Manhattan);
 
-        for y in 1 .. MAPHEIGHT - 1
+        for y in 1 .. build_data.map.map_height - 1
         {
-            for x in 1 .. MAPWIDTH - 1
+            for x in 1 .. build_data.map.map_width - 1
             {
-                let idx = Map::xy_id(x, y);
+                let idx = build_data.map.xy_idx(x, y);
 
                 if build_data.map.map[idx] == TileType::Floor
                 {

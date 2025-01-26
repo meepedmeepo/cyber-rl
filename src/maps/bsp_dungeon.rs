@@ -1,6 +1,6 @@
 use bracket_lib::{prelude::Rect, random::RandomNumberGenerator};
 
-use super::{common::apply_room_to_map, BuilderMap, InitialMapBuilder, Map, TileType, MAPHEIGHT, MAPWIDTH};
+use super::{common::apply_room_to_map, BuilderMap, InitialMapBuilder, Map, TileType};
 
 
 
@@ -29,7 +29,7 @@ impl BspDungeon
     {
         let mut rooms: Vec<Rect> = Vec::new();
         self.rects.clear();
-        self.rects.push(Rect::with_size(2, 2, MAPWIDTH-5, MAPHEIGHT-5));
+        self.rects.push(Rect::with_size(2, 2, build_data.map.map_width-5, build_data.map.map_height-5));
 
         let first_room = self.rects[0];
         self.add_subrects(first_room);//split the first room into 4 rects
@@ -108,13 +108,13 @@ impl BspDungeon
         {
             for x in expanded.x1 .. expanded.x2
             {
-                if x > MAPWIDTH-2 {can_build = false;}
-                if y > MAPHEIGHT-2 {can_build = false;}
+                if x > map.map_width-2 {can_build = false;}
+                if y > map.map_height-2 {can_build = false;}
                 if x < 1 {can_build = false;}
                 if y < 1 {can_build = false;}
                 if can_build
                 {
-                    let idx = Map::xy_id(x, y);
+                    let idx = map.xy_idx(x, y);
                     if map.map[idx] != TileType::Wall
                     {
                         can_build = false

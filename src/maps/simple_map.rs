@@ -5,11 +5,8 @@ use bracket_lib::random::RandomNumberGenerator;
 use crate::spawns::spawning_system::spawn_room;
 use crate::TileType;
 use crate::common::*;
-use crate::MAPHEIGHT;
-use crate::MAPWIDTH;
 use super::BuilderMap;
 use super::InitialMapBuilder;
-use super::MAPSIZE;
 use super::{map, MapBuilder, Map};
 
 pub struct SimpleMapBuilder
@@ -41,8 +38,8 @@ impl SimpleMapBuilder {
         for i in 0..MAX_ROOMS {
             let w = rng.range(MIN_SIZE, MAX_SIZE);
             let h = rng.range(MIN_SIZE, MAX_SIZE);
-            let x = rng.roll_dice(1, MAPWIDTH - w - 1) - 1;
-            let y = rng.roll_dice(1, MAPHEIGHT - h - 1) - 1;
+            let x = rng.roll_dice(1, build_data.map.map_width - w - 1) - 1;
+            let y = rng.roll_dice(1, build_data.map.map_height - h - 1) - 1;
             let new_room = Rect::with_size(x, y, w, h);
             let mut ok = true;
             for other_room in rooms.iter() {

@@ -106,7 +106,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
                     let screen_y = idx.y - min_y;
                     if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y) - 1
                     {
-                        ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
+                        ctx.set_bg(screen_x, screen_y, RGB::named(BLUE));
                         available_cells.push(idx.clone());
                     }
                 }
@@ -183,8 +183,8 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
             
             for point in tiles.iter()
             {
-                let screen_x = point.x + min_x;
-                let screen_y = point.y + min_y;
+                let screen_x = point.x - min_x;
+                let screen_y = point.y - min_y;
                 ctx.set_bg(screen_x, screen_y, YELLOW);
             }
             

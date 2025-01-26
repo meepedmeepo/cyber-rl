@@ -3,7 +3,7 @@ use std::{collections::HashMap, hash::Hash};
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
-use crate::{raws::{self, Reaction}, Faction, FoV, Map, Player, Position, State, WantsToApproach, WantsToFlee, MAPWIDTH};
+use crate::{raws::{self, Reaction}, Faction, FoV, Map, Player, Position, State, WantsToApproach, WantsToFlee};
 
 use super::MyTurn;
 
@@ -21,13 +21,13 @@ pub fn visible_ai_system(state :&mut State)
     for (ent, (_turn, my_faction, pos, fov)) 
         in state.world.query::<(&MyTurn, &Faction, &Position, &FoV)>().without::<&Player>().iter()
     {
-        let my_idx = Map::xy_id(pos.x, pos.y);
+        let my_idx = state.map.xy_idx(pos.x, pos.y);
         let mut reactions : Vec<(usize, Reaction)> = Vec::new();
         let mut flee : Vec<usize> = Vec::new();
 
         for tile in fov.visible_tiles.iter()
         {
-            let idx = Map::xy_id(tile.x, tile.y);
+            let idx = state.map.xy_idx(tile.x, tile.y);
             if idx != my_idx
             {
                 evaluate(idx, state, &my_faction.name, &mut reactions);
@@ -83,7 +83,7 @@ pub fn visible_ai_system(state :&mut State)
 fn evaluate(idx : usize, state : &State , my_faction : &str, reactions : &mut Vec<(usize, raws::Reaction)>)
 {
     for ent in state.map.get_mob_entities_at_position(state
-        , Point::new(idx as i32 % MAPWIDTH , idx as i32 / MAPWIDTH))
+        , Point::new(idx as i32 % state.map.map_width , idx as i32 / state.map.map_width))
     {
         if let Ok(faction) = state.world.get::<&Faction>(ent)
         {

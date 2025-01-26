@@ -1,6 +1,6 @@
 use bracket_lib::color::RGB;
 
-use crate::{State, MAPWIDTH};
+use crate::{State};
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Particle
@@ -29,7 +29,7 @@ pub struct ParticleAnimation
 
 pub fn spawn_particle( state : &mut State, glyph : char, fg : RGB, bg : RGB, lifetime : f32, tile_idx : i32)
 {
-    let x = tile_idx % MAPWIDTH;
-    let y = tile_idx / MAPWIDTH;
+    let x = tile_idx % state.map.map_width;
+    let y = tile_idx / state.map.map_width;
     state.particle_builder.request(x, y, fg, bg, glyph, lifetime, None);
 }

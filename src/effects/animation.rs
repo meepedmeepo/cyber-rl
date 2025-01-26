@@ -41,7 +41,7 @@ pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
                 proj_to_update.push(id);
                 anim.index += 1;
                 anim.current_step_time = anim.step_time;
-                let idx = Map::xy_id(anim.path[anim.index].x, anim.path[anim.index].y) as i32;
+                let idx = state.map.xy_idx(anim.path[anim.index].x, anim.path[anim.index].y) as i32;
 
                 add_effect(None, super::EffectType::Particle { glyph: anim.particle.glyph, fg: anim.particle.fg
                 , bg: anim.particle.bg, lifetime: anim.particle.lifetime+25. }

@@ -15,6 +15,7 @@ use gamelog::GameLog;
 use gui::display_input_text;
 use gui::draw_cursor;
 use gui::get_input_text;
+use gui::keyboard_cursor;
 use gui::menu_theme;
 use gui::TargettingMode;
 use hecs::*;
@@ -243,7 +244,7 @@ impl State
 {
     fn generate_world_map(&mut self, new_depth : i32)
     {
-        let mut builder = random_map_builder(new_depth);
+        let mut builder = random_map_builder(new_depth, 69,69);
 
         builder.build_map(&mut self.rng);
 
@@ -287,8 +288,8 @@ impl GameState for State{
                 item_use_system::run(self);
                 MapIndexingSystem::run(self);
                 ClearDeadSystem::run(self);
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                ////render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -298,10 +299,10 @@ impl GameState for State{
             ProgramState::PlayAnimation =>
             {
                 ctx.cls();
-                draw_map(ctx, &self.map);
+                camera::render_camera(self, ctx);
                 effects::run_effect_queue(self);
                 effects::run_animation_queue(self, ctx);
-                render_system(self, ctx);
+                //render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -350,6 +351,7 @@ impl GameState for State{
 
             ProgramState::Inventory =>
             {
+                let (min_x,_max_x,min_y, _max_y) = camera::get_screen_bounds(self, ctx);
                 ctx.cls();
                 //insert inventory input function here!
                 let invent_state = menus::InventoryMenu::menu_input(ctx, self);
@@ -376,12 +378,17 @@ impl GameState for State{
                             }
                             Err(_) => {}
                         }
+                        let mut screen_pos = self.player_pos;
+                        
+                        screen_pos.x -= min_x;
+                        screen_pos.y -= min_y;
+                        self.target_mode = TargettingMode::Keyboard { cursor_pos: screen_pos };
                         self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
                     }
                 }
 
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                //render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -390,8 +397,8 @@ impl GameState for State{
             ProgramState::SelectionMenu { mut items, menu  } =>
             {
                 ctx.cls();
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                //render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -482,8 +489,8 @@ impl GameState for State{
             ProgramState::Targeting { range, item, aoe } =>
             {
                 ctx.cls();
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                //render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -518,8 +525,8 @@ impl GameState for State{
             ProgramState::RangedCombat { range , dmg } =>
             {
                 ctx.cls();
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                ////render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -551,7 +558,7 @@ impl GameState for State{
                         
                         //effects::ra
                         add_effect(Some(self.player_ent.unwrap()), effects::EffectType::RangedFire { item: query[0] }, 
-                            effects::Targets::Tile { tile_idx: Map::xy_id(end.x, end.y) as i32 });
+                            effects::Targets::Tile { tile_idx: self.map.xy_idx(end.x, end.y) as i32 });
 
                         effects::run_effect_queue(self);
                         effects::run_animation_queue(self, ctx);
@@ -573,9 +580,8 @@ impl GameState for State{
             ProgramState::KeyboardTargetting { cursor_pos } =>
             {
                 ctx.cls();
-                
-                draw_map(ctx, &self.map);
-                render_system(self, ctx);
+                camera::render_camera(self, ctx);
+                ////render_system(self, ctx);
                 gui::draw_ui(self, ctx);
                 gui::draw_status_box(self, ctx);
                 gui::draw_gamelog(self, ctx);
@@ -640,9 +646,9 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
-    draw_map(ctx, &state.map);
+    camera::render_camera(state, ctx);
     effects::run_animation_queue(state, ctx);
-    render_system(state, ctx);
+    camera::render_camera(state, ctx);
     gui::draw_ui(state, ctx);
     gui::draw_status_box(state, ctx);
     gui::draw_gamelog(state, ctx);
@@ -687,34 +693,34 @@ fn game_init ( state: &mut State)
 
 }
 
-fn render_system(state:&mut State, ctx: &mut BTerm)
-{
-    //queries the ECS to get a list of entities to render, collects them into a vec,
-    //and then reverse orders them by the order member of the renderable struct
+// fn render_system(state:&mut State, ctx: &mut BTerm)
+// {
+//     //queries the ECS to get a list of entities to render, collects them into a vec,
+//     //and then reverse orders them by the order member of the renderable struct
 
-    //runs spawns particles from builder requests and cleans up dead particles before rendering
-    //entities/
-    particle_system::spawn_system(state);
-    particle_system::update(state, ctx);
+//     //runs spawns particles from builder requests and cleans up dead particles before rendering
+//     //entities/
+//     particle_system::spawn_system(state);
+//     particle_system::update(state, ctx);
 
-    let mut entities_to_render  = 
-        state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
-        .into_iter()
-        .map(|ent|{(ent.1.0,ent.1.1)})
-        .collect::<Vec<_>>();
+//     let mut entities_to_render  = 
+//         state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
+//         .into_iter()
+//         .map(|ent|{(ent.1.0,ent.1.1)})
+//         .collect::<Vec<_>>();
 
     
-    entities_to_render.sort_by_key(|a| a.1.order);
+//     entities_to_render.sort_by_key(|a| a.1.order);
 
-    for ent in entities_to_render
-    {
-        let idx = Map::xy_id(ent.0.x, ent.0.y);
-        if state.map.visible_tiles[idx]
-        {
-            ctx.set(ent.0.x, ent.0.y, ent.1.fg, ent.1.bg, ent.1.glyph);
-        }
-    }
-}
+//     for ent in entities_to_render
+//     {
+//         let idx = state.map.xy_idx(ent.0.x, ent.0.y);
+//         if state.map.visible_tiles[idx]
+//         {
+//             ctx.set(ent.0.x, ent.0.y, ent.1.fg, ent.1.bg, ent.1.glyph);
+//         }
+//     }
+// }
 
 fn main() ->BError 
 {
@@ -737,11 +743,13 @@ fn main() ->BError
         map : Map 
         {
             map :Vec::new()
-            ,revealed_tiles : vec![false;MAPSIZE]
-            ,visible_tiles : vec![false;MAPSIZE]
-            ,blocked : vec![false;MAPSIZE]
-            ,tile_contents : vec![Vec::new(); MAPSIZE], depth: 0, props: HashMap::new()
-            , view_blocked : HashSet::new()
+            ,revealed_tiles : vec![false;69usize]
+            ,visible_tiles : vec![false;69usize]
+            ,blocked : vec![false;69usize]
+            ,tile_contents : vec![Vec::new(); 69usize], depth: 0, props: HashMap::new()
+            , view_blocked : HashSet::new(),
+            map_width: 69,
+            map_height: 69,
         },
 
         rng : bracket_lib::random::RandomNumberGenerator::new(),

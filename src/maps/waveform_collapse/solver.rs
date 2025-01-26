@@ -2,7 +2,7 @@ use std::{collections::HashSet, option};
 
 use bracket_lib::{prelude::console, random::RandomNumberGenerator};
 
-use crate::{Map, MAPHEIGHT, MAPWIDTH};
+use crate::{Map};
 
 use super::MapChunk;
 
@@ -24,8 +24,8 @@ impl Solver
 {
     pub fn new(constraints : Vec<MapChunk>, chunk_size : i32, map : &Map) -> Solver
     {
-        let chunks_x = (MAPWIDTH / chunk_size) as usize;
-        let chunks_y = (MAPHEIGHT / chunk_size) as usize;
+        let chunks_x = (map.map_width / chunk_size) as usize;
+        let chunks_y = (map.map_height / chunk_size) as usize;
 
         let mut remaining : Vec<(usize, i32)> = Vec::new();
         for i in 0..(chunks_x * chunks_y)
@@ -208,7 +208,7 @@ impl Solver
             {
                 for x in left_x .. right_x
                 {
-                    let mapidx = Map::xy_id(x, y);
+                    let mapidx = map.xy_idx(x, y);
                     let tile = self.constraints[new_chunk_idx].pattern[i];
                     map.map[mapidx] = tile;
                     i += 1;
@@ -263,7 +263,7 @@ impl Solver
                 {
                     for x in left_x .. right_x
                     {
-                        let mapidx = Map::xy_id(x, y);
+                        let mapidx = map.xy_idx(x, y);
                         let tile = self.constraints[possible_options[new_chunk_idx as usize]].pattern[i];
                         map.map[mapidx] = tile;
                     }

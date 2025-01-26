@@ -25,7 +25,7 @@ impl RoomBasedStairs
         {
             let stair_pos = rooms[rooms.len()-1].center();
             
-            let idx = Map::xy_id(stair_pos.x, stair_pos.y);
+            let idx = build_data.map.xy_idx(stair_pos.x, stair_pos.y);
 
             build_data.map.map[idx] = TileType::DownStairs;
         }

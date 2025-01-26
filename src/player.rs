@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
 
-use super::{State,ProgramState,MAPHEIGHT,MAPWIDTH,Entity,Map,Name,AttackSystem,FoV,Position};
+use super::{State,ProgramState,Entity,Map,Name,AttackSystem,FoV,Position};
 use std::{clone, cmp::{max, min}};
 
 
@@ -111,7 +111,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
             },
             VirtualKeyCode::Period => 
             {
-                let idx = Map::xy_id(state.player_pos.x, state.player_pos.y);
+                let idx = state.map.xy_idx(state.player_pos.x, state.player_pos.y);
                 if state.map.map[idx] == TileType::DownStairs
                 {
                     go_down_stairs(state);
@@ -127,7 +127,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
                 let mut items = Vec::new();
 
-                for ent in state.map.tile_contents[Map::xy_id(state.player_pos.x, state.player_pos.y)].iter()
+                for ent in state.map.tile_contents[state.map.xy_idx(state.player_pos.x, state.player_pos.y)].iter()
                 {
                     if state.world.get::<&Item>(*ent).is_ok()
                     {
@@ -181,11 +181,11 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
 
     for(_id,(_player,position,fov)) in state.world.query_mut::<(&Player,&mut Position,&mut FoV)>()
     {
-        destination_id = Map::xy_id(position.x+delta_x, position.y+delta_y);
+        destination_id = state.map.xy_idx(position.x+delta_x, position.y+delta_y);
         if !state.map.blocked[destination_id]
         {
-            position.x = min(MAPWIDTH -1,max(0,position.x+delta_x));
-            position.y = min(MAPHEIGHT - 1,max(0,position.y+delta_y));
+            position.x = min(state.map.map_width -1,max(0,position.x+delta_x));
+            position.y = min(state.map.map_height - 1,max(0,position.y+delta_y));
             state.player_pos = Point::new(position.x, position.y);
             fov.dirty = true;
             moved = true;
@@ -203,7 +203,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
 
             for (ent, (door, pos)) in state.world.query_mut::<(&Door, &Position)>()
             {
-                if Map::xy_id(pos.x, pos.y) == destination_id && door.open == false
+                if state.map.xy_idx(pos.x, pos.y) == destination_id && door.open == false
                 {
                     door_to_open.push(ent);
                 }

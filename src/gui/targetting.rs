@@ -2,7 +2,7 @@
 
 use bracket_lib::{color::{BLACK, BLUE, CYAN, RED, RGB, YELLOW}, prelude::{field_of_view, Algorithm2D, BTerm, Point, VirtualKeyCode}};
 
-use crate::{menus::inventory_state, FoV, State};
+use crate::{camera, menus::inventory_state, FoV, State};
 
 
 pub enum TargettingMode
@@ -73,6 +73,8 @@ pub fn select_target_mode(state : &mut State, ctx: &mut BTerm) -> Point
 pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Option<i32>) 
     -> (inventory_state, Option<Point>)
 {
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
+
     match ctx.key
     {
         Some(key) =>
@@ -84,6 +86,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
         }
         None =>{}
     }
+
     ctx.print_color(5,0,RGB::named(YELLOW), RGB::named(BLACK), "SELECT TARGET:");
     
     let mut available_cells = Vec::new();
@@ -99,8 +102,13 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
                  bracket_lib::pathfinding::DistanceAlg::Pythagoras.distance2d(state.player_pos, *idx);
                 if distance <= range as f32
                 {
-                    ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
-                    available_cells.push(idx.clone());
+                    let screen_x = idx.x - min_x;
+                    let screen_y = idx.y - min_y;
+                    if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y) - 1
+                    {
+                        ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
+                        available_cells.push(idx.clone());
+                    }
                 }
             }
         }
@@ -111,11 +119,16 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
     //the function version of Bterm.mouse_pos is required to actually get the position!
     
     let mouse_pos = select_target_mode(state, ctx).to_tuple();
+
+    let mut mouse_map_pos = mouse_pos;
+    mouse_map_pos.0 += min_x;
+    mouse_map_pos.1 += min_y;
+
     let mut is_valid_target = false;
 
     for idx in available_cells
     {
-        if idx.x == mouse_pos.0 && idx.y == mouse_pos.1
+        if idx.x == mouse_map_pos.0 && idx.y == mouse_map_pos.1
         {
             is_valid_target = true;
         }  
@@ -125,7 +138,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
         ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(CYAN));
         if ctx.left_click
         {
-            return (inventory_state::Selected,Some(Point::new(mouse_pos.0, mouse_pos.1)) );
+            return (inventory_state::Selected,Some(Point::new(mouse_map_pos.0, mouse_map_pos.1)) );
         }
 
         match ctx.key
@@ -134,7 +147,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
             {
                 if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
                 {
-                    return (inventory_state::Selected,Some(Point::new(mouse_pos.0, mouse_pos.1)));
+                    return (inventory_state::Selected,Some(Point::new(mouse_map_pos.0, mouse_map_pos.1)));
                 }
             }
             None => {}
@@ -165,12 +178,14 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
     {
         Some(radius) => 
         {
-            let tiles = field_of_view(Point::from_tuple(mouse_pos),
+            let tiles = field_of_view(Point::from_tuple(mouse_map_pos),
                 radius, &state.map);
             
             for point in tiles.iter()
             {
-                ctx.set_bg(point.x, point.y, YELLOW);
+                let screen_x = point.x + min_x;
+                let screen_y = point.y + min_y;
+                ctx.set_bg(screen_x, screen_y, YELLOW);
             }
             
         }

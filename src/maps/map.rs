@@ -47,7 +47,9 @@ pub struct Map
     pub tile_contents: Vec<Vec<Entity>>,
     pub depth : i32,
     pub props : HashMap<i32,Entity>,
-    pub view_blocked : HashSet<usize>
+    pub view_blocked : HashSet<usize>,
+    pub map_width : i32,
+    pub map_height : i32,
 }
 
 impl BaseMap for Map
@@ -96,6 +98,10 @@ impl Algorithm2D for Map
 }
 impl Map
 {
+    pub fn xy_idx(&self, x : i32,y : i32) -> usize
+    {
+        (y as usize * self.map_width as usize)+ x as usize
+    }
 
     fn is_exit_valid(&self, x:i32, y:i32) -> bool {
         if x < 1 || x > MAPWIDTH-1 || y < 1 || y > MAPHEIGHT-1 { return false; }

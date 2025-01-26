@@ -1,7 +1,7 @@
 use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
 use hecs::Entity;
 
-use crate::{gui::{self, TargettingMode}, raws::{faction_reaction, Reaction, RAWS}, Faction, FoV, Hidden, Map, Position, State};
+use crate::{camera, gui::{self, TargettingMode}, raws::{faction_reaction, Reaction, RAWS}, Faction, FoV, Hidden, Map, Position, State};
 
 pub enum TargettingState
 {
@@ -13,6 +13,7 @@ pub enum TargettingState
 
 pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, range : i32) -> TargettingState
 {
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
     match ctx.key
     {
         Some(key) =>
@@ -48,15 +49,22 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
 
     //draws preview of projectile path to targetted tile if the target is in range
     let point = Point::new(m_x, m_y);
+    let mut screen_point = point;
+    screen_point.x -= min_x;
+    screen_point.y -= min_y;
     if available_cells.contains(&point)
     {
         let _line = bracket_lib::geometry::Bresenham::new(start_pos, point );
         _line.skip(1).for_each(|pos| 
             {
-                ctx.set(pos.x, pos.y, BLACK, GREEN, '*');
+                let mut screen_pos = pos;
+                screen_pos.x -= min_x;
+                screen_pos.y -= min_y;
+
+                ctx.set(screen_pos.x, screen_pos.y, BLACK, GREEN, '*');
             });
         
-        ctx.set_bg(point.x, point.y, GREEN);
+        ctx.set_bg(screen_point.x, screen_point.y, GREEN);
 
         if ctx.left_click
         {
@@ -82,7 +90,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
     }
     else
     {
-        ctx.set_bg(m_x, m_y,RGB::named(RED));
+        ctx.set_bg(screen_point.x, screen_point.y,RGB::named(RED));
 
         if ctx.left_click || ctx.key.unwrap_or(bracket_lib::terminal::VirtualKeyCode::P) == 
             bracket_lib::terminal::VirtualKeyCode::Escape
@@ -112,6 +120,7 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
 fn targetting_viewshed(valid_tiles : &mut Vec<Point>, state : &mut State, range: i32,
     pos: Point,should_display: bool, ctx : &mut BTerm)
 {
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
     let visible = field_of_view(pos, range, &state.map);
 
     for idx in visible.iter()
@@ -122,7 +131,12 @@ fn targetting_viewshed(valid_tiles : &mut Vec<Point>, state : &mut State, range:
         {
             if should_display
             {
-                ctx.set_bg(idx.x, idx.y, RGB::named(BLUE));
+                let screen_x = idx.x - min_x;
+                let screen_y = idx.y - min_y;
+                if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y) - 1
+                {
+                    ctx.set_bg(idx.x - min_x, idx.y - min_y, RGB::named(BLUE));
+                }
             }
             
             valid_tiles.push(*idx);

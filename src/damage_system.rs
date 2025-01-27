@@ -1,5 +1,5 @@
 use hecs::Entity;
-use bracket_lib::{color::{RED, RGB, WHITE}, terminal::console};
+use bracket_lib::{color::{RED, RGB, WHITE}, prelude::to_cp437, terminal::console};
 use crate::{statistics::Pools, Position};
 
 use super::{State,TakeDamage,Name};
@@ -54,7 +54,7 @@ pub fn run(state : &mut State)
             state.world.remove_one::<TakeDamage>(*dmg_comp).expect("Couldn't remove damage comp from entity!");
 
             state.particle_builder.request(pos.x, pos.y, RGB::named(WHITE), RGB::named(RED),
-                '!', 200., Some(*dmg_comp));
+                to_cp437('!'), 200., Some(*dmg_comp));
         }
     }
 }

@@ -244,7 +244,7 @@ impl State
 {
     fn generate_world_map(&mut self, new_depth : i32)
     {
-        let mut builder = random_map_builder(new_depth, 69,69);
+        let mut builder = maps::level_generator(new_depth);
 
         builder.build_map(&mut self.rng);
 
@@ -328,6 +328,7 @@ impl GameState for State{
 
                         //run current goal behaviour
                         ai::approach_ai_system(self);
+                        
                         ai::flee_ai_system(self);
                         //default behaviour
                         ai::default_move_ai_system(self);
@@ -666,7 +667,7 @@ fn game_init ( state: &mut State)
     
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
-    Renderable::new('@',
+    Renderable::new(to_cp437('@'),
     RGB::named(LIME_GREEN),
     RGB::from_f32(0., 0., 0.),
     3)

@@ -70,7 +70,8 @@ pub struct Mob
     pub blocks_tiles: bool,
     pub naturals: Option<Vec<Weapon>>,
     pub equipment: Option<Vec<String>>,
-    pub faction: Option<String>
+    pub faction: Option<String>,
+    pub movement_mode : Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -87,7 +88,7 @@ pub struct MobStats
     pub level : Option<i32>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Renderable
 {
     pub glyph : String,
@@ -108,9 +109,10 @@ pub struct Prop
     pub renderable : Renderable,
     pub single_activation : Option<bool>,
     pub entry_trigger : Option<bool>,
-    pub consumable : Consumable,
+    pub consumable : Option<Consumable>,
     pub door : Option<bool>,
-}
+    pub blocks_tile : Option<bool>
+,}
 
 pub fn run()
 {

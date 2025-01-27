@@ -1,5 +1,5 @@
 use std::{collections::VecDeque, sync::Mutex};
-use bracket_lib::color::RGB;
+use bracket_lib::{color::RGB, prelude::FontCharType};
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
@@ -28,13 +28,13 @@ lazy_static!
 pub enum EffectType
 {
     Damage {amount : i32},
-    Particle {glyph: char, fg: RGB, bg: RGB, lifetime: f32},
+    Particle {glyph: FontCharType, fg: RGB, bg: RGB, lifetime: f32},
     ItemUse {item : Entity},
     Healing {amount : i32},
     Feed {amount : i32},
-    ParticleLine {glyph: char, fg: RGB, bg: RGB, lifetime:f32},
+    ParticleLine {glyph: FontCharType, fg: RGB, bg: RGB, lifetime:f32},
     PropTriggered {prop : Entity},
-    ParticleProjectile {glyph : char, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 },
+    ParticleProjectile {glyph : FontCharType, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 },
     RangedFire{item : Entity},
 }
 

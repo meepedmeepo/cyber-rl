@@ -27,10 +27,10 @@ impl HungerLevel
         }else if percent >= 65.
         {
             return HungerState::WellFed;
-        }else if percent >= 40.
+        }else if percent >= 20.
         {
             return  HungerState::Fed;
-        }else if percent >= 15.
+        }else if percent >= 5.
         {
             return HungerState::Hungry;
         }else {
@@ -56,7 +56,7 @@ pub fn hunger_system(state: &mut State)
                 {
                     //pools.hitpoints.restore(2);
                     add_effect(None, EffectType::Healing { amount: 1 }, Targets::Single { target: _id });
-                    hunger.nutrition.damage(2);
+                    hunger.nutrition.damage(1);
 
                     ent_to_remove_rest.push(_id);
                 }
@@ -67,7 +67,7 @@ pub fn hunger_system(state: &mut State)
         if res == 0
         {
 
-            hunger.nutrition.damage(2);
+            hunger.nutrition.damage(1);
 
             if hunger.get_hunger_state() == HungerState::Starving
             {

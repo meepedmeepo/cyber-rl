@@ -20,7 +20,8 @@ mod door_placement;
 mod rex_assests;
 mod waveform_collapse;
 mod voronoi;
-
+mod locations;
+mod tile_type;
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
 use cellular_automata::CellularAutomataBuilder;
@@ -43,6 +44,8 @@ use door_placement::*;
 pub use rex_assests::*;
 use waveform_collapse::*;
 use voronoi::*;
+pub use locations::*;
+pub use tile_type::*;
 //s
 pub trait MapBuilder
 {

@@ -11,6 +11,9 @@ mod flee_ai;
 pub use flee_ai::*;
 mod default_move_ai;
 pub use default_move_ai::*;
+mod idle_movement;
+pub use idle_movement::*;
+
 use crate::{statistics::BaseStatistics, State};
 
 

@@ -1,6 +1,6 @@
 use bracket_lib::{prelude::DijkstraMap, random::RandomNumberGenerator};
 
-use super::{BuilderMap, Map, MetaMapBuilder, TileType};
+use super::{tile_walkable, BuilderMap, Map, MetaMapBuilder, TileType};
 
 
 
@@ -37,7 +37,7 @@ impl DistantExitBuilder
 
         for (i, tile) in build_data.map.map.iter_mut().enumerate()
         {
-            if *tile == TileType::Floor
+            if tile_walkable(*tile)
             {
                 let distance_to_start = dijkstra_map.map[i];
                 if distance_to_start != std::f32::MAX

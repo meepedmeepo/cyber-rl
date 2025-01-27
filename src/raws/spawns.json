@@ -421,10 +421,6 @@
         "bg": "#000000",
         "order": 2
       },
-      "consumable": {
-        "effects": {
-        }
-      },
       "door" : true
     },
     {
@@ -461,6 +457,52 @@
           "particle":"*;#ffffff;#880808;150."
         }
 
+      }
+    },
+    {
+      "name": "Keg",
+      "renderable": {
+        "glyph": "Θ",
+        "fg": "#8b4513",
+        "bg": "#000000",
+        "order": 2,
+        "blocks_tile" : true
+      }
+    },
+    {
+      "name": "Stool",
+      "renderable": {
+        "glyph": "╓",
+        "fg": "#8b4513",
+        "bg": "#000000",
+        "order": 2
+      }
+    },
+    {
+      "name": "Table",
+      "renderable": {
+        "glyph": "π",
+        "fg": "#8b4513",
+        "bg": "#000000",
+        "order": 2
+      }
+    },
+    {
+      "name": "Metal Bin",
+      "renderable": {
+        "glyph": "∩",
+        "fg": "#18d832",
+        "bg": "#000000",
+        "order": 2
+      }
+    },
+    {
+      "name": "Street Lamp",
+      "renderable": {
+        "glyph": "∩",
+        "fg": "#97bfce",
+        "bg": "#000000",
+        "order": 2
       }
     }
   ],

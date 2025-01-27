@@ -1,10 +1,10 @@
-use std::{borrow::Borrow, clone, collections::HashMap, hash::Hash, string};
+use std::{collections::HashMap, hash::Hash, string};
 
-use bracket_lib::{color::RGB, random::{parse_dice_string, DiceType}};
+use bracket_lib::{color::RGB, prelude::to_cp437, random::{parse_dice_string, DiceType}};
 use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
-use crate::{ai::Energy, components, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{ai::Energy, components::{self, MovementType}, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -74,10 +74,11 @@ pub fn load(&mut self, raws : Raws)
 
 fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) -> EntityBuilder
 {
+    let mut rend = renderable.clone();
     let mut  eb = entity_builder;
     eb.add(components::Renderable
         {
-            glyph: renderable.glyph.chars().next().unwrap(),
+            glyph: to_cp437(rend.glyph.pop().unwrap()),
             fg: bracket_lib::color::RGB::from_hex(&renderable.fg).expect("Invalid RBG"),
             bg: bracket_lib::color::RGB::from_hex(&renderable.bg).expect(format!("Invalid RGB {}",renderable.glyph.clone()).as_str()),
             order: renderable.order,
@@ -139,7 +140,9 @@ pub fn parse_particle_string(particle_string : String) -> Particle
 {
     let parts = particle_string.split(';').collect::<Vec<_>>();
     
-    let glyph = parts[0].parse::<char>().expect("not valid char for particle");
+    let mut glyph_str = parts[0].clone().to_string();
+    
+    let glyph = to_cp437(glyph_str.pop().expect("Not valid particle glyph!"));
     let fg =  RGB::from_hex(parts[1]).expect("not valid hex rgb for particle fg");
     let bg = RGB::from_hex(parts[2]).expect("not valid hex rgb for particle bg");
     let lifetime = parts[3].parse::<f32>().expect("not valid f32 for particle lifetime");
@@ -220,7 +223,7 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
 
         let renderable = &mob_template.renderable;
 
-        eb = RawMaster::add_renderable_comp(eb, renderable);
+        eb = RawMaster::add_renderable_comp(eb,  renderable);
 
         match pos
         {
@@ -273,7 +276,14 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
             eb.add(Faction{name : "Mindless".to_string()});    
         }
 
-        
+        if let Some(movement) = &mob_template.movement_mode
+        {
+            eb.add(MovementType::RandomWaypoint { path: None });
+        }
+        else 
+        {
+            eb.add(MovementType::Static);
+        }
 
         return (Some((Box::new(eb))), equip_list);
     }
@@ -400,9 +410,16 @@ pub fn spawn_named_prop<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuild
             eb.add_bundle((BlocksTiles{},BlocksVisibility{}, Door{open: false}));
         }
 
-        let effects = prop_template.consumable.effects.clone();
-        eb = RawMaster::add_effects_comps(eb, effects);
+        if let Some(_) = &prop_template.blocks_tile
+        {
+            eb.add(BlocksTiles{});
+        }
 
+        if let Some(consume) = &prop_template.consumable
+        {
+            let effects = consume.effects.clone();
+            eb = RawMaster::add_effects_comps(eb, effects);
+        }
         match pos
         {
             SpawnType::AtPosition { x, y } => {eb.add(Position{x: x, y: y});}

@@ -213,7 +213,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
             {
                 let _ =state.world.remove_one::<BlocksTiles>(*door);
                 let _ =state.world.remove_one::<BlocksVisibility>(*door);
-                state.world.query_one_mut::<&mut Renderable>(*door).unwrap().glyph = '/';
+                state.world.query_one_mut::<&mut Renderable>(*door).unwrap().glyph = to_cp437('/');
                 state.world.query_one_mut::<&mut FoV>(state.player_ent.unwrap()).unwrap().dirty = true;
 
                 apply_energy_cost(state, crate::ai::ActionType::OpenDoor, state.player_ent.unwrap());

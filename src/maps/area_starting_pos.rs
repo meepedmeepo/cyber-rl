@@ -1,6 +1,6 @@
 use bracket_lib::{prelude::{DistanceAlg, Point}, random::RandomNumberGenerator};
 
-use super::{BuilderMap, MetaMapBuilder, TileType};
+use super::{tile_walkable, BuilderMap, MetaMapBuilder, TileType};
 
 #[allow(dead_code)]
 pub enum XStart {LEFT, CENTER, RIGHT}
@@ -51,7 +51,7 @@ impl AreaStartingPosition
         let mut available_floors : Vec<(usize, f32)> = Vec::new();
         for (idx, tiletype) in build_data.map.map.iter().enumerate()
         {
-            if *tiletype == TileType::Floor
+            if tile_walkable(*tiletype)
             {
                 available_floors.push((idx, 
                     DistanceAlg::PythagorasSquared

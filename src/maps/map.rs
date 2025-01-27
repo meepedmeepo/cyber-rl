@@ -1,11 +1,14 @@
 
 use std::collections::{hash_map, HashMap, HashSet};
+use std::f32::consts::PI;
 
 use hecs::Entity;
 use bracket_lib::prelude::*;
 use bracket_lib::pathfinding::{SmallVec,DistanceAlg,a_star_search};
 use crate::statistics::Pools;
 use crate::State;
+use super::tile_type::*;
+use super::TileType;
 
 //pub const MAPSIZE : usize = map.map_width as usize * map.map_height as usize;
 //use crate::rect;
@@ -33,11 +36,8 @@ impl Map
 
 
 
-#[derive(PartialEq,Clone, Copy, Debug, Hash, Eq)]
-pub enum TileType
-{
-    Floor, Wall, DownStairs,
-}
+
+
 #[derive(Debug, Clone)]
 pub struct Map
 {
@@ -55,29 +55,37 @@ pub struct Map
 
 impl BaseMap for Map
 {
-    fn is_opaque(&self, _idx: usize) -> bool 
+    fn is_opaque(&self, idx: usize) -> bool 
     {
-        if self.map[_idx as usize] == TileType::Wall  || self.view_blocked.contains(&_idx) { true}
+        if idx > 0 && idx < self.map.len()
+        {
+            if tile_opaque(self.map[idx])  || self.view_blocked.contains(&idx) { true}
+            else 
+            {false}
+        }
         else 
-        {false}
-    }   
+        {
+            true
+        }
+    } 
     fn get_available_exits(&self, idx:usize) -> SmallVec<[(usize, f32); 10]> {
         let mut exits = SmallVec::new();
         let x = idx as i32 % self.map_width;
         let y = idx as i32 / self.map_width;
         let w = self.map_width as usize;
+        let tt = self.map[idx];
     
         // Cardinal directions
-        if self.is_exit_valid(x-1, y) { exits.push((idx-1, 1.0)) };
-        if self.is_exit_valid(x+1, y) { exits.push((idx+1, 1.0)) };
-        if self.is_exit_valid(x, y-1) { exits.push((idx-w, 1.0)) };
-        if self.is_exit_valid(x, y+1) { exits.push((idx+w, 1.0)) };
+        if self.is_exit_valid(x-1, y) { exits.push((idx-1, tile_cost(tt))) };
+        if self.is_exit_valid(x+1, y) { exits.push((idx+1, tile_cost(tt))) };
+        if self.is_exit_valid(x, y-1) { exits.push((idx-w, tile_cost(tt))) };
+        if self.is_exit_valid(x, y+1) { exits.push((idx+w, tile_cost(tt))) };
 
             // Diagonals
-        if self.is_exit_valid(x-1, y-1) { exits.push(((idx-w)-1, 1.45)); }
-        if self.is_exit_valid(x+1, y-1) { exits.push(((idx-w)+1, 1.45)); }
-        if self.is_exit_valid(x-1, y+1) { exits.push(((idx+w)-1, 1.45)); }
-        if self.is_exit_valid(x+1, y+1) { exits.push(((idx+w)+1, 1.45)); }
+        if self.is_exit_valid(x-1, y-1) { exits.push(((idx-w)-1, tile_cost(tt) * 1.45)); }
+        if self.is_exit_valid(x+1, y-1) { exits.push(((idx-w)+1, tile_cost(tt) * 1.45)); }
+        if self.is_exit_valid(x-1, y+1) { exits.push(((idx+w)-1, tile_cost(tt) * 1.45)); }
+        if self.is_exit_valid(x+1, y+1) { exits.push(((idx+w)+1, tile_cost(tt) * 1.45)); }
     
         exits
     }
@@ -114,7 +122,7 @@ impl Map
     {
         for (i,tile) in self.map.iter_mut().enumerate()
         {
-            self.blocked[i] = *tile == TileType::Wall;
+            self.blocked[i] = !tile_walkable(*tile);
         }
     }
 
@@ -142,52 +150,7 @@ pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Ve
 }
 
 
-impl Map
-{
-pub fn draw_map(&self, ctx:&mut BTerm)
-{
-let mut x = 0;
-let mut y = 0;
-for tile in self.map.iter()
-{
-if self.revealed_tiles[self.xy_idx(x,y)] == true
-{
-    let glyph : FontCharType;
-    let mut fg;
-match tile
-{
-    TileType::Floor =>
-    {
-        glyph = FontCharType::from('.' as u8);
-        fg = RGB::named(RED3);
-    }// ctx.set(x, y, RGB::from_f32(0.5,0.5,0.5),RGB::from_f32(0., 0., 0.), '.'),
-    TileType::Wall => 
-    {
-        glyph = wall_glyph(self, x, y);
-        fg = RGB::from_f32(0.1,1.,0.);
-    }//ctx.set(x, y, RGB::from_f32(0.,1.,0.),RGB::from_f32(0., 0., 0.), '#'),
-    TileType::DownStairs =>
-    {
-        glyph = FontCharType::from('>' as u8);
-        fg = RGB::named(WHITE);
 
-    }
-}
-if !self.visible_tiles[self.xy_idx(x, y)]
-{
-    fg = fg.to_greyscale()
-}
-ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
-}
-x+= 1;
-if  x > self.map_width - 1
-{
-x = 0;
-y += 1;
-}
-}
-}
-}
 
 impl Map
 {

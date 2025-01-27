@@ -1,11 +1,11 @@
-use bracket_lib::color::RGB;
+use bracket_lib::{color::RGB, prelude::FontCharType};
 
 use crate::{State};
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Particle
 {
-    pub glyph : char,
+    pub glyph : FontCharType,
     pub fg : RGB,
     pub bg : RGB,
     pub lifetime : f32,
@@ -27,7 +27,7 @@ pub struct ParticleAnimation
     pub particle : Particle,
 }
 
-pub fn spawn_particle( state : &mut State, glyph : char, fg : RGB, bg : RGB, lifetime : f32, tile_idx : i32)
+pub fn spawn_particle( state : &mut State, glyph : FontCharType, fg : RGB, bg : RGB, lifetime : f32, tile_idx : i32)
 {
     let x = tile_idx % state.map.map_width;
     let y = tile_idx / state.map.map_width;

@@ -1,6 +1,13 @@
-use bracket_lib::{prelude::Point, random::DiceType};
+use bracket_lib::{prelude::{FontCharType, Point}, random::DiceType};
 use hecs::Entity;
 use serde::Deserialize;
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum MovementType
+{
+    Static, RandomWaypoint{path : Option<Vec<usize>>}
+}
+
 
 #[derive(Debug, Clone, Copy)]
 pub struct BlocksVisibility {}
@@ -179,10 +186,10 @@ pub struct InContainer
 {
     pub owner : Entity,
 }
-
+#[derive(Debug, Clone, Copy)]
 pub struct Renderable
 {
-    pub glyph : char,
+    pub glyph : FontCharType,
     pub fg : bracket_lib::color::RGB,
     pub bg : bracket_lib::color::RGB,
     pub order : i32,
@@ -196,7 +203,7 @@ pub struct Name
 
 impl Renderable
 {
-    pub fn new(glyph: char,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
+    pub fn new(glyph: FontCharType,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
     {
         Renderable
         {

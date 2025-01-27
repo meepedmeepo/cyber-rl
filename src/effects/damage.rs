@@ -1,4 +1,4 @@
-use bracket_lib::{color::{BLACK, GREEN, RED, RGB}, prelude::console};
+use bracket_lib::{color::{BLACK, GREEN, RED, RGB}, prelude::{console, to_cp437}};
 use hecs::Entity;
 
 use crate::{statistics::Pools, Name};
@@ -26,7 +26,7 @@ pub fn inflict_damage(state : &mut State, damage : &EffectSpawner, target: Entit
                 dmg_num = amount;
 
                 add_effect(None,
-                    EffectType::Particle { glyph: '!',
+                    EffectType::Particle { glyph: to_cp437('!'),
                     fg: RGB::named(BLACK), bg: RGB::named(RED),
                     lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }
@@ -55,7 +55,7 @@ pub fn heal_damage(state : &mut State, heal : &EffectSpawner, target: Entity)
                 pools.hitpoints.restore(amount);
 
                 add_effect(None,
-                    EffectType::Particle { glyph: '+',//glyph should be changed to ♥︎
+                    EffectType::Particle { glyph: 2665u16,//glyph should be changed to ♥︎
                     fg: RGB::named(BLACK), bg: RGB::named(GREEN),
                     lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }

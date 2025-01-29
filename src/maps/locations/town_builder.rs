@@ -2,10 +2,12 @@ use std::{collections::HashSet, hash::Hash};
 
 use bracket_lib::{prelude::{a_star_search, console, DijkstraMap, DistanceAlg, Point}, random::RandomNumberGenerator};
 
-use crate::{maps::{AreaStartingPosition, DistantExitBuilder}, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
+use crate::{maps::{voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
+
+use super::utils::find_entity_spawn_locations;
 
 
-const MAX_W : i32 = 15;
+const MAX_W : i32 = 13;
 const MAX_H : i32 = 10;
 
 //enum showing which wall the door will be placed on
@@ -30,8 +32,10 @@ impl Orientation
 
 pub fn starting_town() -> BuilderChain
 {
-    let mut builder = BuilderChain::new(0, 80, 60);
-    builder.start_with(TownBuilder::new());
+    let mut builder = BuilderChain::new(0, 80, 80);
+    // builder.start_with(VoronoiCellBuilder::new_advanced(300, DistanceAlgorithm::Manhattan
+    //    , TileType::Road));
+    builder.with(TownBuilder::new());
     builder.with(AreaStartingPosition::new(crate::maps::XStart::CENTER, crate::maps::YStart::CENTER));
     builder.with(DistantExitBuilder::new());
 
@@ -50,6 +54,13 @@ impl InitialMapBuilder for TownBuilder
 
 }
 
+impl MetaMapBuilder for TownBuilder
+{
+    fn build_map(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+        self.build(rng, build_data);
+    }
+}
+
 impl TownBuilder
 {
     pub fn new() -> Box<TownBuilder>
@@ -59,7 +70,7 @@ impl TownBuilder
 
     fn build(&mut self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap)
     {
-        self.lay_concrete(build_data);
+        
 
         //creates a HashSet of available tiles to build that are within certain coordinate bounds
         let mut available_building_tiles: HashSet<usize> = HashSet::new();
@@ -74,6 +85,9 @@ impl TownBuilder
                 }
             }
         }
+        self.lay_concrete(build_data, &mut available_building_tiles);
+        
+        //let road = self.paint_road(rng, build_data, &mut available_building_tiles);
 
         console::log(format!("available tiles {}", available_building_tiles.len()));
 
@@ -81,9 +95,11 @@ impl TownBuilder
 
         let doors = self.place_doors(rng, build_data, &buildings);
 
-        let road = self.paint_road(rng, build_data);
+        //let road = self.paint_road(rng, build_data);
 
-        self.draw_footpaths(build_data, rng, &doors, road);
+        //self.draw_footpaths(build_data, rng, &doors, road);
+
+        self.spawn_townsfolk(rng, build_data);
 
     }
 
@@ -114,38 +130,36 @@ impl TownBuilder
                 
         }
     }
-    fn lay_concrete(&mut self, build_data : &mut BuilderMap)
+    fn lay_concrete(&mut self, build_data : &mut BuilderMap, available_building_tiles : &mut HashSet<usize>)
     {
         for y in 1..build_data.map.map_height-1
         {
             for x in 1..build_data.map.map_width-1
             {
                 let idx = build_data.map.xy_idx(x, y);
-                build_data.map.map[idx] = TileType::Concrete;
+                
+                if build_data.map.map[idx] != TileType::Road
+                {
+                    build_data.map.map[idx] = TileType::Concrete;
+                } else 
+                {
+                    available_building_tiles.remove(&idx);
+                }
             }
         }
     }
 
-    fn paint_road(&self,rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap) -> Point
+    fn paint_road(&self,rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap, available_building_tiles : &mut HashSet<usize>) -> Point
     {
         let roll = rng.range(build_data.map.map_height-14, build_data.map.map_height-5);
         let start_pos = Point::new(1, roll);
         let start_idx = build_data.map.xy_idx(start_pos.x, start_pos.y);
-        let end_roll = rng.range(build_data.map.map_height-8, build_data.map.map_height-3);
+        let end_roll = rng.range(10, build_data.map.map_height-3);
         let end_pos = Point::new(build_data.map.map_width-2, end_roll);
         let end_idx = build_data.map.xy_idx(end_pos.x, end_pos.y);
 
+        let width = build_data.map.map_width;
 
-        let path = a_star_search( start_idx, end_idx, &build_data.map).steps;
-
-        for step in path.into_iter()
-        {
-
-            build_data.map.map[step] = TileType::Road;
-            build_data.map.map[(step + build_data.map.map_width as usize)] = TileType::Road;
-            build_data.map.map[(step - build_data.map.map_width as usize)] = TileType::Road;
-
-        }
 
         
         start_pos
@@ -157,7 +171,7 @@ impl TownBuilder
         let mut n_buildings = 0;
         let mut buildings : Vec<(i32,i32,i32,i32)> = Vec::new();
         //create 10 lots for buildings and fill the inside with rusted metal flooring
-        while n_buildings < 8
+        while n_buildings < 7
         {
             //console::log("trying to build hehe");
             let bx = rng.roll_dice(4, build_data.map.map_width-10);
@@ -296,5 +310,22 @@ impl TownBuilder
         }
 
         doors
+    }
+
+    fn spawn_townsfolk(&self, rng : &mut RandomNumberGenerator,build_data : &mut BuilderMap )
+    {
+        let mut valid_locations = find_entity_spawn_locations(build_data);
+        let roll = rng.roll_dice(4, 6) +4;
+
+        for i in 0..roll
+        {
+            if let Some(idx) = valid_locations.iter().next().cloned()
+            {
+                build_data.spawn_list.push((idx, "Citizen".to_string()));
+
+                valid_locations.remove(&idx);
+            }
+            //let idx = valid_locations.iter().take(1).
+        }
     }
 }

@@ -328,8 +328,12 @@ impl GameState for State{
 
                         //run current goal behaviour
                         ai::approach_ai_system(self);
-                        
+
                         ai::flee_ai_system(self);
+
+                        //idle movement
+                        ai::idle_movement_ai(self);
+
                         //default behaviour
                         ai::default_move_ai_system(self);
                         //run systems!
@@ -671,7 +675,7 @@ fn game_init ( state: &mut State)
     RGB::named(LIME_GREEN),
     RGB::from_f32(0., 0., 0.),
     3)
-    ,FoV::new(8)
+    ,FoV::new(16)
     ,Name{name: "Player".to_string(),}
     , Pools{hitpoints: StatPool::new(50), exp: statistics::calculate_xp_from_level(1),level: 1, armour_class: Attribute::new(10)
         , hit_die: DiceType::new(1, 10, 1)}

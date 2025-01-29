@@ -1,23 +1,23 @@
 use bracket_lib::prelude::a_star_search;
 use hecs::Entity;
 
-use crate::{components::MovementType, Position, State};
+use crate::{components::{HasMoved, MovementType}, Position, State};
 
-use super::MyTurn;
+use super::{apply_energy_cost, MyTurn};
 
 
 
 
 pub fn idle_movement_ai(state : &mut State)
 {
-    let mut to_move: Vec<(Entity, usize)> = Vec::new();
-    for (ent, (movement, pos, _turn)) in state.world.query_mut::<(&mut MovementType,&Position,&MyTurn)>()
+    let mut moved: Vec<Entity> = Vec::new();
+    for (ent, (movement, pos, _turn)) in state.world.query_mut::<(&mut MovementType,&mut Position,&MyTurn)>()
     {
         if let MovementType::RandomWaypoint {path } = movement
         {
             if path.is_none()
             {
-                let mut attempt = 3;
+                let mut attempt = 5;
                 while  attempt > 0
                 {
                     let roll = state.rng.random_slice_index(&state.map.map);
@@ -29,10 +29,16 @@ pub fn idle_movement_ai(state : &mut State)
                             if !state.map.blocked[idx]
                             {
                                 let my_idx = state.map.xy_idx(pos.x, pos.y);
-                                *path = Some(a_star_search(my_idx, idx, &state.map).steps
-                                    .into_iter().rev().collect());
+                                let p = a_star_search(my_idx, idx, &state.map);
+                                if p.success && p.steps.len() > 8
+                                {
+                                    *path = Some((p.steps
+                                    .into_iter().rev().collect(), 0usize));
 
-                                break;
+                                    break;
+                                } else {
+                                    attempt -= 1;
+                                }
                             }
                             else 
                             {
@@ -44,10 +50,40 @@ pub fn idle_movement_ai(state : &mut State)
                 }
             }
 
-            if path.is_some()
+            if let Some((p, index)) = path
             {
-                
-            }
+                if p.len() -1  < *index
+                {
+                    *path = None;
+                    
+                } 
+                else if !state.map.blocked[p[*index]] 
+                {
+                    let my_idx = state.map.xy_idx(pos.x, pos.y);
+                    let idx = p[*index];
+                    let x = idx % state.map.map_width as usize;
+                    let y = idx / state.map.map_width as usize;
+                    pos.x = x as i32;
+                    pos.y = y as i32;
+
+                    state.map.blocked[my_idx] = false;
+                    state.map.blocked[idx] = true;
+
+                    moved.push(ent);
+                    
+                    *index += 1;
+                }
+            };
         }
     }
+
+    for ent in moved.iter()
+    {
+        let _ = state.world.insert_one(*ent, HasMoved{});
+        let _ = state.world.remove_one::<MyTurn>(*ent);
+
+        apply_energy_cost(state, super::ActionType::Move, *ent);
+    }
+
+
 }

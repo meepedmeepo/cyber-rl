@@ -396,6 +396,24 @@
           "to_hit_bonus": 1
         }
       ]
+    },
+    {
+      "name": "Citizen",
+      "renderable": {
+        "glyph": "t",
+        "fg": "#43a018",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 7,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 15,
+        "hp": 15,
+        "natural_ac": 6
+      },
+      "faction" : "townsfolk",
+      "movement_mode" : "random"
     }
   ],
   "spawn_table": [
@@ -512,6 +530,7 @@
     {"name" : "vermin", "responses" : {"Default" : "flee", "Player" : "attack", "vermin" : "ignore"}},
     {"name" : "peacekeeper", "responses" : {"Default" : "ignore", "criminals" : "attack", "Player" : "attack", "Mindless" : "attack"}},
     {"name" : "xcorp", "responses" : {"Default" : "attack", "peacekeeper" : "ignore", "vermin" : "ignore"}},
-    {"name" : "hacker", "responses" : {"Default" : "ignore", "peacekeeper" : "flee", "xcorp" : "attack" }}
+    {"name" : "hacker", "responses" : {"Default" : "ignore", "peacekeeper" : "flee", "xcorp" : "attack" }},
+    {"name" : "townsfolk", "responses" : {"Default" : "ignore"}}
   ]
 }

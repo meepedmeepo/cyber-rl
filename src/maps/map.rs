@@ -18,7 +18,7 @@ impl Map
     {
         Map
         {
-            map : vec![TileType::Wall; (width*height) as usize],
+            map : vec![TileType::Floor; (width*height) as usize],
 
             revealed_tiles : vec![false; (width*height) as usize],
             visible_tiles : vec![false; (width*height) as usize],

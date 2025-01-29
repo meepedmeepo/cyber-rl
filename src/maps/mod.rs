@@ -142,7 +142,7 @@ impl BuilderChain
             }
         }
 
-         //Build the rest of the layers one by one
+         //Build the rest of the layers one by oneself.lay_concrete(build_data);
         for metabuilder in self.builders.iter_mut()
         {
             metabuilder.build_map(rng, &mut self.build_data);

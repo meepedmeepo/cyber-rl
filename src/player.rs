@@ -182,6 +182,10 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
     for(_id,(_player,position,fov)) in state.world.query_mut::<(&Player,&mut Position,&mut FoV)>()
     {
         destination_id = state.map.xy_idx(position.x+delta_x, position.y+delta_y);
+        if destination_id >= state.map.blocked.len() 
+        {
+            return false;
+        }
         if !state.map.blocked[destination_id]
         {
             position.x = min(state.map.map_width -1,max(0,position.x+delta_x));

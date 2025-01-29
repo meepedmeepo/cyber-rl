@@ -9,7 +9,8 @@ pub enum DistanceAlgorithm {Pythagoras, Manhattan, Chebyshev}
 pub struct VoronoiCellBuilder
 {
     n_seeds : usize,
-    distance_algorithm : DistanceAlgorithm
+    distance_algorithm : DistanceAlgorithm,
+    tile_to_draw : TileType
 }
 
 impl InitialMapBuilder for VoronoiCellBuilder
@@ -27,26 +28,38 @@ impl VoronoiCellBuilder
         Box::new(VoronoiCellBuilder 
                 {
                 n_seeds: 64
-                , distance_algorithm: DistanceAlgorithm::Chebyshev, 
+                , distance_algorithm: DistanceAlgorithm::Chebyshev
+                , tile_to_draw : TileType::Floor
                 })
     }
     
     pub fn pythagoras() -> Box<VoronoiCellBuilder>
     {
         Box::new(VoronoiCellBuilder 
-            {
+        {
             n_seeds: 64
-            , distance_algorithm: DistanceAlgorithm::Pythagoras, 
-            })
+            , distance_algorithm: DistanceAlgorithm::Pythagoras
+            , tile_to_draw : TileType::Floor 
+        })
     }
 
     pub fn manhattan() -> Box<VoronoiCellBuilder>
     {
         Box::new(VoronoiCellBuilder 
-            {
+        {
             n_seeds: 64
-            , distance_algorithm: DistanceAlgorithm::Manhattan, 
-            })
+            , distance_algorithm: DistanceAlgorithm::Manhattan,
+            tile_to_draw : TileType::Floor 
+        })
+    }
+
+    pub fn new_advanced(seeds : usize, algorithm : DistanceAlgorithm, tile : TileType) ->Box<VoronoiCellBuilder>
+    {
+        Box::new(VoronoiCellBuilder{
+            n_seeds : seeds,
+            distance_algorithm : algorithm,
+            tile_to_draw : tile
+        })
     }
 
 
@@ -116,7 +129,7 @@ impl VoronoiCellBuilder
 
                 if neighbors < 2
                 {
-                    build_data.map.map[my_idx] = TileType::Floor;
+                    build_data.map.map[my_idx] = self.tile_to_draw;
                 }
             }
         }

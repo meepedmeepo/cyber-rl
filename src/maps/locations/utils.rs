@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use bracket_lib::prelude::Point;
 
 use crate::maps::BuilderMap;
-use petgraph::{self as pg, prelude::GraphMap, visit::Visitable, EdgeType};
+use petgraph::{self as pg, prelude::GraphMap, visit::{IntoNodeIdentifiers, Visitable}, EdgeType};
 
 
 pub fn find_entity_spawn_locations(build_data : &BuilderMap) -> HashSet<usize>
@@ -52,9 +52,49 @@ pub fn create_road_network(build_data : &BuilderMap, start_pos: Point)
     graph.add_edge(start_idx, right_idx, 0);
     graph.add_edge(start_idx, down_idx, 0);
 
-    
+    //graph.
 
     
 
 
+}
+
+struct Candidate
+{
+    pub new_node : usize,
+    pub prev_node: usize
+
+}
+//impl Candidate
+
+fn road_get_candidates(build_data : &BuilderMap, roads :&mut GraphMap<usize,i32,petgraph::Undirected>)
+{
+    let w = build_data.map.map_width;
+    let mut candidates:Vec<Candidate> = Vec::new();
+    for node in roads.visit_map().iter()
+    {
+        let c_pos = build_data.map.idx_to_pos(*node);
+        if roads.neighbors(*node).count() < 2
+        {
+            let last_idx = roads.neighbors(*node).next().unwrap();
+            let last_pos = build_data.map.idx_to_pos(last_idx);
+            
+            if last_pos.x < c_pos.x
+            {
+                if !roads.contains_node(*node+1)
+                {
+                    candidates.push(Candidate{new_node:*node+1, prev_node: last_idx});
+                }
+            } else if last_pos.y < c_pos.y
+            {
+                if !roads.contains_node(*node- w as usize)
+                {
+                    candidates.push(Candidate{new_node:*node-w as usize, prev_node:last_idx});
+                }
+                //roads.
+            } else {
+                //must mean previous node is above current node
+            }
+        }
+    }
 }

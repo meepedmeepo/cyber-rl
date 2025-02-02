@@ -35,7 +35,7 @@ pub fn starting_town() -> BuilderChain
     let mut builder = BuilderChain::new(0, 80, 80);
     // builder.start_with(VoronoiCellBuilder::new_advanced(300, DistanceAlgorithm::Manhattan
     //    , TileType::Road));
-    builder.with(TownBuilder::new());
+    builder.start_with(TownBuilder::new());
     builder.with(AreaStartingPosition::new(crate::maps::XStart::CENTER, crate::maps::YStart::CENTER));
     builder.with(DistantExitBuilder::new());
 
@@ -87,7 +87,7 @@ impl TownBuilder
         }
         self.lay_concrete(build_data, &mut available_building_tiles);
         
-        //let road = self.paint_road(rng, build_data, &mut available_building_tiles);
+        let road = self.paint_road(rng, build_data, &mut available_building_tiles);
 
         console::log(format!("available tiles {}", available_building_tiles.len()));
 
@@ -97,7 +97,7 @@ impl TownBuilder
 
         //let road = self.paint_road(rng, build_data);
 
-        //self.draw_footpaths(build_data, rng, &doors, road);
+        self.draw_footpaths(build_data, rng, &doors, road);
 
         self.spawn_townsfolk(rng, build_data);
 
@@ -315,7 +315,7 @@ impl TownBuilder
     fn spawn_townsfolk(&self, rng : &mut RandomNumberGenerator,build_data : &mut BuilderMap )
     {
         let mut valid_locations = find_entity_spawn_locations(build_data);
-        let roll = rng.roll_dice(4, 6) +4;
+        let roll = rng.roll_dice(2, 6) +4;
 
         for i in 0..roll
         {

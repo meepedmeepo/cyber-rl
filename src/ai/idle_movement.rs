@@ -72,6 +72,8 @@ pub fn idle_movement_ai(state : &mut State)
                     moved.push(ent);
                     
                     *index += 1;
+                } else {
+                    *path = None;
                 }
             };
         }

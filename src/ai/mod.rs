@@ -13,7 +13,8 @@ mod default_move_ai;
 pub use default_move_ai::*;
 mod idle_movement;
 pub use idle_movement::*;
-
+mod quipping;
+pub use quipping::*;
 use crate::{statistics::BaseStatistics, State};
 
 

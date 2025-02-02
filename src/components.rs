@@ -8,6 +8,10 @@ pub enum MovementType
     Static, RandomWaypoint{path : Option<(Vec<usize>, usize)>}
 }
 
+pub struct AIQuips
+{
+    pub quips : Vec<String>,
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct BlocksVisibility {}

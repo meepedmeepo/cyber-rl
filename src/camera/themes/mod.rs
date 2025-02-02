@@ -1,4 +1,4 @@
-use bracket_lib::{color::{DARKSLATEGRAY, GHOST_WHITE, GRAY, GREENYELLOW, GREY40, LIGHT_GRAY, PINK2, PINK3, RGB}, prelude::{to_cp437, FontCharType}};
+use bracket_lib::{color::{DARKSLATEGRAY, GHOST_WHITE, GRAY, GREENYELLOW, GREY40, LIGHT_GRAY, PINK2, PINK3, RGB, SLATE_BLUE}, prelude::{to_cp437, FontCharType}};
 
 use crate::{Map, TileType};
 
@@ -37,7 +37,7 @@ fn get_tile_glyph_default(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
             fg = RGB::from_f32(0., 1., 0.);
         }
         TileType::DownStairs => {glyph = to_cp437('>'); fg = RGB::from_f32(0., 1., 1.);}
-        TileType::Road => {glyph = to_cp437('▓'); fg = RGB::named(DARKSLATEGRAY);}
+        TileType::Road => {glyph = to_cp437('▓'); fg = RGB::named(SLATE_BLUE);}
         TileType::MetalGrate => {glyph = to_cp437('≡'); fg = RGB::named(LIGHT_GRAY);}
         TileType::Concrete => {glyph = to_cp437('.'); fg = RGB::named(PINK2);}
         TileType::Footpath => {glyph = to_cp437('.'); fg = RGB::named(GREENYELLOW);}

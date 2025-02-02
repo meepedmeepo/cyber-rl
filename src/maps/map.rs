@@ -32,6 +32,11 @@ impl Map
             
         }
     }
+
+    pub fn idx_to_pos(&self, idx : usize) -> Point
+    {
+        Point::new(idx as i32 % self.map_width, idx as i32 / self.map_width)
+    }
 }
 
 

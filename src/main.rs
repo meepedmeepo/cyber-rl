@@ -317,7 +317,7 @@ impl GameState for State{
                     newrunstate = run_initiative(self);
 
                     {
-                        //makes sure all the visual information for the ai is up to date!
+                        ai::quip_system(self);
                         
                         //todo: in all of the systems that can end a turn apply the energy costs to the entities!
                         //check adjacent reactions

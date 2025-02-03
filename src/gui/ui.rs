@@ -1,6 +1,7 @@
 use bracket_lib::prelude::field_of_view;
 use bracket_lib::terminal::*;
 use bracket_lib::color;
+use crate::components::Equipped;
 use crate::gamelog;
 use crate::hunger::HungerLevel;
 use crate::menus::inventory_state;
@@ -88,7 +89,10 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
         ctx.print_color(81, 20, color::WHITE, color::BLACK, format!("Toughness: {}", bstat.toughness.total));
 
         ctx.print_color(81, 21, color::WHITE, color::BLACK, format!("Mental Fortitude {}", bstat.mental_fortitude.total));
+
     }
+
+    draw_equipped(state, ctx);
     
 }
 
@@ -100,4 +104,33 @@ pub fn draw_cursor(pos : Point, ctx: &mut BTerm, state : &mut State, bg :  (u8, 
     ctx.set_bg(cursor_pos.x, cursor_pos.y, bg);
 
     cursor_pos
+}
+
+
+pub fn draw_equipped(state : &mut State, ctx: &mut BTerm)
+{
+    let mut items = Vec::new();
+    for (ent, (equipped, name)) in state.world.query_mut::<(&Equipped, &Name)>()
+    {
+        if equipped.owner == state.player_ent.unwrap()
+        {
+            items.push((equipped.slot, name.name.clone()));
+        }
+    }
+
+    if items.len() == 0 {return;}
+    //sort by equipment slot
+    items.sort_by(|a,b| {a.0.cmp(&b.0)});
+
+    let mut btm_pos = 32;
+    
+    for (_e, name) in items.iter().rev()
+    {
+        ctx.print(81, btm_pos, name.clone());
+        btm_pos -= 1;
+    }
+
+    btm_pos -= 1;
+    ctx.print(81, btm_pos, "Equipment:");
+
 }

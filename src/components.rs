@@ -161,9 +161,9 @@ pub enum EquipmentSlot
 {
     Head,
     Body,
+    Hands,
     Legs,
     Boots,
-    Hands,
     MainHand,
     OffHand,
     Ranged,

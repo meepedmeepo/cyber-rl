@@ -1,8 +1,8 @@
-use std::collections::HashSet;
+use std::{collections::HashSet};
 
 use bracket_lib::prelude::Point;
 
-use crate::maps::BuilderMap;
+use crate::maps::{tile_walkable, BuilderMap};
 use petgraph::{self as pg, prelude::GraphMap, visit::{IntoNodeIdentifiers, Visitable}, EdgeType};
 
 
@@ -26,6 +26,25 @@ pub fn find_entity_spawn_locations(build_data : &BuilderMap) -> HashSet<usize>
         }).collect::<HashSet<usize>>()
 }
 
+pub fn spawn_building_contents(build_data : &mut BuilderMap, contents : &[String], building_tiles : &mut HashSet<usize> )
+{
+    
+    for obj in contents.iter()
+    {
+        let mut success = false;
+        while !success
+        {
+            let idx = *building_tiles.iter().next().unwrap();
+            if tile_walkable(build_data.map.map[idx])
+            {
+                success = true;
+                build_data.spawn_list.push((idx,obj.clone()));
+            }
+
+            building_tiles.remove(&idx);
+        }
+    }
+}
 
 
 

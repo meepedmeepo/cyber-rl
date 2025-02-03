@@ -415,7 +415,8 @@
       "faction" : "townsfolk",
       "movement_mode" : "random",
       "quips" : ["Keep walking, meat man.", "Yesterday I saw some X Corp Goon dragging off some old chrome junkie.", "You tried those new food pellets yet?"
-                , "All enforcers are bastards!", "Don't even think of trying to mug me!", "I can hardly see shit through this smog today!"]
+                , "All enforcers are bastards!", "Don't even think of trying to mug me!", "I can hardly see shit through this smog today!","My brother was an enforcer till I shot him through the knee!"
+                ,"Fuck off!"]
     }
   ],
   "spawn_table": [

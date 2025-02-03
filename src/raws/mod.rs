@@ -72,6 +72,7 @@ pub struct Mob
     pub equipment: Option<Vec<String>>,
     pub faction: Option<String>,
     pub movement_mode : Option<String>,
+    pub quips : Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Debug)]

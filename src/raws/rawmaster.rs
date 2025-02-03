@@ -4,7 +4,7 @@ use bracket_lib::{color::RGB, prelude::to_cp437, random::{parse_dice_string, Dic
 use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
 use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
-use crate::{ai::Energy, components::{self, MovementType}, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
+use crate::{ai::Energy, components::{self, AIQuips, MovementType}, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
 {
@@ -283,6 +283,11 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
         else 
         {
             eb.add(MovementType::Static);
+        }
+
+        if let Some(quips) = &mob_template.quips
+        {
+            eb.add(AIQuips{quips: quips.clone()});
         }
 
         return (Some((Box::new(eb))), equip_list);

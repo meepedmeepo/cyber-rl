@@ -9,7 +9,7 @@ pub fn quip_system(state : &mut State)
     let mut quipcomp_to_remove = Vec::new();
     for (ent, (quips, fov, name)) in state.world.query_mut::<(&mut AIQuips, &FoV, &Name)>()
     {
-        if fov.visible_tiles.contains(&state.player_pos) && state.rng.roll_dice(1, 10) == 1
+        if fov.visible_tiles.contains(&state.player_pos) && state.rng.roll_dice(1, 15) == 15
         {
             let mut index = 0;
             if quips.quips.len() == 0 {continue;}

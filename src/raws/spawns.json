@@ -405,7 +405,7 @@
         "bg": "#000000",
         "order": 3
       },
-      "vision_range": 7,
+      "vision_range": 9,
       "blocks_tiles": true,
       "stats": {
         "max_hp": 15,
@@ -413,7 +413,9 @@
         "natural_ac": 6
       },
       "faction" : "townsfolk",
-      "movement_mode" : "random"
+      "movement_mode" : "random",
+      "quips" : ["Keep walking, meat man.", "Yesterday I saw some X Corp Goon dragging off some old chrome junkie.", "You tried those new food pellets yet?"
+                , "All enforcers are bastards!", "Don't even think of trying to mug me!", "I can hardly see shit through this smog today!"]
     }
   ],
   "spawn_table": [

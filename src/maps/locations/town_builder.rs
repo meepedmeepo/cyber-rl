@@ -97,7 +97,7 @@ impl TownBuilder
 
         //let road = self.paint_road(rng, build_data);
 
-        self.draw_footpaths(build_data, rng, &doors, road);
+        //self.draw_footpaths(build_data, rng, &doors, road);
 
         self.spawn_townsfolk(rng, build_data);
 
@@ -151,6 +151,7 @@ impl TownBuilder
 
     fn paint_road(&self,rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap, available_building_tiles : &mut HashSet<usize>) -> Point
     {
+        let w = build_data.map.map_width as usize;
         let roll = rng.range(build_data.map.map_height-14, build_data.map.map_height-5);
         let start_pos = Point::new(1, roll);
         let start_idx = build_data.map.xy_idx(start_pos.x, start_pos.y);
@@ -158,7 +159,27 @@ impl TownBuilder
         let end_pos = Point::new(build_data.map.map_width-2, end_roll);
         let end_idx = build_data.map.xy_idx(end_pos.x, end_pos.y);
 
-        let width = build_data.map.map_width;
+        let mut p1 = a_star_search(start_idx, end_idx, &build_data.map);
+        let mut p2 = a_star_search(start_idx-w, end_idx-w, &build_data.map);
+        let mut p3 = a_star_search(start_idx+w, end_idx+w, &build_data.map);
+
+        let mut p4 = a_star_search(start_idx+w+w, end_idx+w+w, &build_data.map);
+        let mut p5 = a_star_search(start_idx-w-w, end_idx-w-w, &build_data.map);
+        p4.steps.append(&mut p5.steps);
+
+        p1.steps.append(&mut p2.steps);
+        p1.steps.append(&mut p3.steps);
+
+        for step in p1.steps.iter()
+        {
+            available_building_tiles.remove(step);
+            build_data.map.map[*step] = TileType::Road;
+        }
+
+        for step in p4.steps.iter()
+        {
+            available_building_tiles.remove(step);
+        }
 
 
         

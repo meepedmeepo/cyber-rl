@@ -4,11 +4,18 @@ use bracket_lib::{prelude::{a_star_search, console, DijkstraMap, DistanceAlg, Po
 
 use crate::{maps::{voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
 
-use super::utils::find_entity_spawn_locations;
+use super::utils::{find_entity_spawn_locations, vec_of_str};
 
 
 const MAX_W : i32 = 13;
 const MAX_H : i32 = 10;
+
+
+pub struct Building
+{
+    pub name : String,
+    pub to_spawn : Vec<String>,
+}
 
 //enum showing which wall the door will be placed on
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -272,6 +279,13 @@ impl TownBuilder
 
 
         buildings
+    }
+
+    fn building_content(build_data : &mut BuilderMap, buildings : &Vec<(i32,i32,i32,i32)>)
+    {
+        let bar = Building{name: "Pub".to_string()
+            , to_spawn: vec_of_str(&
+            ["Keg", "Keg", "Table", "Table", "Stool", "Stool", "Stool", "Stool"])};
     }
 
     fn place_doors(&self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap

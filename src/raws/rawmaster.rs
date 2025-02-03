@@ -18,7 +18,8 @@ pub struct RawMaster
     item_index : HashMap<String, usize>,
     mob_index : HashMap<String, usize>,
     prop_index : HashMap<String, usize>,
-    faction_index : HashMap<String, HashMap<String, Reaction>>
+    faction_index : HashMap<String, HashMap<String, Reaction>>,
+    building_index : HashMap<String, usize>,
 
 }
 
@@ -28,11 +29,14 @@ pub fn empty() -> RawMaster
 {
     RawMaster
     {
-        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new(), props: Vec::new(), faction_table : Vec::new()},
+        raws : Raws{items : Vec::new(), mobs: Vec::new(), spawn_table: Vec::new()
+            , props: Vec::new(), faction_table : Vec::new(), buildings: Vec::new()},
+        
         item_index : HashMap::new(),
         mob_index: HashMap::new(),
         prop_index : HashMap::new(),
         faction_index : HashMap::new(),
+        building_index : HashMap::new(),
     }
 }
 
@@ -55,6 +59,7 @@ pub fn load(&mut self, raws : Raws)
         self.prop_index.insert(prop.name.clone(), k);
     }
 
+
     for faction in self.raws.faction_table.iter()
     {
         let mut reactions : HashMap<String, Reaction> = HashMap::new();
@@ -68,6 +73,11 @@ pub fn load(&mut self, raws : Raws)
             });
         }
         self.faction_index.insert(faction.name.clone(), reactions);
+    }
+
+    for (l, build) in self.raws.buildings.iter().enumerate()
+    {
+        self.building_index.insert(build.name.clone(), l);
     }
 
 }

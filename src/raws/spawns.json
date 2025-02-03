@@ -417,6 +417,44 @@
       "quips" : ["Keep walking, meat man.", "Yesterday I saw some X Corp Goon dragging off some old chrome junkie.", "You tried those new food pellets yet?"
                 , "All enforcers are bastards!", "Don't even think of trying to mug me!", "I can hardly see shit through this smog today!","My brother was an enforcer till I shot him through the knee!"
                 ,"Fuck off!"]
+    },
+    {
+      "name": "Barkeep",
+      "renderable": {
+        "glyph": "t",
+        "fg": "#f532f2",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 9,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 15,
+        "hp": 15,
+        "natural_ac": 9
+      },
+      "equipment" : ["Switch Blade"],
+      "faction" : "townsfolk",
+      "quips" : ["Keep your hands to yourself" , "What's ya poison?", "I am not liable for the cost of a replacement bionic liver!", "Welcome traveller, mind the sick puddles!", "Overdosing patrons will be scrapped for parts."]
+    },
+    {
+      "name": "Drunkard",
+      "renderable": {
+        "glyph": "t",
+        "fg": "#eadf0b",
+        "bg": "#000000",
+        "order": 3
+      },
+      "vision_range": 7,
+      "blocks_tiles": true,
+      "stats": {
+        "max_hp": 15,
+        "hp": 15,
+        "natural_ac": 6
+      },
+      "faction" : "townsfolk",
+      "movement_mode" : "drunk",
+      "quips" : ["Me wife left me and took the kids." , "Can you spare me a sip of rum, my friend?", "Wait! Who is approaching me?", "X corp ruined my life."]
     }
   ],
   "spawn_table": [
@@ -535,5 +573,13 @@
     {"name" : "xcorp", "responses" : {"Default" : "attack", "peacekeeper" : "ignore", "vermin" : "ignore"}},
     {"name" : "hacker", "responses" : {"Default" : "ignore", "peacekeeper" : "flee", "xcorp" : "attack" }},
     {"name" : "townsfolk", "responses" : {"Default" : "ignore"}}
+  ],
+
+  "buildings" : [
+
+  {
+    "name" : "pub",
+    "contents" : ["Keg", "Keg", "Stool", "Stool", "Stool", "Stool", "Table", "Table", "Barkeep", "Drunkard", "Drunkard"]
+  }
   ]
 }

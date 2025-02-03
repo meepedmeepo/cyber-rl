@@ -21,7 +21,8 @@ pub struct Raws
     pub mobs : Vec<Mob>,
     pub props : Vec<Prop>,
     pub spawn_table : Vec<SpawnTableEntry>,
-    pub faction_table : Vec<FactionInfo>
+    pub faction_table : Vec<FactionInfo>,
+    pub buildings : Vec<Building>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -114,12 +115,19 @@ pub struct Prop
     pub door : Option<bool>,
     pub blocks_tile : Option<bool>
 ,}
+#[derive(Deserialize, Debug)]
+pub struct Building
+{
+    pub name : String,
+    pub contents : Vec<String>,
+    pub network : Option<String>
+}
 
 pub fn run()
 {
     let data = fs::read_to_string(std::path::Path::new("./src/raws/spawns.json"))
         .expect("Unable to read spawns.json");
-    println!("{}", data);
+    //println!("{}", data);
     let decoder : Raws = serde_json::from_str(&data).expect("Unable to parse JSON");
     //bracket_lib::terminal::console::log(format!("{:?}", decoder));
     RAWS.lock().unwrap().load(decoder);

@@ -46,6 +46,9 @@ pub fn spawn_building_contents(build_data : &mut BuilderMap, contents : &[String
     }
 }
 
+pub fn vec_of_str(v: &[&str]) -> Vec<String> {
+    v.iter().map(|&x| x.into()).collect()
+}
 
 
 pub fn create_road_network(build_data : &BuilderMap, start_pos: Point)
@@ -72,10 +75,6 @@ pub fn create_road_network(build_data : &BuilderMap, start_pos: Point)
     graph.add_edge(start_idx, down_idx, 0);
 
     //graph.
-
-    
-
-
 }
 
 struct Candidate

@@ -43,7 +43,7 @@ pub fn starting_town() -> BuilderChain
     // builder.start_with(VoronoiCellBuilder::new_advanced(300, DistanceAlgorithm::Manhattan
     //    , TileType::Road));
     builder.start_with(TownBuilder::new());
-    builder.with(AreaStartingPosition::new(crate::maps::XStart::CENTER, crate::maps::YStart::CENTER));
+    //builder.with(AreaStartingPosition::new(crate::maps::XStart::CENTER, crate::maps::YStart::CENTER));
     builder.with(DistantExitBuilder::new());
 
     builder
@@ -285,23 +285,62 @@ impl TownBuilder
 
     fn building_content(&mut self, build_data : &mut BuilderMap, buildings : &Vec<(i32,i32,i32,i32)>,  rng : &mut RandomNumberGenerator)
     {
-        for build in buildings.iter()
+        let mut building_list = vec!["pub", "abandonedhouse", "ripperdocoffice", "drugden"];
+        let building_list_clone = building_list.clone();
+        let mut spawn_any = false;
+        for (i, build) in buildings.iter().enumerate()
         {
-            let roll = rng.roll_dice(1, 4);
-            if roll == 4
+            let mut building_name : &str;
+            if i == 0
             {
-                let building = RAWS.lock().unwrap().get_building_from_name("abandonedhouse".to_string());
-                let mut tiles = HashSet::new();
-                for y in build.1 .. build.1+build.3
+                building_name = "home";
+
+                build_data.starting_position = Some(Point::new(build.0 + (build.2/2), build.1 + (build.3/2)))
+            }
+            else 
+            {
+                let mut index = 0;
+                if building_list.len() == 1
                 {
-                    for x in build.0 .. build.0+build.2
+                    index = 0;
+                } else if building_list.len() > 1
+                {
+                    index = rng.range(0,building_list.len());
+                }
+                else {
+                    spawn_any = true;
+                }
+
+                
+                if !spawn_any
+                {
+                    building_name = building_list[index];
+                    building_list.remove(index);
+                }
+                else {
+                    building_name = "";
+                }
+            }
+            let building : crate::raws::Building;
+            if !spawn_any
+            {
+                building = RAWS.lock().unwrap().get_building_from_name(building_name.to_string());
+            }
+            else {
+                let index = rng.range(0, building_list_clone.len());
+                building = RAWS.lock().unwrap().get_building_from_name(building_list_clone[index].to_string());
+            }
+                let mut tiles = HashSet::new();
+                for y in build.1+1 .. build.1+build.3
+                {
+                    for x in build.0+1 .. build.0+build.2
                     {
                         tiles.insert(build_data.map.xy_idx(x, y));
                     }
                 }
                 console::log(format!("Length of tiles set {}", tiles.len()));
                 spawn_building_contents(build_data, &building.contents, &mut tiles);
-            }
+            
         }
     }
 

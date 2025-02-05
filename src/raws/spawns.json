@@ -590,6 +590,15 @@
         "bg": "#000000",
         "order": 2
       }
+    },
+    {
+      "name": "Bed",
+      "renderable": {
+        "glyph": "_",
+        "fg": "#8a0f0f",
+        "bg": "#000000",
+        "order": 2
+      }
     }
   ],
   "faction_table" : [
@@ -615,6 +624,14 @@
   {
     "name" : "ripperdocoffice",
     "contents" : ["Operating Table", "Scrap", "Scrap", "Metal Bin", "Stool"]  
+  },
+  {
+    "name" : "home",
+    "contents" : ["Bed", "Scrap", "Junk", "Metal Bin", "Stool"]  
+  },
+  {
+    "name" : "drugden",
+    "contents" : ["Bed", "Scrap", "Junk", "Drunkard", "Drunkard", "Junk", "Scrap", "Rat"]  
   }
   ]
 }

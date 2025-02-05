@@ -692,40 +692,15 @@ fn game_init ( state: &mut State)
 
     spawning_system::spawn_item_equipped(state, &"Light Pistol".to_string(), state.player_ent.unwrap());
 
+    state.game_log.add_log("You wake up in your rundown apartment with no memory of what happened last night".to_string());
+    state.game_log.add_log("You check your deck for notifications and see a message from an unknown user".to_string());
+    state.game_log.add_log("The message simply states 'RUN, *THEY* are coming'".to_string());
     state.world.spawn((FoV::new(10), ControlNode{level: 3}, NodeOwned {owner: state.player_ent.unwrap()}
         , Position{x: xy.x, y: xy.y}));
 
 
 }
 
-// fn render_system(state:&mut State, ctx: &mut BTerm)
-// {
-//     //queries the ECS to get a list of entities to render, collects them into a vec,
-//     //and then reverse orders them by the order member of the renderable struct
-
-//     //runs spawns particles from builder requests and cleans up dead particles before rendering
-//     //entities/
-//     particle_system::spawn_system(state);
-//     particle_system::update(state, ctx);
-
-//     let mut entities_to_render  = 
-//         state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
-//         .into_iter()
-//         .map(|ent|{(ent.1.0,ent.1.1)})
-//         .collect::<Vec<_>>();
-
-    
-//     entities_to_render.sort_by_key(|a| a.1.order);
-
-//     for ent in entities_to_render
-//     {
-//         let idx = state.map.xy_idx(ent.0.x, ent.0.y);
-//         if state.map.visible_tiles[idx]
-//         {
-//             ctx.set(ent.0.x, ent.0.y, ent.1.fg, ent.1.bg, ent.1.glyph);
-//         }
-//     }
-// }
 
 fn main() ->BError 
 {

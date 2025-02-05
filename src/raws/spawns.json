@@ -581,6 +581,15 @@
         "bg": "#000000",
         "order": 2
       }
+    },
+    {
+      "name": "Operating Table",
+      "renderable": {
+        "glyph": "π",
+        "fg": "#017fdf",
+        "bg": "#000000",
+        "order": 2
+      }
     }
   ],
   "faction_table" : [
@@ -602,6 +611,10 @@
   {
     "name" : "abandonedhouse",
     "contents" : ["Junk", "Junk", "Rat", "Rat", "Junk", "Scrap", "Scrap", "Junk", "Rat"]
+  },
+  {
+    "name" : "ripperdocoffice",
+    "contents" : ["Operating Table", "Scrap", "Scrap", "Metal Bin", "Stool"]  
   }
   ]
 }

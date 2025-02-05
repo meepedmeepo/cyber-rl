@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use crate::{hunger::hunger_system, statistics::BaseStatistics, time_system, Map, Position, ProgramState, State};
 
-use super::{ Energy, MyTurn};
+use super::{ spot_traps, Energy, MyTurn};
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 use priority_queue::{self, PriorityQueue};
@@ -59,6 +59,7 @@ pub fn run_initiative(state : &mut State) -> ProgramState
     {
         hunger_system(state);
         time_system::time_system(state);
+        spot_traps(state);
 
         let mut turns_to_add = Vec::new();
         

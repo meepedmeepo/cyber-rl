@@ -15,6 +15,10 @@ mod idle_movement;
 pub use idle_movement::*;
 mod quipping;
 pub use quipping::*;
+mod spot_traps;
+use spot_traps::*;
+
+
 use crate::{statistics::BaseStatistics, State};
 
 

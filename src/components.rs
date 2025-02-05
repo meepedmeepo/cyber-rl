@@ -276,7 +276,7 @@ pub struct TakeDamage
     pub damage_to_take : Vec<i32>,
 }
 
-
+#[derive(Debug, Clone)]
 pub struct FoV
 {
     pub visible_tiles: Vec<Point>,

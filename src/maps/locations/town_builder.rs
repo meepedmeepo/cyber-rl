@@ -290,7 +290,7 @@ impl TownBuilder
             let roll = rng.roll_dice(1, 4);
             if roll == 4
             {
-                let building = RAWS.lock().unwrap().get_building_from_name("pub".to_string());
+                let building = RAWS.lock().unwrap().get_building_from_name("abandonedhouse".to_string());
                 let mut tiles = HashSet::new();
                 for y in build.1 .. build.1+build.3
                 {

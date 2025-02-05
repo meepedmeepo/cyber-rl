@@ -1,4 +1,4 @@
-use bracket_lib::prelude::a_star_search;
+use bracket_lib::prelude::{a_star_search, Point};
 use hecs::Entity;
 
 use crate::{components::{HasMoved, MovementType}, Position, State};
@@ -33,7 +33,7 @@ pub fn idle_movement_ai(state : &mut State)
                                 if p.success && p.steps.len() > 8
                                 {
                                     *path = Some((p.steps
-                                    .into_iter().rev().collect(), 0usize));
+                                        .into_iter().rev().collect(), 0usize));
 
                                     break;
                                 } else {
@@ -76,6 +76,24 @@ pub fn idle_movement_ai(state : &mut State)
                     *path = None;
                 }
             };
+        } else if let MovementType::Drunk = movement
+        {
+            let x_rand = state.rng.range(-1, 2);
+            let y_rand = state.rng.range(-1, 2);
+
+            let delta = Point::new(pos.x, pos.y) + Point::new(x_rand, y_rand);
+
+            let idx = state.map.xy_idx(delta.x, delta.y);
+            let my_idx = state.map.xy_idx(pos.x, pos.y);
+
+        if !state.map.blocked[idx]
+        {
+            state.map.blocked[my_idx] = false;
+            state.map.blocked[idx] = true;
+            pos.x = delta.x;
+            pos.y = delta.y;
+            moved.push(ent);
+        }
         }
     }
 

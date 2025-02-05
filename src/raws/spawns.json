@@ -563,6 +563,24 @@
         "bg": "#000000",
         "order": 2
       }
+    },
+    {
+      "name": "Junk",
+      "renderable": {
+        "glyph": ";",
+        "fg": "#674219",
+        "bg": "#000000",
+        "order": 2
+      }
+    },
+    {
+      "name": "Scrap",
+      "renderable": {
+        "glyph": ";",
+        "fg": "#6c6660",
+        "bg": "#000000",
+        "order": 2
+      }
     }
   ],
   "faction_table" : [
@@ -580,6 +598,10 @@
   {
     "name" : "pub",
     "contents" : ["Keg", "Keg", "Stool", "Stool", "Stool", "Stool", "Table", "Table", "Barkeep", "Drunkard", "Drunkard"]
+  },
+  {
+    "name" : "abandonedhouse",
+    "contents" : ["Junk", "Junk", "Rat", "Rat", "Junk", "Scrap", "Scrap", "Junk", "Rat"]
   }
   ]
 }

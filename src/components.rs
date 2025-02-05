@@ -5,7 +5,7 @@ use serde::Deserialize;
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MovementType
 {
-    Static, RandomWaypoint{path : Option<(Vec<usize>, usize)>}
+    Static, RandomWaypoint{path : Option<(Vec<usize>, usize)>}, Drunk
 }
 
 pub struct AIQuips

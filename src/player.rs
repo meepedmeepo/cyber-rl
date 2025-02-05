@@ -153,7 +153,20 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
             }
 
-            VirtualKeyCode::Semicolon => {return ProgramState::KeyboardTargetting { cursor_pos: state.player_pos };}
+            VirtualKeyCode::Semicolon => 
+            {
+                let (x_chars, y_chars) = ctx.get_char_size();
+
+                let center_x = (x_chars / 2) as i32;
+                let center_y = (y_chars / 2) as i32;
+                let player_pos = state.player_pos;
+                let px = player_pos.x;
+                let py = player_pos.y;
+                let min_x = player_pos.x - center_x;
+                let min_y = player_pos.y - center_y;
+
+                return ProgramState::KeyboardTargetting { cursor_pos: Point::new(px - min_x, py - min_y) };
+            }
             _ =>{return ProgramState::AwaitingInput;},
 
         }

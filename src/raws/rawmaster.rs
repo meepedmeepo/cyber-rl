@@ -301,7 +301,13 @@ pub fn spawn_named_mob<'a>(raws : &'a RawMaster, new_entity : hecs::EntityBuilde
 
         if let Some(movement) = &mob_template.movement_mode
         {
-            eb.add(MovementType::RandomWaypoint { path: None });
+            if *movement == "random".to_string()
+            {
+                eb.add(MovementType::RandomWaypoint { path: None });
+            }else {
+                eb.add(MovementType::Drunk);
+            }
+            
         }
         else 
         {

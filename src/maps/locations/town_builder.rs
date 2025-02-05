@@ -2,9 +2,9 @@ use std::{collections::HashSet, hash::Hash};
 
 use bracket_lib::{prelude::{a_star_search, console, DijkstraMap, DistanceAlg, Point}, random::RandomNumberGenerator};
 
-use crate::{maps::{voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
+use crate::{maps::{voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, raws::RAWS, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
 
-use super::utils::{find_entity_spawn_locations, vec_of_str};
+use super::utils::{find_entity_spawn_locations, spawn_building_contents, vec_of_str};
 
 
 const MAX_W : i32 = 13;
@@ -101,6 +101,8 @@ impl TownBuilder
         let buildings = self.buildings(rng, build_data, &mut available_building_tiles);
 
         let doors = self.place_doors(rng, build_data, &buildings);
+
+        self.building_content(build_data, &buildings, rng);
 
         //let road = self.paint_road(rng, build_data);
 
@@ -281,11 +283,26 @@ impl TownBuilder
         buildings
     }
 
-    fn building_content(build_data : &mut BuilderMap, buildings : &Vec<(i32,i32,i32,i32)>)
+    fn building_content(&mut self, build_data : &mut BuilderMap, buildings : &Vec<(i32,i32,i32,i32)>,  rng : &mut RandomNumberGenerator)
     {
-        let bar = Building{name: "Pub".to_string()
-            , to_spawn: vec_of_str(&
-            ["Keg", "Keg", "Table", "Table", "Stool", "Stool", "Stool", "Stool"])};
+        for build in buildings.iter()
+        {
+            let roll = rng.roll_dice(1, 4);
+            if roll == 4
+            {
+                let building = RAWS.lock().unwrap().get_building_from_name("pub".to_string());
+                let mut tiles = HashSet::new();
+                for y in build.1 .. build.1+build.3
+                {
+                    for x in build.0 .. build.0+build.2
+                    {
+                        tiles.insert(build_data.map.xy_idx(x, y));
+                    }
+                }
+                console::log(format!("Length of tiles set {}", tiles.len()));
+                spawn_building_contents(build_data, &building.contents, &mut tiles);
+            }
+        }
     }
 
     fn place_doors(&self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap

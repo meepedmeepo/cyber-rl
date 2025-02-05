@@ -115,7 +115,7 @@ pub struct Prop
     pub door : Option<bool>,
     pub blocks_tile : Option<bool>
 ,}
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Building
 {
     pub name : String,

@@ -3,7 +3,7 @@ use std::{collections::HashMap, hash::Hash, string};
 use bracket_lib::{color::RGB, prelude::to_cp437, random::{parse_dice_string, DiceType}};
 use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 
-use super::{Consumable, Mob, MobStats, Raws, Reaction, Renderable};
+use super::{Building, Consumable, Mob, MobStats, Raws, Reaction, Renderable};
 use crate::{ai::Energy, components::{self, AIQuips, MovementType}, effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine}, randomtable::RandomTable, statistics::{self, Pools, StatPool}, AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty, EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name, Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter, Usable, WeaponStat};
 
 pub enum SpawnType 
@@ -129,6 +129,19 @@ fn add_effects_comps(entity_builder: EntityBuilder, effects: HashMap<String, Str
         }
 
     eb
+}
+
+pub fn get_building_from_name(&self, name : String) -> Building
+{
+    if self.building_index.contains_key(&name)
+    {
+        let index = self.building_index.get(&name);
+        
+        self.raws.buildings[*index.unwrap()].clone()
+
+    } else {
+        panic!("Key {} is not in the building index ", name);
+    }
 }
 
 pub fn get_item_name_list(&self)-> Vec<String>

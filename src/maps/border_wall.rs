@@ -30,7 +30,7 @@ impl BorderWall
         {
             for x in 0 .. w
             {
-                if x == 0 || y == 0 || x == w-2 || y == h-2
+                if x == 1 || y == 1 || x == w-2 || y == h-2
                 {
                     let idx = build_data.map.xy_idx(x, y);
                     build_data.map.map[idx] = TileType::Wall;

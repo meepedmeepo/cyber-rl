@@ -260,7 +260,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
                         target = *potential_target;
                         found_target = true;
                     }
-                    Err(_) =>{return false;}
+                    Err(_) =>{}
                 }
             }
 

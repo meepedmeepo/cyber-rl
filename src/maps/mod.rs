@@ -67,10 +67,11 @@ pub fn random_map_builder(new_depth : i32, width : i32, height : i32) -> Builder
     //builder.with(WaveformCollapseBuilder::new());
     builder.start_with(CellularAutomataBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    builder.with(BorderWall::new());
     builder.with(CullUnreachable::new());
     builder.with(VoronoiSpawning::new());
     builder.with(DistantExitBuilder::new());
-    builder.with(BorderWall::new());
+    
 
     //builder.start_with(BspDungeon::new());
     //builder.with(RoomSorter::new());

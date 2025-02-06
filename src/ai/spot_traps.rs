@@ -1,4 +1,4 @@
-use crate::{components::{FoV, Hidden}, statistics::BaseStatistics, State};
+use crate::{components::{FoV, Hidden, Name}, statistics::BaseStatistics, State};
 
 
 
@@ -20,9 +20,12 @@ pub fn spot_traps(state : &mut State)
                 {
                     let roll = state.rng.roll_dice(1, 20);
                     let bonus = state.world.query_one_mut::<&BaseStatistics>(state.player_ent.unwrap()).unwrap().intelligence.get_modifier();
-                    if roll + bonus > 17 
+                    state.game_log.add_log(format!("Roll: {} Bonus: {} Total: {}",roll,bonus,roll+bonus));
+                    if roll + bonus >= 21 || roll == 20
                     {
                         let _ = state.world.remove_one::<Hidden>(*prop);
+                        let name = state.world.get::<&Name>(*prop).unwrap().name.clone();
+                        state.game_log.add_log(format!("{} spotted!", name));
                     }
                 }
             }

@@ -330,10 +330,10 @@
         "max_hp": 20,
         "hp": 20,
         "dexterity": 12,
-        "strength": 14,
+        "strength": 12,
         "intelligence": 8,
         "mental": 7,
-        "natural_ac": 10
+        "natural_ac": 8
       },
       "faction" : "criminals",
       "equipment" : [
@@ -381,18 +381,18 @@
         "strength": 6,
         "intelligence": 9,
         "mental": 4,
-        "natural_ac": 8
+        "natural_ac": 6
       },
       "faction" : "vermin",
       "naturals": [
         {
           "statistic": "dexterity",
           "damage_die": "1d3",
-          "to_hit_bonus": 2
+          "to_hit_bonus": 0
         },
         {
           "statistic": "dexterity",
-          "damage_die": "1d2+1",
+          "damage_die": "1d2",
           "to_hit_bonus": 1
         }
       ]
@@ -599,6 +599,15 @@
         "bg": "#000000",
         "order": 2
       }
+    },
+    {
+      "name": "Sign",
+      "renderable": {
+        "glyph": "&",
+        "fg": "#0338d8",
+        "bg": "#000000",
+        "order": 2
+      }
     }
   ],
   "faction_table" : [
@@ -632,6 +641,10 @@
   {
     "name" : "drugden",
     "contents" : ["Bed", "Scrap", "Junk", "Drunkard", "Drunkard", "Junk", "Scrap", "Rat"]  
+  },
+  {
+    "name" : "accessroom",
+    "contents" : ["Sign"]
   }
   ]
 }

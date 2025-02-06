@@ -48,9 +48,9 @@ impl ActionType
     {
         match *self
         {
-            ActionType::Move => 100,
+            ActionType::Move => 80,
             ActionType::Equip => 200,
-            ActionType::Attack => 110,
+            ActionType::Attack => 100,
             ActionType::Pickup => 50,
             ActionType::OpenDoor => 50,
             ActionType::UseItem => 100,

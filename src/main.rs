@@ -3,7 +3,6 @@ use ai::apply_energy_cost;
 use ai::run_initiative;
 use ai::Energy;
 use ai::MyTurn;
-use ai::TURN_QUEUE;
 use attack_system::AttackSystem;
 use bracket_lib::prelude::*;
 use bracket_lib::color;

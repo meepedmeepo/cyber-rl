@@ -2,7 +2,7 @@ use std::{collections::HashSet, hash::Hash};
 
 use bracket_lib::{prelude::{a_star_search, console, DijkstraMap, DistanceAlg, Point}, random::RandomNumberGenerator};
 
-use crate::{maps::{voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, raws::RAWS, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
+use crate::{maps::{border_wall::BorderWall, voronoi::{DistanceAlgorithm, VoronoiCellBuilder}, AreaStartingPosition, DistantExitBuilder, MetaMapBuilder}, raws::RAWS, BuilderChain, BuilderMap, InitialMapBuilder, TileType};
 
 use super::utils::{find_entity_spawn_locations, spawn_building_contents, vec_of_str};
 
@@ -43,8 +43,9 @@ pub fn starting_town() -> BuilderChain
     // builder.start_with(VoronoiCellBuilder::new_advanced(300, DistanceAlgorithm::Manhattan
     //    , TileType::Road));
     builder.start_with(TownBuilder::new());
+    //builder.with(BorderWall::new());
     //builder.with(AreaStartingPosition::new(crate::maps::XStart::CENTER, crate::maps::YStart::CENTER));
-    builder.with(DistantExitBuilder::new());
+    //builder.with(DistantExitBuilder::new());
 
     builder
 }
@@ -287,6 +288,7 @@ impl TownBuilder
     {
         let mut building_list = vec!["pub", "abandonedhouse", "ripperdocoffice", "drugden"];
         let building_list_clone = building_list.clone();
+        building_list.push("accessroom");
         let mut spawn_any = false;
         for (i, build) in buildings.iter().enumerate()
         {
@@ -325,15 +327,21 @@ impl TownBuilder
             if !spawn_any
             {
                 building = RAWS.lock().unwrap().get_building_from_name(building_name.to_string());
+                if building_name == "accessroom"
+                {
+                    let point = Point::new(build.0 + (build.2/2), build.1 + (build.3/2));
+                    let p_idx = build_data.map.xy_idx(point.x, point.y);
+                    build_data.map.map[p_idx] = TileType::DownStairs;
+                }
             }
             else {
                 let index = rng.range(0, building_list_clone.len());
                 building = RAWS.lock().unwrap().get_building_from_name(building_list_clone[index].to_string());
             }
                 let mut tiles = HashSet::new();
-                for y in build.1+1 .. build.1+build.3
+                for y in build.1+1 .. build.1+build.3-1
                 {
-                    for x in build.0+1 .. build.0+build.2
+                    for x in build.0+1 .. build.0+build.2-1
                     {
                         tiles.insert(build_data.map.xy_idx(x, y));
                     }

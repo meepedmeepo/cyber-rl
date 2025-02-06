@@ -22,6 +22,9 @@ mod waveform_collapse;
 mod voronoi;
 mod locations;
 mod tile_type;
+mod border_wall;
+
+
 use crate::{map::*, spawns::spawning_system::{self, get_entity_type, EntityType}, State};
 use bracket_lib::{prelude::{Point, Rect}, random::RandomNumberGenerator};
 use cellular_automata::CellularAutomataBuilder;
@@ -46,6 +49,7 @@ use waveform_collapse::*;
 use voronoi::*;
 pub use locations::*;
 pub use tile_type::*;
+use border_wall::*;
 //s
 pub trait MapBuilder
 {
@@ -59,13 +63,14 @@ pub fn random_map_builder(new_depth : i32, width : i32, height : i32) -> Builder
 {
     let mut builder = BuilderChain::new(new_depth, width, height);
     //builder.start_with(CellularAutomataBuilder::new());
-    builder.start_with(VoronoiCellBuilder::pythagoras());
+    //builder.start_with(VoronoiCellBuilder::pythagoras());
     //builder.with(WaveformCollapseBuilder::new());
-    builder.with(CellularAutomataBuilder::new());
+    builder.start_with(CellularAutomataBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     builder.with(CullUnreachable::new());
     builder.with(VoronoiSpawning::new());
     builder.with(DistantExitBuilder::new());
+    builder.with(BorderWall::new());
 
     //builder.start_with(BspDungeon::new());
     //builder.with(RoomSorter::new());

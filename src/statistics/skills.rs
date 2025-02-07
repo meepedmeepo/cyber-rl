@@ -9,10 +9,11 @@ use crate::State;
 
 pub struct Skills
 {
-    skill_map: HashMap<String, i32>,
+    skill_map: HashMap<Skill, i32>,
 }
 
 #[allow(dead_code)]
+#[derive(Hash, Debug, PartialEq, PartialOrd, Ord, Eq)]
 pub enum Skill
 {
     Melee,
@@ -22,7 +23,7 @@ pub enum Skill
     Hack
 }
 
-pub fn get_skill_value(skill: String, entity: Entity, state: &mut State) -> i32
+pub fn get_skill_value(skill : Skill, entity: Entity, state: &mut State) -> i32
 {
     let skills = state.world.query_one_mut::<&Skills>(entity).unwrap();
 

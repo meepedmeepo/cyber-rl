@@ -80,6 +80,8 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
         ctx.draw_bar_horizontal(82, 14, 24, hunger.nutrition.current_value, hunger.nutrition.max_value,
             color::ORANGE, color::BLACK);
         
+        ctx.print_color(81, 16, color::WHITE, color::BLACK, format!("Armour Class: {}", stats.armour_class.total));
+
         ctx.print_color(81, 17, color::WHITE, color::BLACK, format!("Strength: {}", bstat.strength.total));
 
         ctx.print_color(81, 18, color::WHITE, color::BLACK, format!("Dexterity: {}", bstat.dexterity.total));
@@ -89,6 +91,7 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
         ctx.print_color(81, 20, color::WHITE, color::BLACK, format!("Toughness: {}", bstat.toughness.total));
 
         ctx.print_color(81, 21, color::WHITE, color::BLACK, format!("Mental Fortitude {}", bstat.mental_fortitude.total));
+    
 
     }
 

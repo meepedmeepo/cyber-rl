@@ -20,6 +20,7 @@ use gui::TargettingMode;
 use hecs::*;
 use hunger::hunger_system;
 use hunger::HungerLevel;
+use macroquad::miniquad::RenderingBackend;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use menus::menu_input;
@@ -36,6 +37,8 @@ use projectile::ProjectileBuilder;
 use ranged_combat::ranged_aim;
 use ranged_combat::ranged_aim::TargettingState;
 use renderer::draw_tiles;
+use renderer::CharSize;
+use renderer::GraphicGrid;
 use spawns::spawning_system::EntityType;
 use statistics::BaseStatistics;
 use statistics::Pools;
@@ -757,6 +760,19 @@ fn old_main() -> BError
 #[macroquad::main("CyberRL")]
 async fn main()
 {
+    let font = load_ttf_font("./assets/fonts/JuliaMono-Bold.ttf")
+    .await
+    .unwrap();
+
+    let mut rend = renderer::Renderer
+    {
+        mode : renderer::RenderBackend::MacroQuad,
+        default_font: font,
+        canvas: GraphicGrid::new(30, 30, 15, 15),
+        char_size: CharSize(0, 0, 0),
+    };
+    let size = measure_text("x", Some(&rend.default_font), rend.canvas.tile_height as u16, 1.0);
+    rend.char_size = CharSize(size.width as i32, size.height as i32, size.offset_y as i32);
     //let cam = Camera2D::from_display_rect(macroquad::prelude::Rect::new(0.0, 152.0, 320.0, -152.0));
     loop {
         clear_background(DARKPURPLE);
@@ -765,7 +781,7 @@ async fn main()
             //..Default::default()
         //});
 
-        draw_tiles();
+        draw_tiles(&rend);
         next_frame().await
     }
     //old_main();

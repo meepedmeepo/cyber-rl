@@ -1,29 +1,60 @@
 mod tile_rendering;
+
 use macroquad::prelude::*;
 
 
-#[derive(Debug,PartialEq, Eq, PartialOrd, Ord)]
-enum RenderBackend {MacroQuad, BracketLib}
+#[derive(Debug,PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub enum RenderBackend {MacroQuad, BracketLib}
 
 
-struct Renderer 
+pub struct Renderer 
 {
-    pub mode : RenderBackend
+    pub mode : RenderBackend,
+    pub canvas : GraphicGrid,
+    pub default_font : Font,
+    pub char_size : CharSize
+}
+pub struct CharSize(pub i32, pub i32, pub i32);
+impl Renderer
+{
+    pub fn draw_char(&self, x : i32, y: i32, content : &str, color : Color )
+    {
+        let screen_pos = self.canvas.get_tile_screen_pos(x, y);
+        let draw_pos = self.canvas.get_tile_center_at_coords(screen_pos.0, screen_pos.1,self.char_size.0,self.char_size.1, self.char_size.2);
+        let params = TextParams {color, font_size: self.canvas.tile_height as u16
+            , font: Some(&self.default_font), .. Default::default()};
+
+        let _size = draw_text_ex(content, draw_pos.0 as f32, draw_pos.1 as f32, params);
+        //println!("width: {} height: {} offset_y: {}",size.width, size.height, size.offset_y);
+    }
+
+    pub fn draw_square(&self, x : i32, y : i32, color : Color)
+    {
+        let screen_pos = self.canvas.get_tile_screen_pos(x, y);
+
+        draw_rectangle(screen_pos.0 as f32, screen_pos.1 as f32, self.canvas.tile_width as f32
+            , self.canvas.tile_height as f32, color);
+    }
 }
 
 
-pub fn draw_tiles()
+pub fn draw_tiles(rend : &Renderer)
 {
-    let w = 40.;
-    let h = 40.;
-
-    for y in 0..11
+    let w = rend.canvas.tile_width as f32;
+    let h = rend.canvas.tile_height as f32;
+    
+    for y in 1..rend.canvas.grid_height
     {
-        for x in 0..11
+        for x in 1..rend.canvas.grid_width
         {
-            draw_rectangle_lines(x as f32*w, y as f32*h, w, h, 1., GREEN);
+            rend.draw_square( x , y, GREEN);
+            draw_rectangle_lines(x as f32*w, y as f32*h, w, h, 1., BLACK);
+            rend.draw_char(x, y, ".", BLACK);
+
+
         }
     }
+    //rend.draw_char(1, 0, "x", BLACK);
 }
 
 
@@ -37,9 +68,14 @@ pub struct GraphicGrid
 
 impl GraphicGrid
 {
-    pub fn get_tile_center_at_coords(&self, x : i32, y : i32) -> (i32, i32)
+    pub fn new(tile_width : i32, tile_height : i32, grid_width : i32, grid_height : i32) -> GraphicGrid
+    {
+        GraphicGrid { tile_width, tile_height, grid_width, grid_height }
+    }
+    
+    pub fn get_tile_center_at_coords(&self, x : i32, y : i32, w : i32, h : i32, o : i32) -> (i32, i32)
 {
-    (x+(self.tile_width/2), y + (self.tile_height/2))
+    (x+(w/2-1), y+(self.tile_height - (o/2 + 1)))
 }
 
 //Gets screen location of a grid tile

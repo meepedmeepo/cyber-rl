@@ -12,6 +12,7 @@ serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 priority-queue = "2.1.1"
 petgraph = "0.7.1"
+macroquad = "0.4.13"
 
 
 [profile.release]

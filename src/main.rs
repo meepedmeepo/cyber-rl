@@ -35,6 +35,7 @@ use projectile::projectile_system;
 use projectile::ProjectileBuilder;
 use ranged_combat::ranged_aim;
 use ranged_combat::ranged_aim::TargettingState;
+use renderer::draw_tiles;
 use spawns::spawning_system::EntityType;
 use statistics::BaseStatistics;
 use statistics::Pools;
@@ -80,6 +81,9 @@ mod prop_trigger_system;
 mod ai;
 mod networks;
 pub mod camera;
+pub mod renderer;
+
+use macroquad::prelude::*;
 
 //use map_indexing_system;
 #[macro_use]
@@ -700,10 +704,9 @@ fn game_init ( state: &mut State)
 
 }
 
-
-fn main() ->BError 
+fn old_main() -> BError
 {
-    //println!("{}", std::env::current_dir().unwrap().display());
+ //println!("{}", std::env::current_dir().unwrap().display());
     //println!("Hello, world!");
     let mut context = BTermBuilder::new()
     .with_dimensions(110, 45)
@@ -748,4 +751,22 @@ fn main() ->BError
     
     game_init(&mut gs);
     main_loop(context,gs)
+}
+
+
+#[macroquad::main("CyberRL")]
+async fn main()
+{
+    //let cam = Camera2D::from_display_rect(macroquad::prelude::Rect::new(0.0, 152.0, 320.0, -152.0));
+    loop {
+        clear_background(DARKPURPLE);
+        //set_camera(&Camera2D {
+          //  zoom: vec2(1., screen_width() / screen_height()),
+            //..Default::default()
+        //});
+
+        draw_tiles();
+        next_frame().await
+    }
+    //old_main();
 }

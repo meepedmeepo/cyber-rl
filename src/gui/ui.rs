@@ -102,7 +102,7 @@ pub fn draw_status_box(state : &mut State,ctx: &mut BTerm)
 
 pub fn draw_cursor(pos : Point, ctx: &mut BTerm, state : &mut State, bg :  (u8, u8, u8)) -> Point
 {
-    let cursor_pos = keyboard_cursor(state, ctx, pos);
+    let cursor_pos = keyboard_cursor(state,  pos);
 
     ctx.set_bg(cursor_pos.x, cursor_pos.y, bg);
 

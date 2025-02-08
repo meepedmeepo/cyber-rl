@@ -1,7 +1,8 @@
-use bracket_lib::{color::{BLACK, BLUE, GREEN, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
+use bracket_lib::{color::{BLACK, BLUE, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
 use hecs::Entity;
+use macroquad::{color::GREEN, input::{is_key_down, is_key_pressed, is_mouse_button_down, KeyCode, MouseButton}};
 
-use crate::{camera, gui::{self, TargettingMode}, raws::{faction_reaction, Reaction, RAWS}, Faction, FoV, Hidden, Map, Position, State};
+use crate::{camera, gui::{self, TargettingMode}, raws::{faction_reaction, Reaction, RAWS}, renderer::color_with_alpha, Faction, FoV, Hidden, Map, Position, State};
 
 pub enum TargettingState
 {
@@ -11,38 +12,28 @@ pub enum TargettingState
 }
 
 
-pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, range : i32) -> TargettingState
+pub fn aim_projectile(state : &mut State, start_pos: Point, range : i32) -> TargettingState
 {
-    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
-    match ctx.key
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state);
+
+    if is_key_down(KeyCode::Escape)
     {
-        Some(key) =>
-        {
-            match key
-            {
-                VirtualKeyCode::Escape => 
-                {
-                    return TargettingState::Cancel;
-                }
-                VirtualKeyCode::Tab =>
-                {
-                    if let TargettingMode::Keyboard { cursor_pos } = state.target_mode
+        return TargettingState::Cancel
+    }
+    if is_key_down(KeyCode::Tab)
+    {
+        if let TargettingMode::Keyboard { cursor_pos } = state.target_mode
                     {
                         state.target_mode = TargettingMode::Keyboard { cursor_pos: 
                             select_nearest_target_pos(state, state.player_ent.unwrap(), cursor_pos) }
                     }
-                }
-                _ => {}
-            }
-        },
-        None => {}
     }
     let mut available_cells = Vec::new();
     let pos = state.player_pos;
     
-    targetting_viewshed(&mut available_cells, state, range, pos, true, ctx);
+    targetting_viewshed(&mut available_cells, state, range, pos, true);
 
-    let (m_x,m_y) = gui::select_target_mode(state, ctx).to_tuple();
+    let (m_x,m_y) = gui::select_target_mode(state).to_tuple();
 
     //let idx = state.map.xy_idx(m_x, m_y);
     //let mut is_valid_target = false;
@@ -61,54 +52,35 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
                 screen_pos.x -= min_x;
                 screen_pos.y -= min_y;
 
-                ctx.set(screen_pos.x, screen_pos.y, BLACK, GREEN, '*');
+                state.renderer.draw_char_bg(screen_pos.x, screen_pos.y, "*"
+                    , macroquad::prelude::BLACK, macroquad::prelude::GREEN);
             });
         
-        ctx.set_bg(screen_point.x, screen_point.y, GREEN);
 
-        if ctx.left_click
+        state.renderer.draw_square(screen_point.x, screen_point.y, color_with_alpha(macroquad::prelude::GREEN, 0.4));
+
+        if is_mouse_button_down(MouseButton::Left)
         {
             let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
             return TargettingState::Selected { path:targets, end: point };
         }
-        match ctx.key
+        if is_key_down(KeyCode::Enter) || is_key_down(KeyCode::KpEnter) || is_key_down(KeyCode::F)
         {
-            Some(key) => 
+            if point == state.player_pos
             {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
-                {
-                    if point == state.player_pos
-                    {
-                        return TargettingState::None;
-                    }
-                    let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
-                    return TargettingState::Selected { path:targets, end: point };
-                }
+                return TargettingState::None;
             }
-            None => {}
+            let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
+            return TargettingState::Selected { path:targets, end: point };
         }
     }
     else
     {
-        ctx.set_bg(screen_point.x, screen_point.y,RGB::named(RED));
-
-        if ctx.left_click || ctx.key.unwrap_or(bracket_lib::terminal::VirtualKeyCode::P) == 
-            bracket_lib::terminal::VirtualKeyCode::Escape
+        state.renderer.draw_square(screen_point.x, screen_point.y, color_with_alpha(macroquad::prelude::RED, 0.4));
+        if is_mouse_button_down(MouseButton::Left) || is_key_down(KeyCode::Escape)
         {
             return TargettingState::Cancel;
         }
-        match ctx.key
-        {
-            Some(key) => 
-            {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
-                {
-                    return TargettingState::Cancel; 
-                }
-            }
-            None => {}
-        }
-        
     }
 
     return TargettingState::None;
@@ -118,9 +90,9 @@ pub fn aim_projectile(state : &mut State, ctx : &mut BTerm, start_pos: Point, ra
 
 
 fn targetting_viewshed(valid_tiles : &mut Vec<Point>, state : &mut State, range: i32,
-    pos: Point,should_display: bool, ctx : &mut BTerm)
+    pos: Point,should_display: bool)
 {
-    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state);
     let visible = field_of_view(pos, range, &state.map);
 
     for idx in visible.iter()
@@ -135,7 +107,7 @@ fn targetting_viewshed(valid_tiles : &mut Vec<Point>, state : &mut State, range:
                 let screen_y = idx.y - min_y;
                 if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y) - 1
                 {
-                    ctx.set_bg(idx.x - min_x, idx.y - min_y, RGB::named(BLUE));
+                    state.renderer.draw_square(idx.x - min_x, idx.y - min_y, color_with_alpha(macroquad::prelude::BLUE, 0.4));
                 }
             }
             

@@ -20,6 +20,8 @@ use gui::TargettingMode;
 use hecs::*;
 use hunger::hunger_system;
 use hunger::HungerLevel;
+use macroquad::color::RED;
+use macroquad::miniquad::window::quit;
 use macroquad::miniquad::RenderingBackend;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
@@ -39,6 +41,7 @@ use ranged_combat::ranged_aim::TargettingState;
 use renderer::draw_tiles;
 use renderer::CharSize;
 use renderer::GraphicGrid;
+use renderer::Renderer;
 use spawns::spawning_system::EntityType;
 use statistics::BaseStatistics;
 use statistics::Pools;
@@ -105,7 +108,8 @@ pub struct State
     particle_builder : ParticleBuilder,
     target_mode : TargettingMode,
     turn_number : i32,
-    network_map : NetworkMap
+    network_map : NetworkMap,
+    renderer : Renderer
 }
 
 
@@ -267,8 +271,8 @@ impl State
     }
 }
 
-impl GameState for State{
-    fn tick(&mut self, ctx: &mut BTerm)
+impl State{
+    fn tick(&mut self)
     {
 
         match self.current_state.clone()
@@ -276,42 +280,28 @@ impl GameState for State{
 
             ProgramState::AwaitingInput =>
             {
-                ctx.cls();
-                {
-                    let mut input = INPUT.lock();
-                    
-                    input.for_each_message(|event| {
-                        if let BEvent::CloseRequested = event
-                        {
-                            ctx.quit();
-                            return;
-                        }
-                    });
-                    
-                }
-                self.current_state = player_input_system(ctx, self);
+                self.current_state = player_input_system( self);
                 item_pickup_system::run(self);
                 item_use_system::run(self);
                 MapIndexingSystem::run(self);
                 ClearDeadSystem::run(self);
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 ////render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
                 //gui::draw_inventory(self, ctx);
             }
 
             ProgramState::PlayAnimation =>
             {
-                ctx.cls();
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 effects::run_effect_queue(self);
-                effects::run_animation_queue(self, ctx);
+                effects::run_animation_queue(self);
                 //render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
                 
             }
             ProgramState::Ticking =>
@@ -343,7 +333,7 @@ impl GameState for State{
                         //default behaviour
                         ai::default_move_ai_system(self);
                         //run systems!
-                        run_systems(self, ctx);
+                        run_systems(self);
 
                         
                     }
@@ -354,18 +344,18 @@ impl GameState for State{
 
             ProgramState::TextInput {mut text } =>
             {
-                ctx.cls();
-                get_input_text(self, ctx, &mut text);
-                display_input_text(self, ctx, &text, 5, 15);
+
+                get_input_text(self, &mut text);
+                display_input_text(self,  &text, 5, 15);
                 self.current_state = ProgramState::TextInput { text, }
             }
 
             ProgramState::Inventory =>
             {
-                let (min_x,_max_x,min_y, _max_y) = camera::get_screen_bounds(self, ctx);
-                ctx.cls();
+                let (min_x,_max_x,min_y, _max_y) = camera::get_screen_bounds(self);
+
                 //insert inventory input function here!
-                let invent_state = menus::InventoryMenu::menu_input(ctx, self);
+                let invent_state = menus::InventoryMenu::menu_input( self);
                 match invent_state
                 {
                     inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
@@ -398,28 +388,28 @@ impl GameState for State{
                     }
                 }
 
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 //render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
-                gui::draw_inventory(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
+                gui::draw_inventory(self);
             }
             ProgramState::SelectionMenu { mut items, menu  } =>
             {
                 ctx.cls();
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 //render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
 
                 //let (mut input, mut draw) = 
                     //select_menu_functions(menu);
 
                 //input(self, ctx, &mut items)
 
-                match menu_input(self, ctx, &mut items)
+                match menu_input(self, &mut items)
                 {
                     MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
                     MenuSelections::NoInput => {}
@@ -491,7 +481,7 @@ impl GameState for State{
 
                 let(title, text_colour, highlight) = menu_theme(menu);
 
-                gui::draw_menu_custom(ctx, &items, title, text_colour, highlight, self);
+                gui::draw_menu_custom( &items, title, text_colour, highlight, self);
                 //gui::draw_pickup_menu(ctx, items, self);
                 //draw(ctx,items,self);
 
@@ -500,17 +490,17 @@ impl GameState for State{
             ProgramState::Targeting { range, item, aoe } =>
             {
                 ctx.cls();
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 //render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
 
                 if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
                 {
-                    gui::draw_tooltip(self, ctx, cursor_pos );
+                    gui::draw_tooltip(self, cursor_pos );
                 }
-                let (inv_state,point) = gui::ranged_target(self, ctx, range, aoe);
+                let (inv_state,point) = gui::ranged_target(self, range, aoe);
                 match inv_state
                 {
                     inventory_state::Cancel =>{ self.current_state = ProgramState::AwaitingInput;}
@@ -535,16 +525,14 @@ impl GameState for State{
 
             ProgramState::RangedCombat { range , dmg } =>
             {
-                ctx.cls();
-                camera::render_camera(self, ctx);
-                ////render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                camera::render_camera(self);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
 
                 
                 
-                let target_state = ranged_aim::aim_projectile(self, ctx, self.player_pos, range);
+                let target_state = ranged_aim::aim_projectile(self, self.player_pos, range);
 
                 match target_state
                 {
@@ -572,7 +560,7 @@ impl GameState for State{
                             effects::Targets::Tile { tile_idx: self.map.xy_idx(end.x, end.y) as i32 });
 
                         effects::run_effect_queue(self);
-                        effects::run_animation_queue(self, ctx);
+                        effects::run_animation_queue(self);
 
                         //self.projectile_builder.add_request(10., path.into_iter().skip(1).collect::<Vec<_>>(), projectile::ProjectileType::Missile,
                         //    '/', RGB::named(WHITE), RGB::named(BLACK), 5,dmg );
@@ -583,23 +571,22 @@ impl GameState for State{
 
                 if let TargettingMode::Keyboard { cursor_pos } = self.target_mode
                 {
-                    gui::draw_tooltip(self, ctx, cursor_pos );
+                    gui::draw_tooltip(self, cursor_pos );
                 }
 
             }
 
             ProgramState::KeyboardTargetting { cursor_pos } =>
             {
-                ctx.cls();
-                camera::render_camera(self, ctx);
+                camera::render_camera(self);
                 ////render_system(self, ctx);
-                gui::draw_ui(self, ctx);
-                gui::draw_status_box(self, ctx);
-                gui::draw_gamelog(self, ctx);
+                gui::draw_ui(self);
+                gui::draw_status_box(self);
+                gui::draw_gamelog(self);
 
-                self.current_state = ProgramState::KeyboardTargetting{cursor_pos: gui::draw_cursor(cursor_pos, ctx, self, LIGHT_GREEN)};
+                self.current_state = ProgramState::KeyboardTargetting{cursor_pos: gui::draw_cursor(cursor_pos, self, LIGHT_GREEN)};
 
-                gui::draw_tooltip(self, ctx, cursor_pos);
+                gui::draw_tooltip(self, cursor_pos);
 
                 if INPUT.lock().is_key_pressed(VirtualKeyCode::Escape)
                 {
@@ -609,21 +596,10 @@ impl GameState for State{
 
             ProgramState::GameOver =>
             {
-                ctx.cls();
-                ctx.draw_box(20, 10, 40, 20, color::WHITE, color::BLACK);
-                ctx.print_color_centered_at(40, 21, color::WHITE, color::BLACK, "You have died!");
-                let inp = ctx.key;
-                match inp
+                self.renderer.draw_char(250, 100, "You have died!", RED);
+                if is_key_down(KeyCode::Escape)
                 {
-                    Some(key) =>
-                    {
-                        match key
-                        {
-                            bracket_lib::terminal::VirtualKeyCode::Escape => ctx.quit(),
-                            _ => {}
-                        }
-                    }
-                    None => {}
+                    quit();
                 }
             }
             _ =>
@@ -634,9 +610,8 @@ impl GameState for State{
     }
 }
 
-fn run_systems(state: &mut State, ctx: &mut BTerm)
+fn run_systems(state: &mut State)
 {
-    ctx.cls();
 
     VisibilitySystem::run(state);
 
@@ -657,12 +632,12 @@ fn run_systems(state: &mut State, ctx: &mut BTerm)
 
     state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
-    camera::render_camera(state, ctx);
-    effects::run_animation_queue(state, ctx);
-    camera::render_camera(state, ctx);
-    gui::draw_ui(state, ctx);
-    gui::draw_status_box(state, ctx);
-    gui::draw_gamelog(state, ctx);
+    camera::render_camera(state);
+    effects::run_animation_queue(state);
+    camera::render_camera(state);
+    gui::draw_ui(state);
+    gui::draw_status_box(state);
+    gui::draw_gamelog(state);
 }
 
 fn game_init ( state: &mut State)
@@ -707,7 +682,7 @@ fn game_init ( state: &mut State)
 
 }
 
-fn old_main() -> BError
+fn old_main(renderer : Renderer) -> BError
 {
  //println!("{}", std::env::current_dir().unwrap().display());
     //println!("Hello, world!");
@@ -746,6 +721,7 @@ fn old_main() -> BError
         target_mode: TargettingMode::Keyboard{cursor_pos: Point::zero()},
         turn_number: 0,
         network_map: NetworkMap::empty(),
+        renderer,
     };
     
     //context.with_post_scanlines(true);
@@ -770,6 +746,7 @@ async fn main()
         default_font: font,
         canvas: GraphicGrid::new(30, 30, 15, 15),
         char_size: CharSize(0, 0, 0),
+        map_view_size: (30,20)
     };
     let size = measure_text("x", Some(&rend.default_font), rend.canvas.tile_height as u16, 1.0);
     rend.char_size = CharSize(size.width as i32, size.height as i32, size.offset_y as i32);

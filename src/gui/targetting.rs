@@ -1,8 +1,9 @@
 
 
-use bracket_lib::{color::{BLACK, BLUE, CYAN, RED, RGB, YELLOW}, prelude::{field_of_view, Algorithm2D, BTerm, Point, VirtualKeyCode}};
+use bracket_lib::{ prelude::{field_of_view, Algorithm2D, Point}};
+use macroquad::{color::YELLOW, input::{is_key_down, is_mouse_button_down, KeyCode, MouseButton}, miniquad::gl::GL_BLUE, text::draw_text_ex};
 
-use crate::{camera, menus::inventory_state, FoV, State};
+use crate::{camera, menus::inventory_state, renderer::color_with_alpha, FoV, State};
 
 
 pub enum TargettingMode
@@ -11,9 +12,9 @@ pub enum TargettingMode
     Keyboard{cursor_pos : Point}
 }
 
-pub fn keyboard_cursor(state : &mut State, ctx: &mut BTerm, pos : Point) -> Point
+pub fn keyboard_cursor(state : &mut State, pos : Point) -> Point
 {
-    let translation = key_to_translation(ctx);
+    let translation = key_to_translation();
 
     if state.map.in_bounds(pos+translation)
     {
@@ -26,68 +27,54 @@ pub fn keyboard_cursor(state : &mut State, ctx: &mut BTerm, pos : Point) -> Poin
 }
 
 
-pub fn key_to_translation(ctx: &mut BTerm) -> Point
+pub fn key_to_translation() -> Point
 {
-    match ctx.key
-    {
-        Some(key) => 
-        {
-            match key
-            {
-                VirtualKeyCode::Numpad8 => {Point::new(0, -1)}
-                VirtualKeyCode::Numpad9 => {Point::new(1, -1)}
-                VirtualKeyCode::Numpad6 => {Point::new(1, 0)}
-                VirtualKeyCode::Numpad3 => {Point::new(1, 1)}
-                VirtualKeyCode::Numpad2 => {Point::new(0, 1)}
-                VirtualKeyCode::Numpad1 => {Point::new(-1, 1)}
-                VirtualKeyCode::Numpad4 => {Point::new(-1, 0)}
-                VirtualKeyCode::Numpad7 => {Point::new(-1, -1)}
-                _ => {Point::new(0, 0)}
-            }
-        }
-        None => {Point::new(0, 0)}
-    }
+    if is_key_down(KeyCode::Kp8) {return Point::new(0, -1)}
+    if is_key_down(KeyCode::Kp9) {return Point::new(1, -1)}
+    if is_key_down(KeyCode::Kp6) {return Point::new(1, 0)}
+    if is_key_down(KeyCode::Kp3) {return Point::new(1, 1)}
+    if is_key_down(KeyCode::Kp2) {return Point::new(0, 1)}
+    if is_key_down(KeyCode::Kp1) {return Point::new(-1, 1)}
+    if is_key_down(KeyCode::Kp4) {return Point::new(-1, 0)}
+    if is_key_down(KeyCode::Kp7) {return Point::new(-1, -1)}
+
+    Point::zero()
 }
 
 
-pub fn mouse_cursor(state : &mut State, ctx: &mut BTerm) -> Point
+pub fn mouse_cursor(state : &mut State) -> Point
 {
-    ctx.mouse_point()
+    let p = macroquad::input::mouse_position();
+
+    Point::from_tuple(state.renderer.canvas.get_tile_coords(p.0 as i32, p.1 as i32))
 }
 
 
-pub fn select_target_mode(state : &mut State, ctx: &mut BTerm) -> Point
+pub fn select_target_mode(state : &mut State) -> Point
 {
     match state.target_mode
     {
         TargettingMode::Keyboard{cursor_pos: pos}=>
         { 
-            let point = keyboard_cursor(state, ctx, pos); 
+            let point = keyboard_cursor(state, pos); 
             state.target_mode = TargettingMode::Keyboard { cursor_pos: point };
             return point;
         }
-        TargettingMode::Mouse=>{ return mouse_cursor(state, ctx);}
+        TargettingMode::Mouse=>{ return mouse_cursor(state);}
     }
 }
 
-pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Option<i32>) 
+pub fn ranged_target(state : &mut State, range : i32, aoe : Option<i32>) 
     -> (inventory_state, Option<Point>)
 {
-    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state, ctx);
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state);
 
-    match ctx.key
+    if is_key_down(KeyCode::Escape)
     {
-        Some(key) =>
-        {
-            if key == VirtualKeyCode::Escape
-            {
-                return (inventory_state::Cancel,None);
-            }
-        }
-        None =>{}
+        return (inventory_state::Cancel, None);
     }
 
-    ctx.print_color(5,0,RGB::named(YELLOW), RGB::named(BLACK), "SELECT TARGET:");
+    state.renderer.draw_char(5, 0, "SELECT TARGET", macroquad::prelude::YELLOW);
     
     let mut available_cells = Vec::new();
     let visible = state.world.get::<&FoV>(state.player_ent
@@ -106,7 +93,9 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
                     let screen_y = idx.y - min_y;
                     if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y) - 1
                     {
-                        ctx.set_bg(screen_x, screen_y, RGB::named(BLUE));
+                        let mut bg = macroquad::prelude::BLUE;
+                        bg.a = 0.4;
+                        state.renderer.draw_square(screen_x, screen_y, bg);
                         available_cells.push(idx.clone());
                     }
                 }
@@ -118,7 +107,7 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
     std::mem::drop(visible);
     //the function version of Bterm.mouse_pos is required to actually get the position!
     
-    let mouse_pos = select_target_mode(state, ctx).to_tuple();
+    let mouse_pos = select_target_mode(state).to_tuple();
 
     let mut mouse_map_pos = mouse_pos;
     mouse_map_pos.0 += min_x;
@@ -135,42 +124,30 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
     }
     if is_valid_target
     {
-        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(CYAN));
-        if ctx.left_click
+        state.renderer.draw_square(mouse_pos.0, mouse_pos.1, color_with_alpha(macroquad::color::SKYBLUE, 0.4));
+        if is_mouse_button_down(MouseButton::Left)
         {
             return (inventory_state::Selected,Some(Point::new(mouse_map_pos.0, mouse_map_pos.1)) );
         }
 
-        match ctx.key
+        if is_key_down(KeyCode::Enter) || is_key_down(KeyCode::KpEnter) || is_key_down(KeyCode::F)
         {
-            Some(key) => 
-            {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return || key == VirtualKeyCode::F
-                {
-                    return (inventory_state::Selected,Some(Point::new(mouse_map_pos.0, mouse_map_pos.1)));
-                }
-            }
-            None => {}
+            return (inventory_state::Selected,Some(Point::new(mouse_map_pos.0, mouse_map_pos.1)));
         }
     }
     else
     {
-        ctx.set_bg(mouse_pos.0,mouse_pos.1,RGB::named(RED));
-        if ctx.left_click
+        let mut bg = macroquad::prelude::RED;
+        bg.a = 0.4;
+        state.renderer.draw_square(mouse_pos.0, mouse_pos.1, bg);
+        if is_mouse_button_down(MouseButton::Left)
         {
             return (inventory_state::Cancel, None);
         }
 
-        match ctx.key
+        if is_key_down(KeyCode::Enter) || is_key_down(KeyCode::KpEnter) || is_key_down(KeyCode::F)
         {
-            Some(key) => 
-            {
-                if key == VirtualKeyCode::NumpadEnter || key == VirtualKeyCode::Return ||key == VirtualKeyCode::F
-                {
-                    return (inventory_state::Cancel, None);
-                }
-            }
-            None => {}
+            return (inventory_state::Cancel, None);
         }
     }
 
@@ -185,7 +162,10 @@ pub fn ranged_target(state : &mut State, ctx: &mut BTerm, range : i32, aoe : Opt
             {
                 let screen_x = point.x - min_x;
                 let screen_y = point.y - min_y;
-                ctx.set_bg(screen_x, screen_y, YELLOW);
+
+                let mut bg = YELLOW;
+                bg.a = 0.4;
+                state.renderer.draw_square(screen_x, screen_y, bg);
             }
             
         }

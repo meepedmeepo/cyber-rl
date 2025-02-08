@@ -1,7 +1,7 @@
 use bracket_lib::{color::{BLACK, GRAY, RGB}, prelude::{to_cp437, BTerm, FontCharType}};
 
 
-use crate::{particles::particle_system, Hidden, Map, Position, Renderable, State, TileType};
+use crate::{particles::particle_system, renderer::rgb_to_color, Hidden, Map, Position, Renderable, State, TileType};
 
 mod themes;
 
@@ -10,9 +10,9 @@ use themes::*;
 
 const SHOW_BOUNDARIES : bool = false;
 
-pub fn render_camera(state : &mut State, ctx : &mut BTerm)
+pub fn render_camera(state : &mut State)
 {
-    let (x_chars, y_chars) = ctx.get_char_size();
+    let (x_chars, y_chars) = state.renderer.map_view_size;
 
     let center_x = (x_chars / 2) as i32;
     let center_y = (y_chars / 2) as i32;
@@ -39,11 +39,12 @@ pub fn render_camera(state : &mut State, ctx : &mut BTerm)
                 if state.map.revealed_tiles[idx]
                 {
                     let (glyph, fg, bg) = tile_glyph(idx, &state.map);
-                    ctx.set(x, y, fg, bg, glyph);
+                    state.renderer.draw_char_bg(x, y, &glyph.to_string(), rgb_to_color(fg), rgb_to_color(bg));
                 }
             } else if SHOW_BOUNDARIES
             {
-                ctx.set(x, y, RGB::named(GRAY), RGB::named(BLACK), to_cp437('.'));
+                state.renderer.draw_char_bg(x, y, ".", rgb_to_color(RGB::named(GRAY))
+                    , rgb_to_color(RGB::named(BLACK)));
             }
             x += 1;
         }
@@ -51,7 +52,7 @@ pub fn render_camera(state : &mut State, ctx : &mut BTerm)
     }
 
     particle_system::spawn_system(state);
-    particle_system::update(state, ctx);
+    particle_system::update(state);
 
     let mut entities_to_render  = 
         state.world.query_mut::<(&Position,&Renderable)>().without::<&Hidden>()
@@ -72,7 +73,9 @@ pub fn render_camera(state : &mut State, ctx : &mut BTerm)
 
             if entity_screen_x > 0 && entity_screen_x < map_width && entity_screen_y > 0 && entity_screen_y < map_height
             {
-                ctx.set(entity_screen_x, entity_screen_y, ent.1.fg, ent.1.bg, ent.1.glyph);
+                let fg = rgb_to_color(ent.1.fg);
+                let bg = rgb_to_color(ent.1.bg);
+                state.renderer.draw_char_bg(entity_screen_x, entity_screen_y, &ent.1.glyph.to_string(),fg , bg);
             }
         }
     }
@@ -82,9 +85,9 @@ pub fn render_camera(state : &mut State, ctx : &mut BTerm)
 
 
 
-pub fn get_screen_bounds(state : &mut State, ctx : &mut BTerm) -> (i32, i32, i32, i32)
+pub fn get_screen_bounds(state : &mut State) -> (i32, i32, i32, i32)
 {
-    let (x_chars, y_chars) = ctx.get_char_size();
+    let (x_chars, y_chars) = state.renderer.map_view_size;
 
     let center_x = (x_chars / 2) as i32;
     let center_y = (y_chars / 2) as i32;

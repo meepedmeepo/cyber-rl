@@ -1,6 +1,5 @@
-use bracket_lib::prelude::{console, BTerm, Point};
+use bracket_lib::prelude::{console};
 use hecs::Entity;
-use queues::{queue, Queue, IsQueue};
 
 use crate::{ components, effects::{self, add_effect, EffectType, Targets}, statistics::BaseStatistics, Name, Position, RangedWeapon, Renderable, State};
 
@@ -10,7 +9,7 @@ pub struct ProjectileUpdated
 {}
 
 
-pub fn projectile_system(state : &mut State, ctx: &mut BTerm)
+pub fn projectile_system(state : &mut State)
 {
     let mut proj_to_update = Vec::new();
     let mut proj_to_despawn: Vec<Entity> = Vec::new();

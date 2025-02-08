@@ -1,42 +1,44 @@
 use bracket_lib::prelude::*;
-use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
+use macroquad::input::{get_keys_down, KeyCode};
+use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, camera, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,Entity,Map,Name,AttackSystem,FoV,Position};
-use std::{clone, cmp::{max, min}};
+use std::{ cmp::{max, min}};
 
 
 
 pub struct Player
 {}
 
-pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
+pub fn player_input_system(state: &mut State) -> ProgramState
 {
-    match ctx.key
+
+    let keys = get_keys_down();
+    for key in keys.iter()
     {
-        None => {return ProgramState::AwaitingInput;},
-        Some(key) => match key
+        match key
         {
-            VirtualKeyCode::Numpad4 =>return attempt_move(state, -1, 0),
-            VirtualKeyCode::Numpad6 => return attempt_move(state,1,0),
-            VirtualKeyCode::Numpad8 => return attempt_move(state,0,-1),
-            VirtualKeyCode::Numpad2 => return attempt_move(state,0,1),
+            KeyCode::Kp4 =>return attempt_move(state, -1, 0),
+            KeyCode::Kp6 => return attempt_move(state,1,0),
+            KeyCode::Kp8 => return attempt_move(state,0,-1),
+            KeyCode::Kp2 => return attempt_move(state,0,1),
         
-            // VirtualKeyCode::A=>try_move(state, -1, 0),
-            // VirtualKeyCode::D => try_move(state,1,0),
-            // VirtualKeyCode::W => try_move(state,0,-1),
-            // VirtualKeyCode::S => try_move(state,0,1),
+            // KeyCode::A=>try_move(state, -1, 0),
+            // KeyCode::D => try_move(state,1,0),
+            // KeyCode::W => try_move(state,0,-1),
+            // KeyCode::S => try_move(state,0,1),
 
             // Diagonals
-            VirtualKeyCode::Numpad9 => return attempt_move(state, 1, -1),
+            KeyCode::Kp9 => return attempt_move(state, 1, -1),
 
-            VirtualKeyCode::Numpad7 => return attempt_move(state, -1, -1),
+            KeyCode::Kp7 => return attempt_move(state, -1, -1),
 
-            VirtualKeyCode::Numpad3 => return attempt_move(state, 1, 1),
+            KeyCode::Kp3 => return attempt_move(state, 1, 1),
 
-            VirtualKeyCode::Numpad1 => return attempt_move(state, -1, 1),
+            KeyCode::Kp1 => return attempt_move(state, -1, 1),
 
 
-            VirtualKeyCode::D =>
+            KeyCode::D =>
             {
                 let items =state.world.query::<&InContainer>()
                     .iter()
@@ -46,7 +48,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
                 return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::DropItem };
             }
-            VirtualKeyCode::R =>
+            KeyCode::R =>
             {
                 let items =state.world.query::<&Equipped>()
                     .iter()
@@ -57,8 +59,8 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::UnequipItem };
             }
 
-            VirtualKeyCode::I => return ProgramState::Inventory,
-            VirtualKeyCode::Space => 
+            KeyCode::I => return ProgramState::Inventory,
+            KeyCode::Space => 
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
@@ -66,7 +68,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
                 return ProgramState::Ticking;
             },
-            VirtualKeyCode::Numpad5 => 
+            KeyCode::Kp5 => 
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
                     .expect("Couldn't insert WantsToRest componenent onto player!");
@@ -74,7 +76,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 //apply_energy_cost(state, crate::ai::ActionType::Move, state.player_ent.unwrap());
                 return ProgramState::Ticking;
             },
-            VirtualKeyCode::F => 
+            KeyCode::F => 
             {
 
                 let query = state.world.query::<&Equipped>()
@@ -109,7 +111,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                 }
             
             },
-            VirtualKeyCode::Period => 
+            KeyCode::Period => 
             {
                 let idx = state.map.xy_idx(state.player_pos.x, state.player_pos.y);
                 if state.map.map[idx] == TileType::DownStairs
@@ -122,7 +124,7 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
                     return ProgramState::AwaitingInput;
                 }
             }
-            VirtualKeyCode::G => 
+            KeyCode::G => 
             {
 
                 let mut items = Vec::new();
@@ -153,8 +155,9 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
             }
 
-            VirtualKeyCode::Semicolon => 
+            KeyCode::Semicolon => 
             {
+                let x = camera::get_screen_bounds(state);
                 let (x_chars, y_chars) = ctx.get_char_size();
 
                 let center_x = (x_chars / 2) as i32;
@@ -167,12 +170,12 @@ pub fn player_input_system(ctx:&BTerm, state: &mut State) -> ProgramState
 
                 return ProgramState::KeyboardTargetting { cursor_pos: Point::new(px - min_x, py - min_y) };
             }
-            _ =>{return ProgramState::AwaitingInput;},
+            _ =>{},
 
         }
 
     }
-    ProgramState::Ticking
+    ProgramState::AwaitingInput
 }
 
 fn attempt_move(state: &mut State, delta_x:i32, delta_y:i32) -> ProgramState

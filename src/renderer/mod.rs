@@ -1,22 +1,31 @@
 mod tile_rendering;
 
+use bracket_lib::color::RGB;
 use macroquad::prelude::*;
 
 
 #[derive(Debug,PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum RenderBackend {MacroQuad, BracketLib}
 
-
+#[derive(Debug, Clone)]
 pub struct Renderer 
 {
     pub mode : RenderBackend,
     pub canvas : GraphicGrid,
     pub default_font : Font,
-    pub char_size : CharSize
+    pub char_size : CharSize,
+    pub map_view_size : (u32,u32)
 }
+#[derive(Debug, Clone, Copy)]
 pub struct CharSize(pub i32, pub i32, pub i32);
 impl Renderer
 {
+    pub fn draw_char_bg(&self, x : i32, y: i32, content : &str, fg : Color, bg : Color)
+    {
+        self.draw_square(x, y, bg);
+        self.draw_char(x, y, content, fg);
+    }
+
     pub fn draw_char(&self, x : i32, y: i32, content : &str, color : Color )
     {
         let screen_pos = self.canvas.get_tile_screen_pos(x, y);
@@ -51,13 +60,12 @@ pub fn draw_tiles(rend : &Renderer)
             draw_rectangle_lines(x as f32*w, y as f32*h, w, h, 1., BLACK);
             rend.draw_char(x, y, ".", BLACK);
 
-
         }
     }
     //rend.draw_char(1, 0, "x", BLACK);
 }
 
-
+#[derive(Debug, Clone, Copy)]
 pub struct GraphicGrid
 {
     pub tile_width : i32,
@@ -92,3 +100,15 @@ pub fn get_tile_coords(&self, x : i32, y : i32) -> (i32, i32)
 
 }
 
+pub fn rgb_to_color(value : RGB) -> Color
+{
+    Color { r: value.r, g: value.g, b: value.b, a: 1.0 }
+}
+
+pub fn color_with_alpha(color : Color, alpha : f32) -> Color
+{
+    let mut col = color;
+    col.a = alpha;
+
+    col
+}

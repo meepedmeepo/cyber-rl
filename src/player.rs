@@ -157,16 +157,11 @@ pub fn player_input_system(state: &mut State) -> ProgramState
 
             KeyCode::Semicolon => 
             {
-                let x = camera::get_screen_bounds(state);
-                let (x_chars, y_chars) = ctx.get_char_size();
+                let (min_x,max_x,min_y,max_y) = camera::get_screen_bounds(state);
 
-                let center_x = (x_chars / 2) as i32;
-                let center_y = (y_chars / 2) as i32;
                 let player_pos = state.player_pos;
                 let px = player_pos.x;
                 let py = player_pos.y;
-                let min_x = player_pos.x - center_x;
-                let min_y = player_pos.y - center_y;
 
                 return ProgramState::KeyboardTargetting { cursor_pos: Point::new(px - min_x, py - min_y) };
             }

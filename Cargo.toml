@@ -6,14 +6,15 @@ edition = "2021"
 [dependencies]
 bracket-lib = {version ="0.8.7", features=["webgpu"], default-features = false}
 hecs = {version ="0.10.5", features = ["row-serialize"]}
-lazy_static = "1.5.0"
+lazy_static = {version =  "1.5.0"}
 queues = "1.1.0"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 priority-queue = "2.1.1"
 petgraph = "0.7.1"
-macroquad = "0.4.13"
-
+new-egui-macroquad = "0.16.0"
+macroquad = "0.4.5"
+egui-miniquad = "^0.15"
 
 [profile.release]
 debug =  true

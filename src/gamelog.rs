@@ -1,9 +1,9 @@
 
 
-
+#[derive(Debug,Clone)]
 pub struct GameLog
 {
-    entries : Vec<String>,
+    pub entries : Vec<String>,
     pub index : usize,
 }
 
@@ -18,6 +18,11 @@ impl GameLog
         }
     }
 
+    pub fn len(&self) -> usize
+    {
+        self.entries.len()
+    }
+
     pub fn add_log(&mut self, msg: String)
     {
         self.entries.push(". ".to_string() + &msg);
@@ -28,7 +33,14 @@ impl GameLog
     {
         self.entries.iter().rev().skip(self.index).take(num_entries ).map(|s|s.clone()).collect::<Vec<String>>()
     }
+}
 
+impl Iterator for GameLog
+{
+    type Item = String;
 
-
+    fn next(&mut self) -> Option<Self::Item>
+    {
+        self.entries.iter().next().cloned()
+    }
 }

@@ -11,9 +11,7 @@ use damage_system::DamageSystem;
 use effects::add_effect;
 use effects::run_effect_queue;
 use gamelog::GameLog;
-use gui::display_input_text;
 use gui::draw_cursor;
-use gui::get_input_text;
 use gui::keyboard_cursor;
 use gui::menu_theme;
 use gui::TargettingMode;
@@ -32,6 +30,7 @@ use menus::MenuType;
 use networks::ControlNode;
 use networks::NetworkMap;
 use networks::NodeOwned;
+use new_egui_macroquad::egui::Align2;
 use particles::particle_system;
 use particles::ParticleBuilder;
 use projectile::projectile_system;
@@ -90,7 +89,8 @@ pub mod camera;
 pub mod renderer;
 
 use macroquad::prelude::*;
-
+use new_egui_macroquad as em;
+use new_egui_macroquad::egui as egui;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -345,8 +345,8 @@ impl State{
             ProgramState::TextInput {mut text } =>
             {
 
-                get_input_text(self, &mut text);
-                display_input_text(self,  &text, 5, 15);
+                //get_input_text(self, &mut text);
+                //display_input_text(self,  &text, 5, 15);
                 self.current_state = ProgramState::TextInput { text, }
             }
 
@@ -397,7 +397,7 @@ impl State{
             }
             ProgramState::SelectionMenu { mut items, menu  } =>
             {
-                ctx.cls();
+
                 camera::render_camera(self);
                 //render_system(self, ctx);
                 gui::draw_ui(self);
@@ -489,7 +489,7 @@ impl State{
 
             ProgramState::Targeting { range, item, aoe } =>
             {
-                ctx.cls();
+
                 camera::render_camera(self);
                 //render_system(self, ctx);
                 gui::draw_ui(self);
@@ -682,20 +682,20 @@ fn game_init ( state: &mut State)
 
 }
 
-fn old_main(renderer : Renderer) -> BError
+fn create_state(renderer : Renderer) -> State
 {
  //println!("{}", std::env::current_dir().unwrap().display());
     //println!("Hello, world!");
-    let mut context = BTermBuilder::new()
-    .with_dimensions(110, 45)
-    .with_resource_path("resources/")
-    .with_font("dbyte_2x.png", 12 , 16)
-    .with_tile_dimensions(12, 16)
-    .with_simple_console(110, 45, "dbyte_2x.png")
-    .with_title("Rust-like")
-    .with_fps_cap(60.)
-    .with_advanced_input(true)
-    .build()?;
+    // let mut context = BTermBuilder::new()
+    // .with_dimensions(110, 45)
+    // .with_resource_path("resources/")
+    // .with_font("dbyte_2x.png", 12 , 16)
+    // .with_tile_dimensions(12, 16)
+    // .with_simple_console(110, 45, "dbyte_2x.png")
+    // .with_title("Rust-like")
+    // .with_fps_cap(60.)
+    // .with_advanced_input(true)
+    // .build()?;
 
     let mut gs: State = State{
         world: World::new(),
@@ -726,12 +726,12 @@ fn old_main(renderer : Renderer) -> BError
     
     //context.with_post_scanlines(true);
 
-    context.post_screenburn = true;
+    
     
     game_init(&mut gs);
-    main_loop(context,gs)
-}
 
+    gs
+}
 
 #[macroquad::main("CyberRL")]
 async fn main()
@@ -739,6 +739,8 @@ async fn main()
     let font = load_ttf_font("./assets/fonts/JuliaMono-Bold.ttf")
     .await
     .unwrap();
+
+    //egui::Context::
 
     let mut rend = renderer::Renderer
     {
@@ -748,16 +750,31 @@ async fn main()
         char_size: CharSize(0, 0, 0),
         map_view_size: (30,20)
     };
+
+    
     let size = measure_text("x", Some(&rend.default_font), rend.canvas.tile_height as u16, 1.0);
     rend.char_size = CharSize(size.width as i32, size.height as i32, size.offset_y as i32);
     //let cam = Camera2D::from_display_rect(macroquad::prelude::Rect::new(0.0, 152.0, 320.0, -152.0));
+    let mut state = create_state(rend.clone());
+
+    for i in 0..101
+    {
+        state.game_log.entries.push(i.to_string());
+    }
     loop {
         clear_background(DARKPURPLE);
         //set_camera(&Camera2D {
           //  zoom: vec2(1., screen_width() / screen_height()),
             //..Default::default()
         //});
+        em::ui(|egui_ctx| {
+            gui::mqui::ui_layout(egui_ctx, &state);
+                
+            
+        });
 
+        
+        em::draw();
         draw_tiles(&rend);
         next_frame().await
     }

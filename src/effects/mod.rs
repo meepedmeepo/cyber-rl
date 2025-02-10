@@ -28,13 +28,13 @@ lazy_static!
 pub enum EffectType
 {
     Damage {amount : i32},
-    Particle {glyph: FontCharType, fg: RGB, bg: RGB, lifetime: f32},
+    Particle {glyph: String, fg: RGB, bg: RGB, lifetime: f32},
     ItemUse {item : Entity},
     Healing {amount : i32},
     Feed {amount : i32},
-    ParticleLine {glyph: FontCharType, fg: RGB, bg: RGB, lifetime:f32},
+    ParticleLine {glyph: String, fg: RGB, bg: RGB, lifetime:f32},
     PropTriggered {prop : Entity},
-    ParticleProjectile {glyph : FontCharType, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 },
+    ParticleProjectile {glyph : String, fg : RGB, bg : RGB, lifetime : f32, step_time : f32 },
     RangedFire{item : Entity},
 }
 
@@ -133,11 +133,11 @@ fn affect_tile(state : &mut State, effect: &EffectSpawner, tile_idx : i32)
             .for_each(|target| affect_entity(state, effect, *target));
     }
     
-    match effect.effect_type
+    match &effect.effect_type
     {
         EffectType::Particle { glyph, fg, bg, lifetime } =>
         {
-            spawn_particle(state, glyph, fg, bg, lifetime, tile_idx);
+            spawn_particle(state, glyph.clone(), *fg, *bg, *lifetime, tile_idx);
         }
         _ => {}
     }

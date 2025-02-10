@@ -15,7 +15,7 @@ pub fn spawn_system(state: &mut State)
     {
         let p = 
             state.world.spawn((Position{x : particle.x, y : particle.y},
-            Renderable{glyph : particle.glyph, fg : particle.fg, bg : particle.bg, order: 7},
+            Renderable{glyph : particle.glyph.clone(), fg : particle.fg, bg : particle.bg, order: 7},
             ParticleLifetime{lifetime : particle.lifetime}));
         match particle.target
         {
@@ -38,7 +38,7 @@ pub fn update(state: &mut State)
         state.world.query_mut::<(&mut ParticleLifetime, Option<&ParticleFollowEntity>)>()
     {
         let mut culled = false;
-        lifetime.lifetime -= get_frame_time();
+        lifetime.lifetime -= get_frame_time()*1000.;
 
         if lifetime.lifetime < 0.
         {

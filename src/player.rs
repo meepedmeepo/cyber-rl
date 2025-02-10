@@ -1,5 +1,5 @@
 use bracket_lib::prelude::*;
-use macroquad::input::{get_keys_down, KeyCode};
+use macroquad::input::{get_keys_down, get_keys_pressed, KeyCode};
 use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, camera, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,Entity,Map,Name,AttackSystem,FoV,Position};
@@ -13,7 +13,7 @@ pub struct Player
 pub fn player_input_system(state: &mut State) -> ProgramState
 {
 
-    let keys = get_keys_down();
+    let keys = get_keys_pressed();
     for key in keys.iter()
     {
         match key
@@ -228,7 +228,7 @@ pub fn try_move(state: &mut State,delta_x:i32,delta_y:i32) -> bool
             {
                 let _ =state.world.remove_one::<BlocksTiles>(*door);
                 let _ =state.world.remove_one::<BlocksVisibility>(*door);
-                state.world.query_one_mut::<&mut Renderable>(*door).unwrap().glyph = to_cp437('/');
+                state.world.query_one_mut::<&mut Renderable>(*door).unwrap().glyph = "/".to_string();
                 state.world.query_one_mut::<&mut FoV>(state.player_ent.unwrap()).unwrap().dirty = true;
 
                 apply_energy_cost(state, crate::ai::ActionType::OpenDoor, state.player_ent.unwrap());

@@ -1,5 +1,9 @@
-use bracket_lib::{color::{BLACK, GRAY, RGB}, prelude::{to_cp437, BTerm, FontCharType}};
+use std::borrow::Cow;
 
+use bracket_lib::{color::{BLACK, GRAY, RGB}, prelude::{to_char, to_cp437, BTerm, FontCharType}};
+use codepage_437::CP437_CONTROL;
+use encode_unicode::Utf16Char;
+use codepage_437::*;
 
 use crate::{particles::particle_system, renderer::rgb_to_color, Hidden, Map, Position, Renderable, State, TileType};
 
@@ -39,7 +43,11 @@ pub fn render_camera(state : &mut State)
                 if state.map.revealed_tiles[idx]
                 {
                     let (glyph, fg, bg) = tile_glyph(idx, &state.map);
-                    state.renderer.draw_char_bg(x, y, &glyph.to_string(), rgb_to_color(fg), rgb_to_color(bg));
+                    //let dt = glyph.to_string();
+                    //let data =  dt.into_cp437(&CP437_CONTROL).unwrap();
+                    //let res = 
+                    //let mut buf = [0;3];
+                    state.renderer.draw_char_bg(x, y,&glyph, rgb_to_color(fg), rgb_to_color(bg));
                 }
             } else if SHOW_BOUNDARIES
             {
@@ -67,7 +75,7 @@ pub fn render_camera(state : &mut State)
     {
         let idx = state.map.xy_idx(ent.0.x, ent.0.y);
         if state.map.visible_tiles[idx]
-        {
+    { 
             let entity_screen_x = ent.0.x - min_x;
             let entity_screen_y = ent.0.y - min_y;
 

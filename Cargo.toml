@@ -15,6 +15,9 @@ petgraph = "0.7.1"
 new-egui-macroquad = "0.16.0"
 macroquad = "0.4.5"
 egui-miniquad = "^0.15"
+encode_unicode = "1.0.0"
+macroquad-text = "0.2.0"
+codepage-437 = "0.1.0"
 
 [profile.release]
 debug =  true

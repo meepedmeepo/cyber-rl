@@ -33,7 +33,7 @@ pub fn run_animation_queue(state : &mut State)
     //updates animations in the animation queue
     for (id, anim) in state.world.query_mut::<&mut Animation>()
     {
-        anim.current_step_time -= get_frame_time();
+        anim.current_step_time -= get_frame_time()*1000.;
 
         if anim.current_step_time < 0.
         {
@@ -44,7 +44,7 @@ pub fn run_animation_queue(state : &mut State)
                 anim.current_step_time = anim.step_time;
                 let idx = state.map.xy_idx(anim.path[anim.index].x, anim.path[anim.index].y) as i32;
 
-                add_effect(None, super::EffectType::Particle { glyph: anim.particle.glyph, fg: anim.particle.fg
+                add_effect(None, super::EffectType::Particle { glyph: anim.particle.glyph.clone(), fg: anim.particle.fg
                 , bg: anim.particle.bg, lifetime: anim.particle.lifetime+25. }
                 , super::Targets::Tile { tile_idx: idx });
             }

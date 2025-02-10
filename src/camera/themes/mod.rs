@@ -5,7 +5,7 @@ use crate::{Map, TileType};
 
 
 
-pub fn tile_glyph(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
+pub fn tile_glyph(idx : usize, map : &Map) -> (String, RGB, RGB)
 {
     let (glyph, mut fg, bg) = match map.depth 
     {
@@ -17,7 +17,7 @@ pub fn tile_glyph(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
         fg = fg.to_greyscale();
     }
 
-    (glyph, fg, bg)
+    (bracket_lib::terminal::to_char(glyph as u8).to_string(), fg, bg)
 }
 
 fn get_tile_glyph_default(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)

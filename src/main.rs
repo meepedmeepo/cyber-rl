@@ -21,6 +21,7 @@ use hunger::HungerLevel;
 use macroquad::color::RED;
 use macroquad::miniquad::window::quit;
 use macroquad::miniquad::RenderingBackend;
+use macroquad_text::Fonts;
 use map_indexing_system::MapIndexingSystem;
 use menus::inventory_state;
 use menus::menu_input;
@@ -31,6 +32,9 @@ use networks::ControlNode;
 use networks::NetworkMap;
 use networks::NodeOwned;
 use new_egui_macroquad::egui::Align2;
+use new_egui_macroquad::egui::Context;
+use new_egui_macroquad::egui::FontData;
+use new_egui_macroquad::egui::FontDefinitions;
 use particles::particle_system;
 use particles::ParticleBuilder;
 use projectile::projectile_system;
@@ -50,6 +54,7 @@ use std::cmp::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::Hash;
+use std::rc::Rc;
 use maps::*;
 pub mod maps;
 mod components;
@@ -96,6 +101,9 @@ use new_egui_macroquad::egui as egui;
 extern crate lazy_static;
 
 
+
+const NOTO_SANS_SYMBOLS : &[u8] = include_bytes!("../assets/fonts/NotoSansSymbols.ttf");
+const JULIA : &[u8] = include_bytes!("../assets/fonts/JuliaMono-Bold.ttf");
 pub struct State
 {
     world : World,
@@ -536,7 +544,7 @@ impl State{
 
                 match target_state
                 {
-                    TargettingState::None => {}
+                    TargettingState::None => {self.current_state = ProgramState::RangedCombat { range: range, dmg: dmg }}
                     TargettingState::Cancel => {self.current_state = ProgramState::AwaitingInput;}
 
                     TargettingState::Selected { mut path, end  } =>
@@ -652,7 +660,7 @@ fn game_init ( state: &mut State)
     
     state.player_pos = xy;
     state.player_ent = Some( state.world.spawn((Position::new(xy.x,xy.y),
-    Renderable::new(to_cp437('@'),
+    Renderable::new("@".to_string(),
     RGB::named(LIME_GREEN),
     RGB::from_f32(0., 0., 0.),
     3)
@@ -684,19 +692,6 @@ fn game_init ( state: &mut State)
 
 fn create_state(renderer : Renderer) -> State
 {
- //println!("{}", std::env::current_dir().unwrap().display());
-    //println!("Hello, world!");
-    // let mut context = BTermBuilder::new()
-    // .with_dimensions(110, 45)
-    // .with_resource_path("resources/")
-    // .with_font("dbyte_2x.png", 12 , 16)
-    // .with_tile_dimensions(12, 16)
-    // .with_simple_console(110, 45, "dbyte_2x.png")
-    // .with_title("Rust-like")
-    // .with_fps_cap(60.)
-    // .with_advanced_input(true)
-    // .build()?;
-
     let mut gs: State = State{
         world: World::new(),
 
@@ -723,11 +718,6 @@ fn create_state(renderer : Renderer) -> State
         network_map: NetworkMap::empty(),
         renderer,
     };
-    
-    //context.with_post_scanlines(true);
-
-    
-    
     game_init(&mut gs);
 
     gs
@@ -736,11 +726,33 @@ fn create_state(renderer : Renderer) -> State
 #[macroquad::main("CyberRL")]
 async fn main()
 {
-    let font = load_ttf_font("./assets/fonts/JuliaMono-Bold.ttf")
+    let font = load_ttf_font("./assets/fonts/droid-sans-mono.ttf")
     .await
     .unwrap();
 
+    let mut font_list = Fonts::default();
+
+    font_list.load_font_from_bytes("Julia Mono", JULIA).unwrap();
+    font_list.load_font_from_bytes("Noto Sans Symbols", NOTO_SANS_SYMBOLS).unwrap();
+    
+
     //egui::Context::
+
+    let mut fonts = FontDefinitions::default();
+
+    //todo WHAT IN THE FUCKERY IS THIS I HATE IT PLS FUCKING NOT DO THIS PLS FUKCING CHANGE AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    fonts.font_data.insert("julia".to_owned(), 
+    std::sync::Arc::unwrap_or_clone(
+        std::sync::Arc::new(FontData::from_static(include_bytes!("../assets/fonts/JuliaMono-Bold.ttf")) )) );
+
+    //Makes newly added julia font the highest priority
+    fonts.families.get_mut(&egui::FontFamily::Proportional).unwrap().insert(0, "julia".to_owned());
+
+    //Makes julia font the monospace fallback font
+    fonts.families.get_mut(&egui::FontFamily::Monospace).unwrap().push("julia".to_owned());
+
+    em::cfg(|ctx| {ctx.set_fonts(fonts);});
+
 
     let mut rend = renderer::Renderer
     {
@@ -751,16 +763,12 @@ async fn main()
         map_view_size: (30,20)
     };
 
-    
     let size = measure_text("x", Some(&rend.default_font), rend.canvas.tile_height as u16, 1.0);
     rend.char_size = CharSize(size.width as i32, size.height as i32, size.offset_y as i32);
     //let cam = Camera2D::from_display_rect(macroquad::prelude::Rect::new(0.0, 152.0, 320.0, -152.0));
     let mut state = create_state(rend.clone());
 
-    for i in 0..101
-    {
-        state.game_log.entries.push(i.to_string());
-    }
+    state.renderer.setup_grid();
     loop {
         clear_background(DARKPURPLE);
         //set_camera(&Camera2D {
@@ -773,9 +781,11 @@ async fn main()
             
         });
 
-        
+        state.tick();
+
         em::draw();
-        draw_tiles(&rend);
+        //draw_tiles(&rend);
+        
         next_frame().await
     }
     //old_main();

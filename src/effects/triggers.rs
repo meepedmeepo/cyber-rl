@@ -55,7 +55,7 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
 
     if let Ok(p) = state.world.get::<&ParticleBurst>(item)
     {
-        add_effect(creator, EffectType::Particle { glyph: p.particle.glyph, fg: p.particle.fg
+        add_effect(creator, EffectType::Particle { glyph: p.particle.glyph.clone(), fg: p.particle.fg
             , bg: p.particle.bg, lifetime: p.particle.lifetime }, targets.clone());
     }
 
@@ -63,7 +63,7 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
     {
         if let Some(source) = creator
         {
-            let pl = *p;
+            let pl = &p.clone();
 
             if let Ok(source_pos) = state.world.get::<&Position>( source)
             {
@@ -85,7 +85,7 @@ fn event_trigger(creator : Option<Entity>, item : Entity, targets : &Targets, st
                     let line = bracket_lib::geometry::Bresenham::new(Point{x:start_pos.x,y: start_pos.y}, end_pos);
                     let tile_vec =line.skip(1).map(|point| state.map.xy_idx(point.x, point.y) as i32).collect::<Vec<_>>();
 
-                    add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph, fg: pl.particle.fg
+                    add_effect(creator, EffectType::Particle { glyph: pl.particle.glyph.clone(), fg: pl.particle.fg
                         , bg: pl.particle.bg, lifetime: pl.particle.lifetime }
                         , Targets::Tiles { tiles: tile_vec.clone() });
                 }

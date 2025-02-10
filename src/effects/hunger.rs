@@ -19,7 +19,7 @@ pub fn restore_hunger(state : &mut State, feed : &EffectSpawner, target: Entity)
                 pools.nutrition.restore(amount);
 
                 add_effect(None,
-                    EffectType::Particle { glyph: to_cp437('%'),//glyph should be changed to π
+                    EffectType::Particle { glyph: "π".to_string(),//glyph should be changed to π
                     fg: RGB::named(BLACK), bg: RGB::named(ORANGE),
                     lifetime: 200. }, Targets::Tile{tile_idx : entity_position(state, target).unwrap()});
             }

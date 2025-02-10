@@ -190,10 +190,10 @@ pub struct InContainer
 {
     pub owner : Entity,
 }
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Renderable
 {
-    pub glyph : FontCharType,
+    pub glyph : String,
     pub fg : bracket_lib::color::RGB,
     pub bg : bracket_lib::color::RGB,
     pub order : i32,
@@ -207,7 +207,7 @@ pub struct Name
 
 impl Renderable
 {
-    pub fn new(glyph: FontCharType,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
+    pub fn new(glyph: String,fg : bracket_lib::color::RGB, bg: bracket_lib::color::RGB,order : i32) -> Renderable
     {
         Renderable
         {

@@ -88,7 +88,7 @@ fn add_renderable_comp(entity_builder: EntityBuilder, renderable : &Renderable) 
     let mut  eb = entity_builder;
     eb.add(components::Renderable
         {
-            glyph: to_cp437(rend.glyph.pop().unwrap()),
+            glyph: rend.glyph,
             fg: bracket_lib::color::RGB::from_hex(&renderable.fg).expect("Invalid RBG"),
             bg: bracket_lib::color::RGB::from_hex(&renderable.bg).expect(format!("Invalid RGB {}",renderable.glyph.clone()).as_str()),
             order: renderable.order,
@@ -165,7 +165,7 @@ pub fn parse_particle_string(particle_string : String) -> Particle
     
     let mut glyph_str = parts[0].clone().to_string();
     
-    let glyph = to_cp437(glyph_str.pop().expect("Not valid particle glyph!"));
+    let glyph = glyph_str;
     let fg =  RGB::from_hex(parts[1]).expect("not valid hex rgb for particle fg");
     let bg = RGB::from_hex(parts[2]).expect("not valid hex rgb for particle bg");
     let lifetime = parts[3].parse::<f32>().expect("not valid f32 for particle lifetime");

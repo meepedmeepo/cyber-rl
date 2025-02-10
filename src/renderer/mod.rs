@@ -26,15 +26,21 @@ impl Renderer
         self.draw_char(x, y, content, fg);
     }
 
+    pub fn setup_grid(&mut self)
+    {
+        self.canvas.tile_width = self.char_size.0;
+        self.canvas.tile_height = self.char_size.1;
+    }
+
     pub fn draw_char(&self, x : i32, y: i32, content : &str, color : Color )
     {
         let screen_pos = self.canvas.get_tile_screen_pos(x, y);
-        let draw_pos = self.canvas.get_tile_center_at_coords(screen_pos.0, screen_pos.1,self.char_size.0,self.char_size.1, self.char_size.2);
-        let params = TextParams {color, font_size: self.canvas.tile_height as u16
+        let draw_pos = self.canvas.get_tile_center_at_coords(screen_pos.0, screen_pos.1,self.canvas.tile_width,self.canvas.tile_height, self.char_size.2);
+        let params = TextParams {color, font_size: (self.canvas.tile_height -1) as u16
             , font: Some(&self.default_font), .. Default::default()};
 
         let _size = draw_text_ex(content, draw_pos.0 as f32, draw_pos.1 as f32, params);
-        //println!("width: {} height: {} offset_y: {}",size.width, size.height, size.offset_y);
+        //println!("width: {} height: {} offset_y: {}",sself.tile_heightize.width, size.height, size.offset_y);
     }
 
     pub fn draw_square(&self, x : i32, y : i32, color : Color)
@@ -83,7 +89,7 @@ impl GraphicGrid
     
     pub fn get_tile_center_at_coords(&self, x : i32, y : i32, w : i32, h : i32, o : i32) -> (i32, i32)
 {
-    (x+(w/2-1), y+(self.tile_height - (o/2 + 1)))
+    (x+(self.tile_width - (self.tile_width/2)), y+(self.tile_height - (self.tile_height/2) ))
 }
 
 //Gets screen location of a grid tile

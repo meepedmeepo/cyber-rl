@@ -16,11 +16,11 @@ pub fn aim_projectile(state : &mut State, start_pos: Point, range : i32) -> Targ
 {
     let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(state);
 
-    if is_key_down(KeyCode::Escape)
+    if is_key_pressed(KeyCode::Escape)
     {
         return TargettingState::Cancel
     }
-    if is_key_down(KeyCode::Tab)
+    if is_key_pressed(KeyCode::Tab)
     {
         if let TargettingMode::Keyboard { cursor_pos } = state.target_mode
                     {
@@ -64,11 +64,11 @@ pub fn aim_projectile(state : &mut State, start_pos: Point, range : i32) -> Targ
             let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
             return TargettingState::Selected { path:targets, end: point };
         }
-        if is_key_down(KeyCode::Enter) || is_key_down(KeyCode::KpEnter) || is_key_down(KeyCode::F)
+        if is_key_pressed(KeyCode::Enter) || is_key_pressed(KeyCode::KpEnter) || is_key_pressed(KeyCode::F)
         {
             if point == state.player_pos
             {
-                return TargettingState::None;
+                return TargettingState::Cancel;
             }
             let targets = bracket_lib::geometry::Bresenham::new(start_pos, point).collect();
             return TargettingState::Selected { path:targets, end: point };

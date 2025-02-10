@@ -1,7 +1,7 @@
 
 
 use bracket_lib::{ prelude::{field_of_view, Algorithm2D, Point}};
-use macroquad::{color::YELLOW, input::{is_key_down, is_mouse_button_down, KeyCode, MouseButton}, miniquad::gl::GL_BLUE, text::draw_text_ex};
+use macroquad::{color::YELLOW, input::{is_key_down, is_key_pressed, is_mouse_button_down, KeyCode, MouseButton}, miniquad::gl::GL_BLUE, text::draw_text_ex};
 
 use crate::{camera, menus::inventory_state, renderer::color_with_alpha, FoV, State};
 
@@ -29,14 +29,14 @@ pub fn keyboard_cursor(state : &mut State, pos : Point) -> Point
 
 pub fn key_to_translation() -> Point
 {
-    if is_key_down(KeyCode::Kp8) {return Point::new(0, -1)}
-    if is_key_down(KeyCode::Kp9) {return Point::new(1, -1)}
-    if is_key_down(KeyCode::Kp6) {return Point::new(1, 0)}
-    if is_key_down(KeyCode::Kp3) {return Point::new(1, 1)}
-    if is_key_down(KeyCode::Kp2) {return Point::new(0, 1)}
-    if is_key_down(KeyCode::Kp1) {return Point::new(-1, 1)}
-    if is_key_down(KeyCode::Kp4) {return Point::new(-1, 0)}
-    if is_key_down(KeyCode::Kp7) {return Point::new(-1, -1)}
+    if is_key_pressed(KeyCode::Kp8) {return Point::new(0, -1)}
+    if is_key_pressed(KeyCode::Kp9) {return Point::new(1, -1)}
+    if is_key_pressed(KeyCode::Kp6) {return Point::new(1, 0)}
+    if is_key_pressed(KeyCode::Kp3) {return Point::new(1, 1)}
+    if is_key_pressed(KeyCode::Kp2) {return Point::new(0, 1)}
+    if is_key_pressed(KeyCode::Kp1) {return Point::new(-1, 1)}
+    if is_key_pressed(KeyCode::Kp4) {return Point::new(-1, 0)}
+    if is_key_pressed(KeyCode::Kp7) {return Point::new(-1, -1)}
 
     Point::zero()
 }

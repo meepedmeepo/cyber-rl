@@ -8,7 +8,7 @@ pub fn bottom_panel(ctx : &egui::Context, gamelog : &GameLog)
     egui::TopBottomPanel::bottom("gamelog")
         .exact_height(screen_height()/3.)
         .show(ctx, |ui| {
-            ui.label("Cunt");
+            //ui.label("Cunt");
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
 
@@ -16,6 +16,7 @@ pub fn bottom_panel(ctx : &egui::Context, gamelog : &GameLog)
             egui::ScrollArea::vertical()
                 .drag_to_scroll(true)
                 .auto_shrink([false, false])
+                .stick_to_bottom(true)
                 .show_rows(ui, row_height, num_rows, |ui, rows| 
                 {
                     for row in rows

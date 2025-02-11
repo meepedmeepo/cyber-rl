@@ -29,24 +29,25 @@ pub fn right_panel(ctx : &egui::Context, state : &State )
             });
 
 
-            ui.add(egui::ProgressBar::new((pools.hitpoints.current_value/pools.hitpoints.max_value) as f32)
+            ui.add(egui::ProgressBar::new(((pools.hitpoints.current_value as f32/pools.hitpoints.max_value as f32)))
                 .text(format!("{} / {} HP", pools.hitpoints.current_value, pools.hitpoints.max_value))
                 .fill(Color32::RED)
                 );
 
+            let xp = pools.exp;
             let cl = calculate_xp_from_level(pools.level);
 
             let nl = calculate_xp_from_level(pools.level+1);
 
-            ui.add(egui::ProgressBar::new((cl/nl) as f32)
-            .text(format!("Level {}:{} / {} XP",pools.level, cl, nl))
+            ui.add(egui::ProgressBar::new((xp as f32-cl as f32)/(nl as f32-cl as f32))
+            .text(format!("Level {}:{} / {} XP",pools.level, xp-cl, nl-cl))
             .fill(Color32::BLUE));
 
 
             std::mem::drop(pools);
             let hng = state.world.get::<&HungerLevel>(state.player_ent.unwrap()).unwrap();
 
-            ui.add(egui::ProgressBar::new((hng.nutrition.current_value/hng.nutrition.max_value) as f32)
+            ui.add(egui::ProgressBar::new(hng.nutrition.current_value as f32/hng.nutrition.max_value as f32)
                 .text(format!("Hunger"))
                 .fill(Color32::from_hex("#ee913a").unwrap()));
 

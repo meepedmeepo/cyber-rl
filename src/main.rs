@@ -18,6 +18,7 @@ use gui::TargettingMode;
 use hecs::*;
 use hunger::hunger_system;
 use hunger::HungerLevel;
+use macroquad::color::GRAY;
 use macroquad::color::RED;
 use macroquad::miniquad::window::quit;
 use macroquad::miniquad::RenderingBackend;
@@ -93,10 +94,11 @@ mod ai;
 mod networks;
 pub mod camera;
 pub mod renderer;
-
 use macroquad::prelude::*;
 use new_egui_macroquad as em;
 use new_egui_macroquad::egui as egui;
+
+mod screen_manager;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -139,6 +141,7 @@ pub enum ProgramState
     SelectionMenu{items : Vec<(Entity, bool)>, menu : MenuType},
     TextInput {text: Vec<char>},
     PlayAnimation,
+    AwaitingMenu {response: Option<Vec<Entity>>, menu_type : screen_manager::MenuType},
 }
 
 
@@ -603,6 +606,52 @@ impl State{
                 }
             }
 
+            ProgramState::AwaitingMenu { response, menu_type } =>
+            {
+                if response.is_some()
+                {
+                    match menu_type
+                    {
+                        screen_manager::MenuType::Pickup =>
+                        {
+                            for item in response.unwrap().iter()
+                            {
+                                self.world.insert_one(*item, InContainer{owner: self.player_ent.unwrap()}).unwrap();
+                                        
+                                self.world.remove_one::<Position>(*item).unwrap();
+                            }
+                        }
+                        screen_manager::MenuType::Unequip =>
+                        {
+
+                        }
+                        screen_manager::MenuType::Drop =>
+                        {
+                            let posref = self.world.get::<&Position>(self.player_ent.unwrap()).unwrap();
+                            let pos = Point::new(posref.x, posref.y);
+                            
+                            std::mem::drop(posref);
+                            for item in response.unwrap().iter()
+                            {
+                                self.world.insert_one(*item, Position{x: pos.x, y: pos.y}).unwrap();
+
+                                self.world.remove_one::<InContainer>(*item).unwrap();
+                            }
+
+                            apply_energy_cost(self, ai::ActionType::Pickup , self.player_ent.unwrap());
+
+                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                        }
+                        screen_manager::MenuType::Inventory =>
+                        {
+
+                        }
+                        _ => {self.current_state = ProgramState::AwaitingInput}
+                    }
+                }
+            }
+
+
             ProgramState::GameOver =>
             {
                 self.renderer.draw_char(250, 100, "You have died!", RED);
@@ -775,7 +824,7 @@ async fn main()
 
     state.renderer.setup_grid();
     loop {
-        clear_background(DARKPURPLE);
+        clear_background(GRAY);
         //set_camera(&Camera2D {
           //  zoom: vec2(1., screen_width() / screen_height()),
             //..Default::default()

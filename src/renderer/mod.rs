@@ -1,46 +1,57 @@
 mod tile_rendering;
+mod bmpfonts;
+mod resources;
 
-use bracket_lib::color::RGB;
+
+use std::sync::Arc;
+
+use bracket_lib::{color::RGB, prelude::to_cp437};
 use macroquad::prelude::*;
+pub use resources::*;
 
 
 #[derive(Debug,PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum RenderBackend {MacroQuad, BracketLib}
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Renderer 
 {
     pub mode : RenderBackend,
     pub canvas : GraphicGrid,
     pub default_font : Font,
     pub char_size : CharSize,
-    pub map_view_size : (u32,u32)
+    pub map_view_size : (u32,u32),
+    pub textures : Arc<Resources>
 }
 #[derive(Debug, Clone, Copy)]
 pub struct CharSize(pub i32, pub i32, pub i32);
 impl Renderer
 {
-    pub fn draw_char_bg(&self, x : i32, y: i32, content : &str, fg : Color, bg : Color)
+    pub fn draw_char_bg(&self, x : i32, y: i32, content : u8, fg : Color, bg : Color)
     {
         self.draw_square(x, y, bg);
-        self.draw_char(x, y, content, fg);
+        self.draw_bmp_char(x, y, fg, content);
     }
 
     pub fn setup_grid(&mut self)
     {
-        self.canvas.tile_width = self.char_size.0;
-        self.canvas.tile_height = self.char_size.1;
+        self.canvas.tile_width = self.textures.font_width;
+        self.canvas.tile_height = self.textures.font_height;
     }
 
     pub fn draw_char(&self, x : i32, y: i32, content : &str, color : Color )
     {
-        let screen_pos = self.canvas.get_tile_screen_pos(x, y);
-        let draw_pos = self.canvas.get_tile_center_at_coords(screen_pos.0, screen_pos.1,self.canvas.tile_width,self.canvas.tile_height, self.char_size.2);
-        let params = TextParams {color, font_size: (self.canvas.tile_height -1) as u16
-            , font: Some(&self.default_font), .. Default::default()};
+        // let screen_pos = self.canvas.get_tile_screen_pos(x, y);
+        // let draw_pos = self.canvas.get_tile_center_at_coords(screen_pos.0, screen_pos.1,self.canvas.tile_width,self.canvas.tile_height, self.char_size.2);
+        // let params = TextParams {color, font_size: (self.canvas.tile_height) as u16
+        //     , font: Some(&self.default_font), .. Default::default()};
 
-        let _size = draw_text_ex(content, draw_pos.0 as f32, draw_pos.1 as f32, params);
-        //println!("width: {} height: {} offset_y: {}",sself.tile_heightize.width, size.height, size.offset_y);
+        // let _size = draw_text_ex(content, draw_pos.0 as f32, draw_pos.1 as f32, params);
+        // //println!("width: {} height: {} offset_y: {}",sself.tile_heightize.width, size.height, size.offset_y);
+
+        self.draw_bmp_char(x, y, color, to_cp437(content.chars().next().unwrap()) as u8);
+
+
     }
 
     pub fn draw_square(&self, x : i32, y : i32, color : Color)
@@ -49,6 +60,28 @@ impl Renderer
 
         draw_rectangle(screen_pos.0 as f32, screen_pos.1 as f32, self.canvas.tile_width as f32
             , self.canvas.tile_height as f32, color);
+    }
+
+    pub fn draw_bmp_char(&self, x : i32, y : i32, color : Color, letter : u8)
+    {
+        let screen_pos = self.canvas.get_tile_screen_pos(x, y);
+
+        let index = bmpfonts::cp437_to_xy(letter);
+
+        let pos = self.bmpfont_index_to_texture_pos(index);
+
+        let params = DrawTextureParams{source:Some((Rect { x: pos.0 as f32, y: pos.1 as f32
+            , w: self.textures.font_width as f32, h: self.textures.font_height as f32 })), ..Default::default()};
+
+
+        draw_texture_ex(&self.textures.bmp_font, screen_pos.0 as f32, screen_pos.1 as f32, color, params);
+
+
+    }
+
+    fn bmpfont_index_to_texture_pos(&self, pos : (i32,i32)) -> (i32, i32)
+    {
+        (pos.0 * self.textures.font_width, pos.1 * self.textures.font_height)
     }
 }
 

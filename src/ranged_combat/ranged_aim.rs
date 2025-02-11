@@ -1,4 +1,5 @@
 use bracket_lib::{color::{BLACK, BLUE, RED, RGB, WHITE, YELLOW}, prelude::{field_of_view, BTerm, Point, VirtualKeyCode}};
+use codepage_437::{ToCp437, CP437_CONTROL};
 use hecs::Entity;
 use macroquad::{color::GREEN, input::{is_key_down, is_key_pressed, is_mouse_button_down, KeyCode, MouseButton}};
 
@@ -52,7 +53,7 @@ pub fn aim_projectile(state : &mut State, start_pos: Point, range : i32) -> Targ
                 screen_pos.x -= min_x;
                 screen_pos.y -= min_y;
 
-                state.renderer.draw_char_bg(screen_pos.x, screen_pos.y, "*"
+                state.renderer.draw_char_bg(screen_pos.x, screen_pos.y, *"*".to_cp437(&CP437_CONTROL).unwrap().first().unwrap()
                     , macroquad::prelude::BLACK, macroquad::prelude::GREEN);
             });
         

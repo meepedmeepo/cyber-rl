@@ -55,6 +55,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::rc::Rc;
+use std::sync::Arc;
 use maps::*;
 pub mod maps;
 mod components;
@@ -726,9 +727,12 @@ fn create_state(renderer : Renderer) -> State
 #[macroquad::main("CyberRL")]
 async fn main()
 {
-    let font = load_ttf_font("./assets/fonts/droid-sans-mono.ttf")
+    let font = load_ttf_font("./assets/fonts/Mx437_ATI_8x8.ttf")
     .await
     .unwrap();
+
+    let res = Arc::new(renderer::Resources{bmp_font: Arc::new(load_texture("./assets/fonts/fontbmp/nived16x16.png").await.unwrap()
+        ), font_width : 16, font_height: 16});
 
     let mut font_list = Fonts::default();
 
@@ -760,7 +764,8 @@ async fn main()
         default_font: font,
         canvas: GraphicGrid::new(30, 30, 15, 15),
         char_size: CharSize(0, 0, 0),
-        map_view_size: (30,20)
+        map_view_size: (30,20),
+        textures: res.clone()
     };
 
     let size = measure_text("x", Some(&rend.default_font), rend.canvas.tile_height as u16, 1.0);

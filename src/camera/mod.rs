@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use bracket_lib::{color::{BLACK, GRAY, RGB}, prelude::{to_char, to_cp437, BTerm, FontCharType}};
 use codepage_437::CP437_CONTROL;
-use encode_unicode::Utf16Char;
+use encode_unicode::{StrExt, Utf16Char};
 use codepage_437::*;
 
 use crate::{particles::particle_system, renderer::rgb_to_color, Hidden, Map, Position, Renderable, State, TileType};
@@ -47,11 +47,12 @@ pub fn render_camera(state : &mut State)
                     //let data =  dt.into_cp437(&CP437_CONTROL).unwrap();
                     //let res = 
                     //let mut buf = [0;3];
-                    state.renderer.draw_char_bg(x, y,&glyph, rgb_to_color(fg), rgb_to_color(bg));
+                    let cont = *glyph.to_cp437(&CP437_WINGDINGS).unwrap().first().unwrap();
+                    state.renderer.draw_char_bg(x, y,cont, rgb_to_color(fg), rgb_to_color(bg));
                 }
             } else if SHOW_BOUNDARIES
             {
-                state.renderer.draw_char_bg(x, y, ".", rgb_to_color(RGB::named(GRAY))
+                state.renderer.draw_char_bg(x, y, *".".to_cp437(&CP437_WINGDINGS).unwrap().first().unwrap(), rgb_to_color(RGB::named(GRAY))
                     , rgb_to_color(RGB::named(BLACK)));
             }
             x += 1;
@@ -83,7 +84,8 @@ pub fn render_camera(state : &mut State)
             {
                 let fg = rgb_to_color(ent.1.fg);
                 let bg = rgb_to_color(ent.1.bg);
-                state.renderer.draw_char_bg(entity_screen_x, entity_screen_y, &ent.1.glyph.to_string(),fg , bg);
+                let cont = *ent.1.glyph.to_cp437(&CP437_WINGDINGS).unwrap().first().unwrap();
+                state.renderer.draw_char_bg(entity_screen_x, entity_screen_y, cont,fg , bg);
             }
         }
     }

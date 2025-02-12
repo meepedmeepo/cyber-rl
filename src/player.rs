@@ -1,9 +1,9 @@
 use bracket_lib::prelude::*;
 use macroquad::input::{get_keys_down, get_keys_pressed, KeyCode};
-use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, camera, go_down_stairs, gui::TargettingMode, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
+use crate::{ai::{apply_energy_cost, MyTurn}, attack_system, camera, go_down_stairs, gui::{mqui::ItemWindowMode, TargettingMode}, menus::MenuType, ranged_combat::ranged_aim::select_nearest_target_pos, screen_manager::{self, MANAGER}, statistics::Pools, BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equippable, Equipped, HasMoved, InContainer, Item, RangedTargetting, RangedWeapon, Renderable, TileType, WantsToPickupItem, WantsToRest};
 
 use super::{State,ProgramState,Entity,Map,Name,AttackSystem,FoV,Position};
-use std::{ cmp::{max, min}};
+use std::{ cmp::{max, min}, sync::LazyLock};
 
 
 
@@ -46,7 +46,10 @@ pub fn player_input_system(state: &mut State) -> ProgramState
                     .map(|(ent, _cont)| (ent, false))
                     .collect::<Vec<_>>();
 
-                return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::DropItem };
+                    let menu_type = screen_manager::MenuType::Drop;
+                    MANAGER.lock().unwrap().create_menu(items, "Drop Items:".to_string(), crate::gui::mqui::ItemWindowMode::Multiple, menu_type, state);
+
+                return ProgramState::AwaitingMenu { response: None, menu_type };
             }
             KeyCode::R =>
             {
@@ -56,10 +59,26 @@ pub fn player_input_system(state: &mut State) -> ProgramState
                     .map(|(ent, _eq)| (ent, false))
                     .collect::<Vec<_>>();
 
-                return ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::UnequipItem };
+                    let menu_type = screen_manager::MenuType::Unequip;
+                    
+                    MANAGER.lock().unwrap().create_menu(items, "Unequip Items:".to_string(), crate::gui::mqui::ItemWindowMode::Multiple, menu_type, state);
+
+                return ProgramState::AwaitingMenu { response: None, menu_type };
             }
 
-            KeyCode::I => return ProgramState::Inventory,
+            KeyCode::I => 
+            {
+                let items = state.world.query::<(&Item, &InContainer,&Name)>()
+                    .iter().filter(|ent| ent.1.1.owner == state.player_ent.unwrap())
+                    .map(|ent|(ent.0, false)).collect::<Vec<(Entity, bool)>>();
+
+                let menu_type = screen_manager::MenuType::Inventory;
+                
+                MANAGER.lock().unwrap().create_menu(items, "Inventory:".to_string(),
+                    ItemWindowMode::Single, menu_type, state);
+
+                return ProgramState::AwaitingMenu { response: None, menu_type};
+            }
             KeyCode::Space => 
             {
                 state.world.insert_one(state.player_ent.unwrap(), WantsToRest{})
@@ -145,7 +164,12 @@ pub fn player_input_system(state: &mut State) -> ProgramState
                     apply_energy_cost(state, crate::ai::ActionType::Pickup, state.player_ent.unwrap());
                 } else if items.len() > 1
                 {
-                    return   ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::PickupItem };
+                    let menu_type = screen_manager::MenuType::Pickup;
+                    
+                    MANAGER.lock().unwrap().create_menu(items, "Pickup:".to_string(), crate::gui::mqui::ItemWindowMode::Multiple, menu_type, state);
+
+                return ProgramState::AwaitingMenu { response: None, menu_type };
+                    //return   ProgramState::SelectionMenu { items: items.clone(), menu: MenuType::PickupItem };
                 }
                 else 
                 {

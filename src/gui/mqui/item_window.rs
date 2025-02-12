@@ -1,6 +1,6 @@
 use hecs::Entity;
-use macroquad::window::{screen_height, screen_width};
-use new_egui_macroquad::egui::{self as egui, Layout, RichText, ScrollArea};
+use macroquad::{input::{is_key_down, KeyCode}, window::{screen_height, screen_width}};
+use new_egui_macroquad::egui::{self as egui, Button, Color32, Layout, RichText, ScrollArea};
 
 use crate::{components::Name, State};
 
@@ -26,14 +26,20 @@ impl ItemWindow
         ItemWindow {contents, title : "Inventory".to_string(), dimensions: (200.,200.), mode : ItemWindowMode ::Single}
     }
 
+    pub fn default_with_type(contents : Vec<(Entity, bool)>, title : String, mode: ItemWindowMode) -> ItemWindow
+    {
+        ItemWindow{contents, title, dimensions : (200.,200.), mode}
+    }
+
     pub fn new <T : Into<(f32,f32)>>(contents : Vec<(Entity, bool)>, title : String, dimensions : T, mode: ItemWindowMode) -> ItemWindow
     {
         ItemWindow {contents,title,dimensions : dimensions.into(),mode}
     }
 
-    pub fn show(&mut self, ctx : &egui::Context, state : &State) -> Option<Vec<Entity>>
+    pub fn show(&mut self, ctx : &egui::Context, state : &State) -> (Option<Vec<Entity>>, bool)
     {
         let mut target : Option<Vec<Entity>> = None;
+        let should_close = is_key_down(KeyCode::Escape);
         egui::Window::new(self.title.clone())
             .title_bar(false)
             .default_pos(self.calculate_window_pos())
@@ -42,8 +48,10 @@ impl ItemWindow
             .show(ctx, |ui|
             {
                 //Draws title
-                ui.centered_and_justified(|ui| ui.label(RichText::new(self.title.clone())
-                    .heading()));
+                //ui.centered_and_justified(|ui| ));
+                
+                ui.label(RichText::new(self.title.clone())
+                    .heading());
 
                 //Draws grid of items
                 ui.with_layout(Layout::top_down_justified(egui::Align::Min)
@@ -56,10 +64,18 @@ impl ItemWindow
                         {
                             for (i,row) in rows.enumerate()
                             {
+                                let mut col = Color32::DARK_GRAY;
+
+                                if self.contents[i].1 
+                                {
+                                    col = Color32::GREEN;
+                                }
+
                                 let c = 65u8 + i as u8;
-                                if ui.button(format!("{}.) {}",c as char
+
+                                if ui.add(Button::new(format!("{}.) {}",c as char
                                     , state.world.get::<&Name>(self.contents[i].0).unwrap().name.clone())
-                                ).clicked()
+                                ).fill(col)).clicked()
                                 {
                                     if self.mode == ItemWindowMode::Single
                                     {
@@ -93,7 +109,7 @@ impl ItemWindow
                 });
             });
 
-        target
+        (target,should_close)
     }
 
     fn calculate_window_pos(&self) -> (f32,f32)

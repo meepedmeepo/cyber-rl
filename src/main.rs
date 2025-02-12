@@ -46,6 +46,7 @@ use renderer::draw_tiles;
 use renderer::CharSize;
 use renderer::GraphicGrid;
 use renderer::Renderer;
+use screen_manager::MANAGER;
 use spawns::spawning_system::EntityType;
 use statistics::BaseStatistics;
 use statistics::Pools;
@@ -608,6 +609,8 @@ impl State{
 
             ProgramState::AwaitingMenu { response, menu_type } =>
             {
+                camera::render_camera(self);
+
                 if response.is_some()
                 {
                     match menu_type
@@ -620,16 +623,33 @@ impl State{
                                         
                                 self.world.remove_one::<Position>(*item).unwrap();
                             }
+
+                            self.current_state = ProgramState::AwaitingInput;
                         }
+
                         screen_manager::MenuType::Unequip =>
                         {
+                            let ent = self.player_ent.unwrap();
 
+                            for item in response.unwrap().iter()
+                            {
+                                self.world.insert_one(*item, InContainer{owner: ent}).unwrap();
+
+                                self.world.remove_one::<Equipped>(*item).unwrap();
+
+                                self.world.insert_one(ent, EquipmentDirty{}).unwrap();
+                            }
+
+                            apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
+                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                            self.current_state = ProgramState::Ticking;
                         }
+
                         screen_manager::MenuType::Drop =>
                         {
                             let posref = self.world.get::<&Position>(self.player_ent.unwrap()).unwrap();
                             let pos = Point::new(posref.x, posref.y);
-                            
+
                             std::mem::drop(posref);
                             for item in response.unwrap().iter()
                             {
@@ -641,10 +661,64 @@ impl State{
                             apply_energy_cost(self, ai::ActionType::Pickup , self.player_ent.unwrap());
 
                             let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                            self.current_state = ProgramState::Ticking;
                         }
                         screen_manager::MenuType::Inventory =>
                         {
+                            let item = response.unwrap()[0];
 
+                            let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(self);
+
+                            if let Ok(ranged) = self.world.get::<&RangedTargetting>(item)
+                            {
+                                let range = ranged.range;
+                                std::mem::drop(ranged);
+
+                                let query = self.world.get::<&AoE>(item);
+                                let mut aoe = None;
+                                match query
+                                {
+                                    Ok(ref aoe_comp) =>
+                                    {
+                                        aoe = Some(aoe_comp.radius);
+                                    }
+                                    Err(_) => {}
+                                }
+                                std::mem::drop(query);
+                                let mut screen_pos = self.player_pos;
+
+                                screen_pos.x -= min_x;
+                                screen_pos.y -= min_y;
+                                self.target_mode = TargettingMode::Keyboard { cursor_pos: screen_pos };
+                                self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
+
+                                return;
+                            
+                            }
+
+                            if self.world.get::<&Equippable>(item).is_ok()
+                            {
+                                let equip = self.world.get::<&Equippable>(item).unwrap();
+                                    let slot = equip.slot;
+
+                                    std::mem::drop(equip);
+    
+                                    let _ =self.world.insert_one(self.player_ent.unwrap(), WantsToEquipItem{item, slot});
+
+                                    let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+
+                                    self.current_state = ProgramState::Ticking;
+                                    return;
+                                
+                            }
+
+                            let _ = self.world.insert_one(self.player_ent.unwrap(), WantsToUseItem{item, target: None});
+                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
+                            self.current_state = ProgramState::Ticking;
+                            return;
+
+                            
+                            
                         }
                         _ => {self.current_state = ProgramState::AwaitingInput}
                     }
@@ -690,7 +764,7 @@ fn run_systems(state: &mut State)
 
     state.target_mode = TargettingMode::Keyboard { cursor_pos: state.player_pos };
 
-    camera::render_camera(state);
+    //camera::render_camera(state);
     effects::run_animation_queue(state);
     camera::render_camera(state);
     gui::draw_ui(state);
@@ -831,7 +905,8 @@ async fn main()
         //});
         em::ui(|egui_ctx| {
             gui::mqui::ui_layout(egui_ctx, &state);
-                
+            
+            MANAGER.lock().unwrap().show(egui_ctx, &mut state);
             
         });
 

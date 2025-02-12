@@ -284,7 +284,8 @@ impl State
     }
 }
 
-impl State{
+impl State
+{
     fn tick(&mut self)
     {
 
@@ -361,143 +362,6 @@ impl State{
                 //get_input_text(self, &mut text);
                 //display_input_text(self,  &text, 5, 15);
                 self.current_state = ProgramState::TextInput { text, }
-            }
-
-            ProgramState::Inventory =>
-            {
-                let (min_x,_max_x,min_y, _max_y) = camera::get_screen_bounds(self);
-
-                //insert inventory input function here!
-                let invent_state = menus::InventoryMenu::menu_input( self);
-                match invent_state
-                {
-                    inventory_state::Cancel => {self.current_state = ProgramState::AwaitingInput;}
-                    inventory_state::Selected => 
-                    {
-                            apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
-                            let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
-                            self.current_state = ProgramState::Ticking;
-                            //return;
-                    }
-                    inventory_state::None => {}
-                    inventory_state::TargetedItem { item, range } =>
-                    {
-                        let query = self.world.get::<&AoE>(item);
-                        let mut aoe = None;
-                        match query
-                        {
-                            Ok(ref aoe_comp) =>
-                            {
-                                aoe = Some(aoe_comp.radius);
-                            }
-                            Err(_) => {}
-                        }
-                        let mut screen_pos = self.player_pos;
-                        
-                        screen_pos.x -= min_x;
-                        screen_pos.y -= min_y;
-                        self.target_mode = TargettingMode::Keyboard { cursor_pos: screen_pos };
-                        self.current_state = ProgramState::Targeting { range: range, item: item, aoe : aoe };
-                    }
-                }
-
-                camera::render_camera(self);
-                //render_system(self, ctx);
-                gui::draw_ui(self);
-                gui::draw_status_box(self);
-                gui::draw_gamelog(self);
-                gui::draw_inventory(self);
-            }
-            ProgramState::SelectionMenu { mut items, menu  } =>
-            {
-
-                camera::render_camera(self);
-                //render_system(self, ctx);
-                gui::draw_ui(self);
-                gui::draw_status_box(self);
-                gui::draw_gamelog(self);
-
-                //let (mut input, mut draw) = 
-                    //select_menu_functions(menu);
-
-                //input(self, ctx, &mut items)
-
-                match menu_input(self, &mut items)
-                {
-                    MenuSelections::Cancel => {self.current_state = ProgramState::AwaitingInput; return;}
-                    MenuSelections::NoInput => {}
-                    MenuSelections::ToggleSelected => {self.current_state = ProgramState::SelectionMenu { items: items.clone(), menu };}
-                    MenuSelections::Execute =>
-                    {
-                        match menu
-                        {
-                        //TODO: change this to actually use the item pickup system like normal oof
-                            MenuType::PickupItem =>
-                            {
-                                for (item, is_selected) in items.iter()
-                                {
-                                    if *is_selected
-                                    {
-                                        self.world.insert_one(*item, InContainer{owner: self.player_ent.unwrap()}).unwrap();
-                                        
-                                        self.world.remove_one::<Position>(*item).unwrap();
-                                    }
-                                }
-                            }
-
-                            MenuType::DropItem =>
-                            {
-                                let pos = self.player_pos;
-                                for (item, is_selected) in items.iter()
-                                {
-                                    if *is_selected
-                                    {
-                                        self.world.insert_one(*item, Position{x: pos.x, y: pos.y}).unwrap();
-
-                                        self.world.remove_one::<InContainer>(*item).unwrap();
-                                    }
-                                }
-                                apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
-                                let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
-                                self.current_state = ProgramState::Ticking;
-                                return;
-                            }
-
-                            MenuType::UnequipItem =>
-                            {
-                                let ent = self.player_ent.unwrap();
-
-                                for (item, is_selected) in items.iter()
-                                {
-                                    if *is_selected
-                                    {
-                                        self.world.insert_one(*item, InContainer{owner: ent}).unwrap();
-
-                                        self.world.remove_one::<Equipped>(*item).unwrap();
-
-                                        self.world.insert_one(ent, EquipmentDirty{}).unwrap();
-                                    }
-                                }
-                                apply_energy_cost(self, ai::ActionType::Equip, self.player_ent.unwrap());
-                                let _ = self.world.remove_one::<MyTurn>(self.player_ent.unwrap());
-                                self.current_state = ProgramState::Ticking;
-                                return;
-                            }
-
-
-                            _ => {}
-                        }
-
-                        self.current_state = ProgramState::AwaitingInput;
-                    }
-                }
-
-                let(title, text_colour, highlight) = menu_theme(menu);
-
-                gui::draw_menu_custom( &items, title, text_colour, highlight, self);
-                //gui::draw_pickup_menu(ctx, items, self);
-                //draw(ctx,items,self);
-
             }
 
             ProgramState::Targeting { range, item, aoe } =>
@@ -599,9 +463,11 @@ impl State{
 
                 self.current_state = ProgramState::KeyboardTargetting{cursor_pos: gui::draw_cursor(cursor_pos, self, LIGHT_GREEN)};
 
-                gui::draw_tooltip(self, cursor_pos);
+                //gui::draw_tooltip(self, cursor_pos);
 
-                if INPUT.lock().is_key_pressed(VirtualKeyCode::Escape)
+                
+
+                if is_key_down(KeyCode::Escape)
                 {
                     self.current_state = ProgramState::AwaitingInput;
                 }
@@ -851,8 +717,8 @@ fn create_state(renderer : Renderer) -> State
 async fn main()
 {
     let font = load_ttf_font("./assets/fonts/Mx437_ATI_8x8.ttf")
-    .await
-    .unwrap();
+        .await
+        .unwrap();
 
     let res = Arc::new(renderer::Resources{bmp_font: Arc::new(load_texture("./assets/fonts/fontbmp/nived16x16.png").await.unwrap()
         ), font_width : 16, font_height: 16});
@@ -885,9 +751,9 @@ async fn main()
     {
         mode : renderer::RenderBackend::MacroQuad,
         default_font: font,
-        canvas: GraphicGrid::new(30, 30, 15, 15),
+        canvas: GraphicGrid::new(30, 30, 50, 35),
         char_size: CharSize(0, 0, 0),
-        map_view_size: (30,20),
+        map_view_size: (50,35),
         textures: res.clone()
     };
 

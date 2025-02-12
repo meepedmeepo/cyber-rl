@@ -1,8 +1,11 @@
 mod gamelog;
 mod status_panel;
 mod item_window;
+mod tooltip_window;
+
 
 pub use item_window::*;
+pub use tooltip_window::*;
 use new_egui_macroquad::egui as egui;
 use status_panel::right_panel;
 use crate::State;

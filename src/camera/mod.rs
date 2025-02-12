@@ -80,7 +80,7 @@ pub fn render_camera(state : &mut State)
             let entity_screen_x = ent.0.x - min_x;
             let entity_screen_y = ent.0.y - min_y;
 
-            if entity_screen_x > 0 && entity_screen_x < map_width && entity_screen_y > 0 && entity_screen_y < map_height
+            if entity_screen_x > 0 && entity_screen_x < max_x -2 && entity_screen_y > 0 && entity_screen_y < max_y - 2
             {
                 let fg = rgb_to_color(ent.1.fg);
                 let bg = rgb_to_color(ent.1.bg);

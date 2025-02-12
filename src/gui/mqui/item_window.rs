@@ -1,8 +1,8 @@
 use hecs::Entity;
-use macroquad::{input::{is_key_down, KeyCode}, window::{screen_height, screen_width}};
+use macroquad::{input::{get_last_key_pressed, is_key_down, KeyCode}, window::{screen_height, screen_width}};
 use new_egui_macroquad::egui::{self as egui, Button, Color32, Layout, RichText, ScrollArea};
 
-use crate::{components::Name, State};
+use crate::{components::Name, menus::key_to_option, State};
 
 #[derive(Debug,PartialEq, Eq)]
 pub enum ItemWindowType{Pickup, Drop, Unequip}
@@ -108,6 +108,37 @@ impl ItemWindow
                         }
                 });
             });
+
+            if let Some(key) = get_last_key_pressed()
+            {
+                let res = key_to_option(key);
+
+                if self.contents.get(res as usize).is_some()
+                {
+                    if self.mode == ItemWindowMode::Single
+                    {
+                        target = Some(vec![self.contents[res as usize].0;1]);
+                        return (target, true);
+                    } else {
+                        self.contents[res as usize].1 = !self.contents[res as usize].1;
+                    }
+                }
+            }
+
+            if (is_key_down(KeyCode::Enter) || is_key_down(KeyCode::KpEnter)) && self.mode == ItemWindowMode::Multiple
+            {
+                target = Some(self.contents.iter().filter_map(|(ent, selected)|
+                {
+                    if *selected
+                    {
+                        Some(*ent)
+                    }
+                    else {
+                        None
+                    }
+                }).collect())
+            }
+
 
         (target,should_close)
     }

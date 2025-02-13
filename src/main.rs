@@ -717,7 +717,18 @@ fn create_state(renderer : Renderer) -> State
     gs
 }
 
-#[macroquad::main("CyberRL")]
+fn window_conf() -> Conf
+{
+    Conf
+    {
+        window_title: "CyberRL".to_owned(),
+        window_width:1600,
+        window_height: 900,
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(window_conf)]
 async fn main()
 {
     let font = load_ttf_font("./assets/fonts/Mx437_ATI_8x8.ttf")

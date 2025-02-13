@@ -152,6 +152,20 @@ impl Attribute
     {
         (self.total - 10) / 2
     }
+
+    pub fn get_modifier_display(&self) -> String
+    {
+        let modi = self.get_modifier();
+
+        if modi < 0
+        {
+            format!("{}", modi)
+        }
+        else 
+        {
+            format!("+{}", modi)
+        }
+    }
 }
 
 

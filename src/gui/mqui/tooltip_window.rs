@@ -6,7 +6,7 @@ use crate::{camera, components::Name, State};
 
 pub fn show_tooltip_window(ctx : &egui::Context, state : &mut State, x : i32, y : i32)
 {
-    //let (min_x, max_x, min_y, max_y) =camera::get_screen_bounds(state);
+    let (min_x, _max_x, min_y, _max_y) =camera::get_screen_bounds(state);
     let entities = state.map.tile_contents[state.map.xy_idx(x, y)].clone();
     let mut name = Vec::new();
 
@@ -20,10 +20,13 @@ pub fn show_tooltip_window(ctx : &egui::Context, state : &mut State, x : i32, y 
     }
     if name.len() > 0
     {
-        let (screen_x, screen_y) = state.renderer.canvas.get_tile_screen_pos(x, y);
+        let (screen_x, screen_y) = state.renderer.canvas.get_tile_screen_pos(x-min_x, y-min_y);
         egui::Window::new("Tile Contents")
             .title_bar(false)
-            .default_pos((screen_x as f32, screen_y as f32))
+            .current_pos((screen_x as f32 + 70., screen_y as f32 + 16.))
+            .max_width(100.)
+            .resizable(false)
+            .movable(false)
             .show(ctx, |ui|
             {
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::Min), |ui|

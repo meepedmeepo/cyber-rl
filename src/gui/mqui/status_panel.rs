@@ -58,19 +58,19 @@ pub fn right_panel(ctx : &egui::Context, state : &State )
 
             ui.columns(2, |cols| 
                 {
-                    cols[0].label(format!("Strength: {} {}",stats.strength.total, stats.strength.get_modifier()));
-                    cols[1].label(format!("Dexterity: {} {}",stats.dexterity.total, stats.dexterity.get_modifier()));
+                    cols[0].label(format!("Strength: {} {}",stats.strength.total, stats.strength.get_modifier_display()));
+                    cols[1].label(format!("Dexterity: {} {}",stats.dexterity.total, stats.dexterity.get_modifier_display()));
                 });
 
             ui.columns(2, |cols| 
                 {
-                    cols[0].label(format!("Toughness: {} {}",stats.toughness.total, stats.toughness.get_modifier()));
-                    cols[1].label(format!("Intelligence: {} {}",stats.intelligence.total, stats.intelligence.get_modifier()));
+                    cols[0].label(format!("Toughness: {} {}",stats.toughness.total, stats.toughness.get_modifier_display()));
+                    cols[1].label(format!("Intelligence: {} {}",stats.intelligence.total, stats.intelligence.get_modifier_display()));
                 });
 
-            ui.columns(1, |cols| 
+            ui.columns(2, |cols| 
                 {
-                    cols[0].label(format!("Mental Fortitude: {} {}",stats.mental_fortitude.total, stats.mental_fortitude.get_modifier()));
+                    cols[0].label(format!("Mental Fortitude: {} {}",stats.mental_fortitude.total, stats.mental_fortitude.get_modifier_display()));
                 });
         });
         });

@@ -1,13 +1,14 @@
 use std::sync::{LazyLock, Mutex};
 use new_egui_macroquad::egui::{self as egui};
 use hecs::Entity;
-use crate::{ProgramState, State};
-use crate::gui::mqui::{ItemWindow, ItemWindowMode};
+use crate::gui::TargettingMode;
+use crate::{camera, ProgramState, State};
+use crate::gui::mqui::{show_tooltip_window, ItemWindow, ItemWindowMode};
 
 
 
 pub static MANAGER : LazyLock<Mutex<ScreenManager>> = LazyLock::new(|| Mutex::new
-    (ScreenManager { current_menu: None }));
+    (ScreenManager { current_menu: None, tooltip_active: false }));
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum MenuType {Pickup, Drop, Unequip, Inventory}
@@ -23,7 +24,8 @@ pub struct MenuScreen
 
 pub struct ScreenManager
 {
-    pub current_menu : Option<MenuScreen>
+    pub current_menu : Option<MenuScreen>,
+    pub tooltip_active : bool,
 }
 
 
@@ -61,6 +63,15 @@ impl ScreenManager
 {
     pub fn show(&mut self, ctx : &egui::Context, state : &mut State)
     {
+        if self.tooltip_active
+        {
+            if let TargettingMode::Keyboard { cursor_pos } = state.target_mode
+            {
+                let (min_x, _max_x, min_y, _max_y) = camera::get_screen_bounds(state);
+
+                show_tooltip_window(ctx, state, cursor_pos.x + min_x, cursor_pos.y + min_y);
+            }
+        }
         match self.current_menu
         {
             Some(ref mut menu) =>

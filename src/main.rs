@@ -455,13 +455,16 @@ impl State
 
             ProgramState::KeyboardTargetting { cursor_pos } =>
             {
+                MANAGER.lock().unwrap().tooltip_active = true;
                 camera::render_camera(self);
                 ////render_system(self, ctx);
-                gui::draw_ui(self);
-                gui::draw_status_box(self);
-                gui::draw_gamelog(self);
+                //gui::draw_ui(self);
+                //gui::draw_status_box(self);
+                //gui::draw_gamelog(self);
+                let pos = gui::draw_cursor(cursor_pos, self, LIGHT_GREEN);
+                self.current_state = ProgramState::KeyboardTargetting{cursor_pos: pos };
 
-                self.current_state = ProgramState::KeyboardTargetting{cursor_pos: gui::draw_cursor(cursor_pos, self, LIGHT_GREEN)};
+                self.target_mode = TargettingMode::Keyboard { cursor_pos: pos };
 
                 //gui::draw_tooltip(self, cursor_pos);
 
@@ -469,6 +472,7 @@ impl State
 
                 if is_key_down(KeyCode::Escape)
                 {
+                    MANAGER.lock().unwrap().tooltip_active = false;
                     self.current_state = ProgramState::AwaitingInput;
                 }
             }

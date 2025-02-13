@@ -20,6 +20,7 @@ use crate::State;
 use std::cmp::{max,min};
 
 use super::keyboard_cursor;
+use super::TargettingMode;
 
 pub fn draw_ui(state :&mut State)
 {
@@ -108,7 +109,7 @@ pub fn draw_cursor(pos : Point, state : &mut State, bg :  (u8, u8, u8)) -> Point
 
     let col = RGB::from_u8(bg.0, bg.1, bg.2);
     state.renderer.draw_square(cursor_pos.x, cursor_pos.y, color_with_alpha(rgb_to_color(col), 0.4));
-
+    
     cursor_pos
 }
 

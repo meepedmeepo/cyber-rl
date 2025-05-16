@@ -8,6 +8,12 @@ pub struct DevConsole<'a> {
 }
 
 impl DevConsole<'_> {
+    pub fn new<'a>(terminal: &'a mut Terminal) -> DevConsole<'a> {
+        DevConsole {
+            current_cmd: String::from(""),
+            terminal,
+        }
+    }
     pub fn show(&mut self, ctx: &super::egui::Context, state: &super::State) {
         egui::Window::new("dev console").show(ctx, |ui| {
             ui.label(RichText::new("Dev Console:").heading());

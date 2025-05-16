@@ -1,4 +1,4 @@
-use std::sync::{LazyLock, Mutex};
+use std::sync::{LazyLock, Mutex, MutexGuard};
 
 pub static DEBUGLOG: DebugLog = DebugLog::new();
 
@@ -20,6 +20,10 @@ impl DebugLog {
 
     pub fn view_log(&self, num_entries: usize) -> Vec<String> {
         self.log.lock().unwrap().view_log(num_entries)
+    }
+
+    pub fn get_log_guard(&self) -> MutexGuard<'_, GameLog> {
+        self.log.lock().unwrap()
     }
 }
 

@@ -1,16 +1,21 @@
+use std::{
+    cell::{Cell, LazyCell},
+    sync::LazyLock,
+};
+
 use crate::{
     gamelog::{DebugLog, DEBUGLOG},
     scripting,
 };
-
-struct Console {
+//pub static TERMINAL: LazyLock<Terminal> = LazyLock::new(Terminal::new());
+pub struct Terminal {
     buffer: &'static DebugLog,
     current_command: String,
     is_visible: bool,
     engine: scripting::ScriptingEngine,
 }
 
-impl Console {
+impl Terminal {
     pub fn new() -> Self {
         Self {
             buffer: &DEBUGLOG,
@@ -18,6 +23,10 @@ impl Console {
             is_visible: false,
             engine: scripting::init_engine(),
         }
+    }
+
+    pub fn set_cmd(&mut self, cmd: String) {
+        self.current_command = cmd;
     }
 
     ///Runs command on the embedded rhai scripting engine

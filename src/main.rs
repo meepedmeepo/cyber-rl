@@ -82,7 +82,7 @@ mod calculate_attribute_system;
 mod dev_console;
 pub mod gamelog;
 mod particles;
-mod scripting;
+pub mod scripting;
 mod spawns;
 use spawns::spawning_system;
 use spawns::*;

@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use crate::gamelog::DEBUGLOG;
 
-struct ScriptingEngine {
+pub struct ScriptingEngine {
     engine: rhai::Engine,
     pub scope: Mutex<rhai::Scope<'static>>,
 }

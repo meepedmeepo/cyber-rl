@@ -18,6 +18,7 @@ egui-miniquad = "^0.15"
 encode_unicode = "1.0.0"
 macroquad-text = "0.2.0"
 codepage-437 = "0.1.0"
+rhai = "1.21.0"
 
 [profile.release]
 debug =  true

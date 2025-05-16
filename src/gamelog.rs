@@ -17,6 +17,10 @@ impl DebugLog {
         self.log.lock().unwrap().add_log(msg.clone());
         println!("debug: {}", msg);
     }
+
+    pub fn view_log(&self, num_entries: usize) -> Vec<String> {
+        self.log.lock().unwrap().view_log(num_entries)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -38,7 +42,7 @@ impl GameLog {
     }
 
     pub fn add_log(&mut self, msg: String) {
-        self.entries.push(". ".to_string() + &msg);
+        self.entries.push(format!(". {}", msg));
         //self.index+=1;
     }
 

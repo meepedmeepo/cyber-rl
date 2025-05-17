@@ -8,12 +8,14 @@ use bracket_lib::color;
 use bracket_lib::prelude::*;
 use clear_dead_system::ClearDeadSystem;
 use damage_system::DamageSystem;
+use dev_console::Terminal;
 use effects::add_effect;
 use effects::run_effect_queue;
 use gamelog::GameLog;
 use gui::draw_cursor;
 use gui::keyboard_cursor;
 use gui::menu_theme;
+use gui::mqui::DevConsole;
 use gui::TargettingMode;
 use hecs::*;
 use hunger::hunger_system;
@@ -857,6 +859,10 @@ async fn main() {
     //let cam = Camera2D::from_display_rect(macroquad::prelude::Rect::new(0.0, 152.0, 320.0, -152.0));
     let mut state = create_state(rend.clone());
 
+    //creates instance of scripting engine for dev console
+    let mut term = Terminal::new();
+    let mut console = DevConsole::new(&mut term);
+
     state.renderer.setup_grid();
     loop {
         clear_background(GRAY);
@@ -867,8 +873,14 @@ async fn main() {
         em::ui(|egui_ctx| {
             gui::mqui::ui_layout(egui_ctx, &state);
 
-            MANAGER.lock().unwrap().show(egui_ctx, &mut state);
+            MANAGER
+                .lock()
+                .unwrap()
+                .show(egui_ctx, &mut state, &mut console);
         });
+
+        //todo remove this
+        gameProject::input::get_input();
 
         state.tick();
 

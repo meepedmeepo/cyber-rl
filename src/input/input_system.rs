@@ -1,5 +1,3 @@
-use std::ops::Not;
-
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
@@ -9,7 +7,7 @@ use crate::{
     camera,
     components::{
         BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equipped, FoV, HasMoved, InContainer,
-        Item, Name, Renderable, WantsToPickupItem, WantsToRest,
+        Item, Name, RangedWeapon, Renderable, WantsToPickupItem, WantsToRest,
     },
     gamelog::DEBUGLOG,
     go_down_stairs,
@@ -17,7 +15,6 @@ use crate::{
     maps::TileType,
     player::Player,
     ranged_combat::ranged_aim::select_nearest_target_pos,
-    raws::RangedWeapon,
     screen_manager::{self, MANAGER},
     statistics::Pools,
     Position, ProgramState, State,

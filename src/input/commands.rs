@@ -3,7 +3,9 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use bracket_lib::prelude::Point;
 use macroquad::input::KeyCode;
 
-use crate::utils;
+use crate::{gui::mqui::DevConsole, utils};
+
+use super::keymap::default_keymap;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 //internal representation of actions to be taken by player, to decouple them from having fixed keys
@@ -22,6 +24,8 @@ pub enum Command {
 
     Quit,
 
+    DevConsole,
+
     None,
 }
 
@@ -36,18 +40,18 @@ impl CommandManager {
     pub fn new() -> Self {
         Self {
             command_queue: VecDeque::new(),
-            cooldown: utils::timer::Timer::new_stopped(0.08),
+            cooldown: utils::timer::Timer::new_stopped(0.15),
             command_locked: false,
-            keymap: HashMap::new(), //todo: actually add keybindings and keybinding loading
+            keymap: default_keymap(), //todo: actually add keybindings and keybinding loading
         }
     }
 
     pub fn tick(&mut self, delta_t: f32, inputs: HashSet<KeyCode>) {
         self.command_queue.clear();
         self.cooldown.tick(delta_t);
-        if !self.command_locked {
-            self.translate_inputs(inputs);
-        }
+        //if !self.command_locked {
+        self.translate_inputs(inputs);
+        //}
     }
 
     pub fn translate_inputs(&mut self, inputs: HashSet<KeyCode>) {
@@ -88,7 +92,7 @@ impl Default for CommandManager {
     fn default() -> Self {
         CommandManager {
             command_queue: VecDeque::new(),
-            cooldown: utils::timer::Timer::new(0.08),
+            cooldown: utils::timer::Timer::new(0.12),
             command_locked: false,
             keymap: HashMap::new(),
         }

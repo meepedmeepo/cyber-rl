@@ -1,5 +1,6 @@
 mod commands;
 mod input_system;
+mod keymap;
 pub use commands::*;
 pub use input_system::*;
 
@@ -65,5 +66,13 @@ impl InputManager {
 
     pub fn get_command(&mut self) -> Option<Command> {
         self.commands.get_command()
+    }
+
+    pub fn disable_input(&mut self) {
+        self.commands.disable();
+    }
+
+    pub fn enable_input(&mut self) {
+        self.commands.enable();
     }
 }

@@ -1,6 +1,7 @@
+use macroquad::input::KeyCode;
 use new_egui_macroquad::egui::{self, RichText};
 
-use crate::{dev_console::Terminal, gamelog::DEBUGLOG};
+use crate::{dev_console::Terminal, gamelog::DEBUGLOG, input::INPUT};
 
 pub struct DevConsole<'a> {
     current_cmd: String,
@@ -14,9 +15,19 @@ impl DevConsole<'_> {
             terminal,
         }
     }
-    pub fn show(&mut self, ctx: &super::egui::Context, state: &super::State) {
+
+    pub fn show(&mut self, ctx: &super::egui::Context, state: &super::State, is_open: &mut bool) {
+        if macroquad::input::is_key_pressed(KeyCode::Escape) {
+            *is_open = false;
+        }
+        if *is_open {
+            INPUT.lock().disable_input();
+        } else {
+            INPUT.lock().enable_input();
+        }
         egui::Window::new("dev console")
             .fixed_size([400f32, 700f32])
+            .open(is_open)
             .show(ctx, |ui| {
                 {
                     ui.label(RichText::new("Dev Console:").heading());
@@ -46,6 +57,7 @@ impl DevConsole<'_> {
                 if response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
                     self.terminal.set_cmd(self.current_cmd.clone());
                     self.terminal.run_cmd();
+                    self.current_cmd.clear();
                 }
             });
     }

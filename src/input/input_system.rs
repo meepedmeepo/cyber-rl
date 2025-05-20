@@ -1,3 +1,5 @@
+use std::ops::Not;
+
 use bracket_lib::prelude::Point;
 use hecs::Entity;
 
@@ -63,6 +65,11 @@ pub fn input_system(state: &mut State) -> ProgramState {
                 return ProgramState::KeyboardTargetting {
                     cursor_pos: Point::new(px - min_x, py - min_y),
                 };
+            }
+
+            Command::DevConsole => {
+                MANAGER.lock().unwrap().toggle_view();
+                ProgramState::AwaitingInput
             }
 
             _ => ProgramState::AwaitingInput,

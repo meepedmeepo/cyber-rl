@@ -1,14 +1,17 @@
+use crate::dev_console::Terminal;
 use crate::gui::mqui::{show_tooltip_window, DevConsole, ItemWindow, ItemWindowMode};
 use crate::gui::TargettingMode;
 use crate::{camera, ProgramState, State};
 use hecs::Entity;
 use new_egui_macroquad::egui::{self as egui};
-use std::sync::{LazyLock, Mutex};
+use std::sync::{Arc, LazyLock, Mutex};
 
+//pub static TERMINAL: LazyLock<Terminal> = LazyLock::new(Terminal::new());
 pub static MANAGER: LazyLock<Mutex<ScreenManager>> = LazyLock::new(|| {
     Mutex::new(ScreenManager {
         current_menu: None,
         tooltip_active: false,
+        dev_console_open: false,
     })
 });
 
@@ -30,6 +33,7 @@ pub struct MenuScreen {
 pub struct ScreenManager {
     pub current_menu: Option<MenuScreen>,
     pub tooltip_active: bool,
+    pub dev_console_open: bool,
 }
 
 impl MenuScreen {
@@ -60,7 +64,7 @@ impl MenuScreen {
 
 impl ScreenManager {
     pub fn show(&mut self, ctx: &egui::Context, state: &mut State, console: &mut DevConsole) {
-        console.show(ctx, state);
+        console.show(ctx, state, &mut self.dev_console_open);
 
         if self.tooltip_active {
             if let TargettingMode::Keyboard { cursor_pos } = state.target_mode {
@@ -106,5 +110,9 @@ impl ScreenManager {
             response: None,
             menu_type,
         };
+    }
+
+    pub fn toggle_view(&mut self) {
+        self.dev_console_open = !self.dev_console_open;
     }
 }

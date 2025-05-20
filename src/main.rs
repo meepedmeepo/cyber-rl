@@ -313,7 +313,7 @@ impl State {
     fn tick(&mut self) {
         match self.current_state.clone() {
             ProgramState::AwaitingInput => {
-                self.current_state = player_input_system(self);
+                self.current_state = input::input_system(self);
                 item_pickup_system::run(self);
                 item_use_system::run(self);
                 MapIndexingSystem::run(self);
@@ -862,6 +862,7 @@ async fn main() {
     let mut state = create_state(rend.clone());
 
     //creates instance of scripting engine for dev console
+    use std::sync::Mutex;
     let mut term = Terminal::new();
     let mut console = DevConsole::new(&mut term);
 

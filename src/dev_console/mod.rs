@@ -1,6 +1,6 @@
 use std::{
     cell::{Cell, LazyCell},
-    sync::LazyLock,
+    sync::{LazyLock, Mutex},
 };
 
 use crate::{

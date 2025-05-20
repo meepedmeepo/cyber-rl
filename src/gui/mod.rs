@@ -4,6 +4,7 @@ mod inventory;
 mod menus;
 mod text_input;
 mod tooltip;
+pub mod mqui;
 pub use text_input::*;
 pub use ui::*;
 pub use targetting::*;

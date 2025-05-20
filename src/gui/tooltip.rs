@@ -7,9 +7,9 @@ use crate::{camera, Map, Name, Renderable, State,};
 
 
 
-pub fn draw_tooltip(state : &mut State, ctx : &mut BTerm, cursor_pos : Point )
+pub fn draw_tooltip(state : &mut State, cursor_pos : Point )
 {
-    let (min_x, _max_x, min_y, _max_y) = camera::get_screen_bounds(state, ctx);
+    let (min_x, _max_x, min_y, _max_y) = camera::get_screen_bounds(state);
     let mut cursor_map_pos = cursor_pos;
     cursor_map_pos.x += min_x;
     cursor_map_pos.y += min_y;
@@ -67,12 +67,12 @@ pub fn draw_tooltip(state : &mut State, ctx : &mut BTerm, cursor_pos : Point )
         tip_pos.x -= 3;
     } 
     
-    ctx.draw_box(tip_pos.x, tip_pos.y-1, tip_width, tip_height, LIMEGREEN, BLACK);
+    //ctx.draw_box(tip_pos.x, tip_pos.y-1, tip_width, tip_height, LIMEGREEN, BLACK);
 
     let mut y = tip_pos.y + 1;
     for (name, _order) in content.iter()
     {
-        ctx.print(tip_pos.x + 3, y, name.clone());
+        //ctx.print(tip_pos.x + 3, y, name.clone());
         y += 1;
     }
 

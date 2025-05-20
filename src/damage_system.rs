@@ -54,7 +54,7 @@ pub fn run(state : &mut State)
             state.world.remove_one::<TakeDamage>(*dmg_comp).expect("Couldn't remove damage comp from entity!");
 
             state.particle_builder.request(pos.x, pos.y, RGB::named(WHITE), RGB::named(RED),
-                to_cp437('!'), 200., Some(*dmg_comp));
+                "!".to_string(), 200., Some(*dmg_comp));
         }
     }
 }

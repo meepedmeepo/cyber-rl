@@ -5,7 +5,7 @@ use crate::{Map, TileType};
 
 
 
-pub fn tile_glyph(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
+pub fn tile_glyph(idx : usize, map : &Map) -> (String, RGB, RGB)
 {
     let (glyph, mut fg, bg) = match map.depth 
     {
@@ -20,7 +20,7 @@ pub fn tile_glyph(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
     (glyph, fg, bg)
 }
 
-fn get_tile_glyph_default(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
+fn get_tile_glyph_default(idx : usize, map : &Map) -> (String, RGB, RGB)
 {
     let glyph;
     let mut fg;
@@ -28,20 +28,20 @@ fn get_tile_glyph_default(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
 
     match map.map[idx]
     {
-        TileType::Floor =>  {glyph = to_cp437('.'); fg = RGB::from_f32(0., 0.5, 0.5);}
+        TileType::Floor =>  {glyph = ".".to_string(); fg = RGB::from_f32(0., 0.5, 0.5);}
         TileType::Wall => 
         {
             let x = idx as i32 % map.map_width;
             let y = idx as i32 / map.map_width;
-            glyph = wall_glyph(map, x, y);
+            glyph = bracket_lib::terminal::to_char(wall_glyph(map, x, y)).to_string();
             fg = RGB::from_f32(0., 1., 0.);
         }
-        TileType::DownStairs => {glyph = to_cp437('>'); fg = RGB::from_f32(0., 1., 1.);}
-        TileType::Road => {glyph = to_cp437('▓'); fg = RGB::named(SLATE_BLUE);}
-        TileType::MetalGrate => {glyph = to_cp437('≡'); fg = RGB::named(LIGHT_GRAY);}
-        TileType::Concrete => {glyph = to_cp437('.'); fg = RGB::named(PINK2);}
-        TileType::Footpath => {glyph = to_cp437('.'); fg = RGB::named(GREENYELLOW);}
-        TileType::RustedMetalFloor => {glyph = to_cp437('~'); fg = RGB::from_hex("#e04300").unwrap();}
+        TileType::DownStairs => {glyph = '>'.to_string(); fg = RGB::from_f32(0., 1., 1.);}
+        TileType::Road => {glyph = '▓'.to_string(); fg = RGB::named(SLATE_BLUE);}
+        TileType::MetalGrate => {glyph = '≡'.to_string(); fg = RGB::named(LIGHT_GRAY);}
+        TileType::Concrete => {glyph = ".".to_string(); fg = RGB::named(PINK2);}
+        TileType::Footpath => {glyph = '.'.to_string(); fg = RGB::named(GREENYELLOW);}
+        TileType::RustedMetalFloor => {glyph = '~'.to_string(); fg = RGB::from_hex("#e04300").unwrap();}
     }
 
     
@@ -50,7 +50,7 @@ fn get_tile_glyph_default(idx : usize, map : &Map) -> (FontCharType, RGB, RGB)
 }
 
 
-fn wall_glyph(map : &Map, x: i32, y: i32) -> FontCharType
+fn wall_glyph(map : &Map, x: i32, y: i32) -> u8
 {
     if x < 1 || x > map.map_width-2 || y < 1 || y > map.map_height-2 as i32 { return 35; }
     let mut mask : u8 = 0;

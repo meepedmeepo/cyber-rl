@@ -1,5 +1,6 @@
 use bracket_lib::prelude::{BTerm, Point};
 use hecs::Entity;
+use macroquad::time::get_frame_time;
 
 use crate::{projectile::{projectile_system::*, ProjectileType}, Creator, Hidden, Map, ProgramState, Projectile, State};
 
@@ -17,7 +18,7 @@ pub struct Animation
     pub creator : Entity,
 }
 
-pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
+pub fn run_animation_queue(state : &mut State)
 {
     //spawns animations added from effect queue
     for (anim, ranged) in ANIMATIONQUEUE.lock().unwrap().iter()
@@ -32,7 +33,7 @@ pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
     //updates animations in the animation queue
     for (id, anim) in state.world.query_mut::<&mut Animation>()
     {
-        anim.current_step_time -= ctx.frame_time_ms;
+        anim.current_step_time -= get_frame_time()*1000.;
 
         if anim.current_step_time < 0.
         {
@@ -43,7 +44,7 @@ pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
                 anim.current_step_time = anim.step_time;
                 let idx = state.map.xy_idx(anim.path[anim.index].x, anim.path[anim.index].y) as i32;
 
-                add_effect(None, super::EffectType::Particle { glyph: anim.particle.glyph, fg: anim.particle.fg
+                add_effect(None, super::EffectType::Particle { glyph: anim.particle.glyph.clone(), fg: anim.particle.fg
                 , bg: anim.particle.bg, lifetime: anim.particle.lifetime+25. }
                 , super::Targets::Tile { tile_idx: idx });
             }
@@ -62,7 +63,7 @@ pub fn run_animation_queue(state : &mut State, ctx : &mut BTerm)
         let _ = state.world.despawn(*ent);
     }
 
-    projectile_system(state, ctx);
+    projectile_system(state);
 
     let mut q = state.world.query::<&Animation>();
     let query = q.into_iter().collect::<Vec<_>>();

@@ -56,7 +56,7 @@ pub fn check_level_up(state : &mut State)
 
         state.particle_builder
             .request(state.player_pos.x, state.player_pos.y, RGB::named(WHITE), RGB::named(ORANGE)
-            , to_cp437('+'), 350., Some(state.player_ent.unwrap()));
+            , "+".to_string(), 350., Some(state.player_ent.unwrap()));
     }
 }
 

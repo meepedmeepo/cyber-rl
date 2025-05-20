@@ -1,5 +1,6 @@
 use bracket_lib::prelude::{BTerm, Point};
 use hecs::Entity;
+use macroquad::time::get_frame_time;
 
 use crate::{Position, Renderable, State};
 
@@ -14,7 +15,7 @@ pub fn spawn_system(state: &mut State)
     {
         let p = 
             state.world.spawn((Position{x : particle.x, y : particle.y},
-            Renderable{glyph : particle.glyph, fg : particle.fg, bg : particle.bg, order: 7},
+            Renderable{glyph : particle.glyph.clone(), fg : particle.fg, bg : particle.bg, order: 7},
             ParticleLifetime{lifetime : particle.lifetime}));
         match particle.target
         {
@@ -29,7 +30,7 @@ pub fn spawn_system(state: &mut State)
     state.particle_builder.requests.clear();
 }
 
-pub fn update(state: &mut State, ctx : &mut BTerm)
+pub fn update(state: &mut State)
 {
     let mut particles_to_update_position : Vec<(Entity, Entity, Point)> = Vec::new();
     let mut particles_to_despawn : Vec<Entity> = Vec::new();
@@ -37,7 +38,7 @@ pub fn update(state: &mut State, ctx : &mut BTerm)
         state.world.query_mut::<(&mut ParticleLifetime, Option<&ParticleFollowEntity>)>()
     {
         let mut culled = false;
-        lifetime.lifetime -= ctx.frame_time_ms;
+        lifetime.lifetime -= get_frame_time()*1000.;
 
         if lifetime.lifetime < 0.
         {

@@ -1,11 +1,20 @@
 {
-  "commands": [
-    {
-      "name": "heal",
-      "target": "self",
-      "consumable": {
-        "effects": [{ "provides_healing": 20 }, { "foo": "bar" }]
+  "script_commands": {
+    "commands": [
+      {
+        "name": "heal",
+        "target": "self",
+        "consumable": {
+          "effects": { "provides_healing": "20" }
+        }
+      },
+      {
+        "name": "test",
+        "target": "test",
+        "consumable": {
+          "effects": {}
+        }
       }
-    }
-  ]
+    ]
+  }
 }

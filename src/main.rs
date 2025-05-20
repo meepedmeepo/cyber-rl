@@ -46,6 +46,7 @@ use projectile::projectile_system;
 use projectile::ProjectileBuilder;
 use ranged_combat::ranged_aim;
 use ranged_combat::ranged_aim::TargettingState;
+use raws::scripting::load_scripting_commands;
 use renderer::draw_tiles;
 use renderer::CharSize;
 use renderer::GraphicGrid;
@@ -313,6 +314,9 @@ impl State {
     fn tick(&mut self) {
         match self.current_state.clone() {
             ProgramState::AwaitingInput => {
+                //runs effect queue so console commands can take effect even if player doesn't take an action
+                effects::run_effect_queue(self);
+
                 self.current_state = input::input_system(self);
                 item_pickup_system::run(self);
                 item_use_system::run(self);
@@ -864,6 +868,7 @@ async fn main() {
     //creates instance of scripting engine for dev console
     use std::sync::Mutex;
     let mut term = Terminal::new();
+    term.load_commands();
     let mut console = DevConsole::new(&mut term);
 
     state.renderer.setup_grid();

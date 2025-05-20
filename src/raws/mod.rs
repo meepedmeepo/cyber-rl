@@ -9,7 +9,7 @@ use std::sync::Mutex;
 mod faction_structs;
 pub use faction_structs::*;
 
-mod scripting;
+pub mod scripting;
 //makes it safe to use RawMaster as a global static singleton.
 lazy_static! {
     pub static ref RAWS: Mutex<RawMaster> = Mutex::new(RawMaster::empty());
@@ -90,7 +90,7 @@ pub struct Renderable {
     pub order: i32,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct Consumable {
     pub effects: HashMap<String, String>,
 }

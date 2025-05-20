@@ -106,7 +106,7 @@ impl RawMaster {
         eb
     }
 
-    fn add_effects_comps(
+    pub fn add_effects_comps(
         entity_builder: EntityBuilder,
         effects: HashMap<String, String>,
     ) -> EntityBuilder {

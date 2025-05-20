@@ -5,6 +5,7 @@ use std::{
 
 use crate::{
     gamelog::{DebugLog, DEBUGLOG},
+    raws::scripting::load_scripting_commands,
     scripting,
 };
 //pub static TERMINAL: LazyLock<Terminal> = LazyLock::new(Terminal::new());
@@ -27,6 +28,10 @@ impl Terminal {
 
     pub fn set_cmd(&mut self, cmd: String) {
         self.current_command = cmd;
+    }
+
+    pub fn load_commands(&mut self) {
+        load_scripting_commands(&mut self.engine);
     }
 
     ///Runs command on the embedded rhai scripting engine

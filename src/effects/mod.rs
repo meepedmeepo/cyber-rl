@@ -4,7 +4,9 @@ use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
 use std::{collections::VecDeque, sync::Mutex};
-use triggers::{entry_trigger_fire, interact_trigger, item_trigger, ranged_trigger};
+use triggers::{
+    command_trigger, entry_trigger_fire, interact_trigger, item_trigger, ranged_trigger,
+};
 
 mod animation;
 mod damage;
@@ -37,6 +39,9 @@ pub enum EffectType {
     },
     InteractMachine {
         machine: Entity,
+    },
+    ConsoleCommand {
+        command: crate::raws::scripting::Command,
     },
     Healing {
         amount: i32,
@@ -111,6 +116,8 @@ fn target_applicator(state: &mut State, effect: &EffectSpawner) {
         entry_trigger_fire(effect.creator, prop, &effect.targets, state);
     } else if let EffectType::RangedFire { item } = effect.effect_type {
         ranged_trigger(effect.creator, item, &effect.targets, state);
+    } else if let EffectType::ConsoleCommand { command } = &effect.effect_type {
+        command_trigger(command.clone(), state);
     } else {
         match &effect.targets {
             Targets::Tile { tile_idx } => affect_tile(state, effect, *tile_idx),

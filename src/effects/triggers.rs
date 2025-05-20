@@ -2,8 +2,8 @@ use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
 use crate::{
-    gamelog, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile,
-    RangedWeapon, State,
+    gamelog, raws::RawMaster, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map,
+    Position, Projectile, RangedWeapon, State,
 };
 
 use super::{
@@ -36,6 +36,27 @@ pub fn interact_trigger(
     //fires off effect from interacting with machine
     state.game_log.add_log(String::from("Machine used!"));
     event_trigger(creator, interactable, targets, state);
+}
+
+///Activates effects caused by running console commands
+///todo: currently only works for player targetted commands and doesn't take any arguments
+pub fn command_trigger(command: crate::raws::scripting::Command, state: &mut State) {
+    let mut builder = hecs::EntityBuilder::new();
+    builder = RawMaster::add_effects_comps(builder, command.consumable.effects.clone());
+    let ent = state.world.spawn(builder.build());
+
+    if command.target == "self" {
+        event_trigger(
+            None,
+            ent,
+            &Targets::Single {
+                target: state.player_ent.unwrap(),
+            },
+            state,
+        );
+
+        let _ = state.world.despawn(ent);
+    }
 }
 
 #[allow(dead_code)]

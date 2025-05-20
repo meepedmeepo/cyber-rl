@@ -105,7 +105,9 @@ use macroquad::prelude::*;
 use new_egui_macroquad as em;
 use new_egui_macroquad::egui;
 
+pub mod input;
 mod screen_manager;
+pub mod utils;
 //use map_indexing_system;
 #[macro_use]
 extern crate lazy_static;
@@ -866,6 +868,9 @@ async fn main() {
     state.renderer.setup_grid();
     loop {
         clear_background(GRAY);
+        //updates hashmaps of currently pressed and released keys, and what game commands they map to
+        input::INPUT.lock().tick(macroquad::time::get_frame_time());
+
         //set_camera(&Camera2D {
         //  zoom: vec2(1., screen_width() / screen_height()),
         //..Default::default()
@@ -878,9 +883,6 @@ async fn main() {
                 .unwrap()
                 .show(egui_ctx, &mut state, &mut console);
         });
-
-        //todo remove this
-        gameProject::input::get_input();
 
         state.tick();
 

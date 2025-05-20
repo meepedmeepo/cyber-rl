@@ -9,11 +9,14 @@ use crate::utils;
 //internal representation of actions to be taken by player, to decouple them from having fixed keys
 pub enum Command {
     Move { pos: Point },
+    Wait,
+    GoDownStairs,
     Inventory,
     Pickup,
     Drop,
     Equip,
     Unequip,
+    Fire,
     Look,
     Save,
 
@@ -30,9 +33,24 @@ pub struct CommandManager {
 }
 
 impl CommandManager {
-    pub fn translate_inputs(&mut self, inputs: HashSet<KeyCode>) {
-        self.command_queue.clear();
+    pub fn new() -> Self {
+        Self {
+            command_queue: VecDeque::new(),
+            cooldown: utils::timer::Timer::new_stopped(0.08),
+            command_locked: false,
+            keymap: HashMap::new(), //todo: actually add keybindings and keybinding loading
+        }
+    }
 
+    pub fn tick(&mut self, delta_t: f32, inputs: HashSet<KeyCode>) {
+        self.command_queue.clear();
+        self.cooldown.tick(delta_t);
+        if !self.command_locked {
+            self.translate_inputs(inputs);
+        }
+    }
+
+    pub fn translate_inputs(&mut self, inputs: HashSet<KeyCode>) {
         for key in inputs.iter() {
             match self.keymap.get(key) {
                 None => {}

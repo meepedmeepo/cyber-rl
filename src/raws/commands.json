@@ -1,0 +1,11 @@
+{
+  "commands": [
+    {
+      "name": "heal",
+      "target": "self",
+      "consumable": {
+        "effects": [{ "provides_healing": 20 }, { "foo": "bar" }]
+      }
+    }
+  ]
+}

@@ -37,7 +37,8 @@ impl Terminal {
     ///Runs command on the embedded rhai scripting engine
     pub fn run_cmd(&mut self) {
         self.buffer.add_log(self.current_command.clone());
-        self.engine.run_command(self.current_command.clone());
+        let cmd = format!("invoke(\"{}\")", self.current_command.clone());
+        self.engine.run_command(cmd);
         self.current_command.clear();
     }
 }

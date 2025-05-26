@@ -87,7 +87,9 @@ fn pickup_items(state: &mut State) -> ProgramState {
         }
     }
 
-    if items.len() == 1 {
+    if items.is_empty() {
+        ProgramState::AwaitingInput
+    } else if items.len() == 1 {
         state
             .world
             .insert_one(
@@ -103,7 +105,7 @@ fn pickup_items(state: &mut State) -> ProgramState {
             state.player_ent.unwrap(),
         );
         //signifies that player's turn has now ended
-        ProgramState::PlayerTurn
+        ProgramState::Ticking
     } else if items.len() > 1 {
         let menu_type = screen_manager::MenuType::Pickup;
 

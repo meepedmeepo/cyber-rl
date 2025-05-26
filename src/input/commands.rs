@@ -92,7 +92,7 @@ impl Default for CommandManager {
     fn default() -> Self {
         CommandManager {
             command_queue: VecDeque::new(),
-            cooldown: utils::timer::Timer::new(0.12),
+            cooldown: utils::timer::Timer::new(0.17),
             command_locked: false,
             keymap: HashMap::new(),
         }

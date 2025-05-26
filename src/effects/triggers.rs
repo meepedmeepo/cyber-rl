@@ -2,8 +2,8 @@ use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
 use crate::{
-    gamelog, raws::RawMaster, Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map,
-    Position, Projectile, RangedWeapon, State,
+    components::DescendFloors, gamelog, raws::RawMaster, Consumable, DamageEffect, GivesFood,
+    HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State,
 };
 
 use super::{
@@ -111,6 +111,16 @@ fn event_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, state
                 fg: p.particle.fg,
                 bg: p.particle.bg,
                 lifetime: p.particle.lifetime,
+            },
+            targets.clone(),
+        );
+    }
+
+    if let Ok(p) = state.world.get::<&DescendFloors>(item) {
+        add_effect(
+            creator,
+            EffectType::PlayerDecendFloor {
+                to_descend: p.num_floors,
             },
             targets.clone(),
         );

@@ -56,7 +56,7 @@ pub fn heal_damage(state: &mut State, heal: &EffectSpawner, target: Entity) {
                 add_effect(
                     None,
                     EffectType::Particle {
-                        glyph: to_char(3).to_string(), //glyph should be changed to ♥︎
+                        glyph: to_char(3).to_string(), //this translates into being ♥︎
                         fg: RGB::named(BLACK),
                         bg: RGB::named(GREEN),
                         lifetime: 200.,

@@ -9,10 +9,10 @@
         }
       },
       {
-        "name": "test",
-        "target": "test",
+        "name": "descend",
+        "target": "self",
         "consumable": {
-          "effects": {}
+          "effects": { "descendfloor": "1" }
         }
       }
     ]

@@ -55,6 +55,10 @@ pub struct Triggered {
     pub entity: Entity,
     pub idx: i32,
 }
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct DescendFloors {
+    pub num_floors: u32,
+}
 
 pub struct TriggerOnEnter {}
 

@@ -3,6 +3,7 @@ use bracket_lib::{color::RGB, prelude::FontCharType};
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
+use movement::player_decend_floor;
 use std::{collections::VecDeque, sync::Mutex};
 use triggers::{
     command_trigger, entry_trigger_fire, interact_trigger, item_trigger, ranged_trigger,
@@ -11,6 +12,7 @@ use triggers::{
 mod animation;
 mod damage;
 mod hunger;
+mod movement;
 mod particles;
 mod targetting;
 mod triggers;
@@ -67,6 +69,9 @@ pub enum EffectType {
     },
     RangedFire {
         item: Entity,
+    },
+    PlayerDecendFloor {
+        to_descend: u32,
     },
 }
 
@@ -169,6 +174,7 @@ fn affect_entity(state: &mut State, effect: &EffectSpawner, target: Entity) {
         EffectType::Damage { .. } => inflict_damage(state, effect, target),
         EffectType::Healing { .. } => heal_damage(state, effect, target),
         EffectType::Feed { .. } => restore_hunger(state, effect, target),
+        EffectType::PlayerDecendFloor { .. } => player_decend_floor(state, effect),
         _ => {}
     }
 }

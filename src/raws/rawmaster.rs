@@ -10,7 +10,7 @@ use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 use super::{Building, Consumable, Mob, MobStats, Raws, Reaction, Renderable};
 use crate::{
     ai::Energy,
-    components::{self, AIQuips, EffectSpawner, EffectSpawnerPrefab, MovementType},
+    components::{self, AIQuips, DescendFloors, EffectSpawner, EffectSpawnerPrefab, MovementType},
     effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine},
     randomtable::RandomTable,
     statistics::{self, Pools, StatPool},
@@ -148,6 +148,11 @@ impl RawMaster {
                 "particleline" => {
                     eb.add(ParticleLine {
                         particle: RawMaster::parse_particle_string(effect.1.clone()),
+                    });
+                }
+                "descendfloor" => {
+                    eb.add(DescendFloors {
+                        num_floors: effect.1.parse::<u32>().unwrap_or(1),
                     });
                 }
                 _ => {

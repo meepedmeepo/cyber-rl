@@ -7,7 +7,7 @@ use crate::{
 };
 
 use super::{apply_energy_cost, MyTurn};
-
+///todo: change this to use NavPath struct to cache routes better and be able to record idle time easily
 pub fn idle_movement_ai(state: &mut State) {
     let mut moved: Vec<Entity> = Vec::new();
     for (ent, (movement, pos, _turn)) in state

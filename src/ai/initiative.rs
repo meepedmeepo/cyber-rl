@@ -9,7 +9,7 @@ use bracket_lib::prelude::Point;
 //todo possible change this
 const MAX_TURNS_PER_TICK: usize = 25;
 
-///If an entity has more than 0 energy it is given a chance to have a turn - will process all available MyTurns and when there are none
+///If an entity has more than 0  energy it is given a chance to have a turn - will process all available MyTurns and when there are none
 /// left all entities will have energy added to them. If the player can act then the program state will go to AwaitingInput
 pub fn run_initiative(state: &mut State) -> ProgramState {
     if state.world.query_mut::<&MyTurn>().into_iter().len() < 1 {
@@ -19,13 +19,14 @@ pub fn run_initiative(state: &mut State) -> ProgramState {
 
         let mut turns_to_add = Vec::new();
 
+        //collects query into vec so it can be sorted as iterators can't directly be sorted
         let mut query = state
             .world
             .query_mut::<(&mut Energy, &BaseStatistics, &Position)>()
             .into_iter()
             .collect::<Vec<(hecs::Entity, (&mut Energy, &BaseStatistics, &Position))>>();
 
-        query.sort_by_key(|(_, (e, stats, pos))| {
+        query.sort_by_key(|(_, (_, _, pos))| {
             let p =
                 Point::from_tuple(pos.as_tuple()) - Point::from_tuple(state.player_pos.to_tuple());
             p.x.abs() * p.y.abs()

@@ -191,8 +191,12 @@ impl Into<Point> for Position {
 }
 
 impl Position {
-    fn new(x: i32, y: i32) -> Position {
+    pub fn new(x: i32, y: i32) -> Position {
         Position { x, y }
+    }
+
+    pub fn as_tuple(&self) -> (i32, i32) {
+        (self.x, self.y)
     }
 }
 

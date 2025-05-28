@@ -19,6 +19,8 @@ mod quipping;
 pub use quipping::*;
 mod spot_traps;
 use spot_traps::*;
+mod chase_ai;
+pub use chase_ai::*;
 
 use crate::{statistics::BaseStatistics, State};
 

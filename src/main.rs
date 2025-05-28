@@ -105,8 +105,8 @@ mod time_system;
 use macroquad::prelude::*;
 use new_egui_macroquad as em;
 use new_egui_macroquad::egui;
-
 pub mod input;
+pub mod map_indexing;
 mod screen_manager;
 pub mod utils;
 //use map_indexing_system;

@@ -1,40 +1,38 @@
 use bracket_lib::prelude::console;
 
-use crate::Trigger;
+use crate::{map_indexing::SPATIAL_INDEX, Trigger};
 
-use super::{State,Map,Position,BlocksTiles};
+use super::{BlocksTiles, Map, Position, State};
 
-pub struct MapIndexingSystem
-{}
+pub struct MapIndexingSystem {}
 
-impl MapIndexingSystem
-{
-    pub fn run(state : &mut State)
-    {
-        state.map.populate_blocked();
-        state.map.reset_tile_contents();
-        state.map.props.clear();
+impl MapIndexingSystem {
+    pub fn run(state: &mut State) {
+        let mut spatial_map = SPATIAL_INDEX.lock().unwrap();
 
-        for (_id,(pos, _blocks,trig)) in 
-            state.world.query::<(&Position,Option<&BlocksTiles>, Option<&Trigger>)>().iter()
+        spatial_map.reset(state.map.populate_blocked());
+
+        for (id, (pos, blocks, trig)) in state
+            .world
+            .query::<(&Position, Option<&BlocksTiles>, Option<&Trigger>)>()
+            .iter()
         {
             let idx = state.map.xy_idx(pos.x, pos.y);
-            state.map.tile_contents[idx].push(_id);
-            match _blocks
-            {
-                Some(_p) => {state.map.blocked[idx] = true;}
+            spatial_map.add_tile_content(idx, id);
+            match blocks {
+                Some(_) => {
+                    spatial_map.set_tile_blocked_by_entity(idx);
+                }
                 None => {}
             }
 
-            match trig
-            {
-                Some(_) =>
-                {
-                    state.map.props.insert(idx as i32, _id);
+            match trig {
+                Some(_) => {
+                    spatial_map.insert_prop(idx as i32, id);
                     //console::log(format!("after insertion {} on map",state.map.props.len()));
                 }
                 None => {}
-            }  
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::{particles::ParticleBuilder, Projectile, State};
+use crate::{map_indexing::SPATIAL_INDEX, particles::ParticleBuilder, Projectile, State};
 use bracket_lib::{color::RGB, prelude::FontCharType};
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
@@ -149,7 +149,10 @@ fn tile_effect_hits_entities(effect: &EffectType) -> bool {
 
 fn affect_tile(state: &mut State, effect: &EffectSpawner, tile_idx: i32) {
     if tile_effect_hits_entities(&effect.effect_type) {
-        let contents = state.map.tile_contents[tile_idx as usize].clone();
+        let contents = SPATIAL_INDEX
+            .lock()
+            .unwrap()
+            .get_tile_contents(tile_idx as usize);
 
         contents
             .iter()

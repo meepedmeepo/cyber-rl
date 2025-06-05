@@ -761,10 +761,7 @@ fn create_state(renderer: Renderer) -> State {
             map: Vec::new(),
             revealed_tiles: vec![false; 69usize],
             visible_tiles: vec![false; 69usize],
-            blocked: vec![false; 69usize],
-            tile_contents: vec![Vec::new(); 69usize],
             depth: 0,
-            props: HashMap::new(),
             view_blocked: HashSet::new(),
             map_width: 69,
             map_height: 69,
@@ -870,7 +867,6 @@ async fn main() {
     let mut state = create_state(rend.clone());
 
     //creates instance of scripting engine for dev console
-    use std::sync::Mutex;
     let mut term = Terminal::new();
     term.load_commands();
     let mut console = DevConsole::new(&mut term);

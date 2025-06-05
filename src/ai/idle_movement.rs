@@ -3,6 +3,7 @@ use hecs::Entity;
 
 use crate::{
     components::{HasMoved, MovementType},
+    map_indexing::SPATIAL_INDEX,
     Position, State,
 };
 
@@ -24,7 +25,7 @@ pub fn idle_movement_ai(state: &mut State) {
 
                     match roll {
                         Some(idx) => {
-                            if !state.map.blocked[idx] {
+                            if !SPATIAL_INDEX.lock().unwrap().is_tile_blocked(idx) {
                                 let my_idx = state.map.xy_idx(pos.x, pos.y);
                                 let p = a_star_search(my_idx, idx, &state.map);
                                 if p.success && p.steps.len() > 8 {
@@ -46,9 +47,10 @@ pub fn idle_movement_ai(state: &mut State) {
             }
 
             if let Some((p, index)) = path {
+                let mut spatial_map = SPATIAL_INDEX.lock().unwrap();
                 if p.len() - 1 < *index {
                     *path = None;
-                } else if !state.map.blocked[p[*index]] {
+                } else if !spatial_map.is_tile_blocked(p[*index]) {
                     let my_idx = state.map.xy_idx(pos.x, pos.y);
                     let idx = p[*index];
                     let x = idx % state.map.map_width as usize;
@@ -56,8 +58,8 @@ pub fn idle_movement_ai(state: &mut State) {
                     pos.x = x as i32;
                     pos.y = y as i32;
 
-                    state.map.blocked[my_idx] = false;
-                    state.map.blocked[idx] = true;
+                    spatial_map.set_tile_unblocked_by_entity(my_idx);
+                    spatial_map.set_tile_blocked_by_entity(idx);
 
                     moved.push(ent);
 
@@ -75,9 +77,11 @@ pub fn idle_movement_ai(state: &mut State) {
             let idx = state.map.xy_idx(delta.x, delta.y);
             let my_idx = state.map.xy_idx(pos.x, pos.y);
 
-            if !state.map.blocked[idx] {
-                state.map.blocked[my_idx] = false;
-                state.map.blocked[idx] = true;
+            let mut spatial_map = SPATIAL_INDEX.lock().unwrap();
+
+            if !spatial_map.is_tile_blocked(idx) {
+                spatial_map.set_tile_unblocked_by_entity(my_idx);
+                spatial_map.set_tile_blocked_by_entity(idx);
                 pos.x = delta.x;
                 pos.y = delta.y;
                 moved.push(ent);

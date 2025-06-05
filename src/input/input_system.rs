@@ -12,6 +12,7 @@ use crate::{
     gamelog::DEBUGLOG,
     go_down_stairs,
     gui::{mqui::ItemWindowMode, TargettingMode},
+    map_indexing::SPATIAL_INDEX,
     maps::TileType,
     player::Player,
     ranged_combat::ranged_aim::select_nearest_target_pos,
@@ -79,13 +80,17 @@ pub fn input_system(state: &mut State) -> ProgramState {
 fn pickup_items(state: &mut State) -> ProgramState {
     let mut items = Vec::new();
 
-    for ent in
-        state.map.tile_contents[state.map.xy_idx(state.player_pos.x, state.player_pos.y)].iter()
-    {
-        if state.world.get::<&Item>(*ent).is_ok() {
-            items.push((*ent, false));
-        }
-    }
+    let player_pos = state.player_pos;
+    let player_idx = state.map.xy_idx(player_pos.x, player_pos.y);
+
+    SPATIAL_INDEX
+        .lock()
+        .unwrap()
+        .for_each_tile_content(player_idx, state, |entity, state| {
+            if let Ok(_) = state.world.get::<&Item>(entity) {
+                items.push((entity, false));
+            }
+        });
 
     if items.is_empty() {
         ProgramState::AwaitingInput
@@ -278,31 +283,32 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
     let mut attacker: Entity = id;
     let mut target = id;
 
-    for (_id, (_player, position, fov)) in state
+    let spatial_map = SPATIAL_INDEX.lock().unwrap();
+
+    let (_, position, fov) = state
         .world
-        .query_mut::<(&Player, &mut Position, &mut FoV)>()
-    {
-        destination_id = state.map.xy_idx(position.x + delta_x, position.y + delta_y);
-        if destination_id >= state.map.blocked.len() {
-            return false;
-        }
-        if !state.map.blocked[destination_id] {
-            position.x = std::cmp::min(
-                state.map.map_width - 1,
-                std::cmp::max(0, position.x + delta_x),
-            );
-            position.y = std::cmp::min(
-                state.map.map_height - 1,
-                std::cmp::max(0, position.y + delta_y),
-            );
-            state.player_pos = Point::new(position.x, position.y);
-            fov.dirty = true;
-            moved = true;
-            attacker = _id;
-            break;
-        } else if state.map.map[destination_id] == TileType::Wall {
-            return false;
-        }
+        .query_one_mut::<(&Player, &mut Position, &mut FoV)>(state.player_ent.unwrap())
+        .unwrap();
+
+    destination_id = state.map.xy_idx(position.x + delta_x, position.y + delta_y);
+    if destination_id >= state.map.map.len() {
+        return false;
+    }
+    if !spatial_map.is_tile_blocked(destination_id) {
+        position.x = std::cmp::min(
+            state.map.map_width - 1,
+            std::cmp::max(0, position.x + delta_x),
+        );
+        position.y = std::cmp::min(
+            state.map.map_height - 1,
+            std::cmp::max(0, position.y + delta_y),
+        );
+        state.player_pos = Point::new(position.x, position.y);
+        fov.dirty = true;
+        moved = true;
+        attacker = id;
+    } else if state.map.map[destination_id] == TileType::Wall {
+        return false;
     }
 
     let mut door_to_open = Vec::new();
@@ -348,9 +354,10 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
         let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
     }
 
-    if state.map.tile_contents[destination_id].len() > 0 && !moved {
+    let contents = spatial_map.get_tile_contents(destination_id);
+    if contents.len() > 0 && !moved {
         let mut found_target = false;
-        for potential_target in state.map.tile_contents[destination_id].iter() {
+        for potential_target in contents.iter() {
             let query = state
                 .world
                 .query_one_mut::<(&Pools, &Name)>(*potential_target);

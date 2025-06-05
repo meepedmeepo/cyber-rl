@@ -1,6 +1,7 @@
 use crate::{
     components::{FoV, Hidden, Name},
     gamelog::DEBUGLOG,
+    map_indexing::SPATIAL_INDEX,
     statistics::BaseStatistics,
     State,
 };
@@ -16,9 +17,9 @@ pub fn spot_traps(state: &mut State) {
     for tile in fov.visible_tiles.iter() {
         let idx = state.map.xy_idx(tile.x, tile.y) as i32;
 
-        match state.map.props.get(&idx) {
+        match SPATIAL_INDEX.lock().unwrap().get_prop_entity_at_idx(idx) {
             Some(prop) => {
-                if state.world.get::<&Hidden>(*prop).is_ok() {
+                if state.world.get::<&Hidden>(prop).is_ok() {
                     let roll = state.rng.roll_dice(1, 20);
                     let bonus = state
                         .world
@@ -33,8 +34,8 @@ pub fn spot_traps(state: &mut State) {
                         roll + bonus
                     ));
                     if roll + bonus >= 21 || roll == 20 {
-                        let _ = state.world.remove_one::<Hidden>(*prop);
-                        let name = state.world.get::<&Name>(*prop).unwrap().name.clone();
+                        let _ = state.world.remove_one::<Hidden>(prop);
+                        let name = state.world.get::<&Name>(prop).unwrap().name.clone();
                         state.game_log.add_log(format!("{} spotted!", name));
                     }
                 }

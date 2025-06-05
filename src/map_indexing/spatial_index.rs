@@ -33,9 +33,9 @@ pub struct SpatialIndexMap {
 
 impl SpatialIndexMap {
     ///Runs a provided function on each entity that is within provided tile
-    pub fn for_each_tile_content<F>(&self, idx: usize, state: &mut State, f: F)
+    pub fn for_each_tile_content<F>(&self, idx: usize, state: &mut State, mut f: F)
     where
-        F: Fn(Entity, &mut State),
+        F: FnMut(Entity, &mut State),
     {
         self.tile_content[idx].iter().for_each(|ent| f(*ent, state));
     }
@@ -56,6 +56,9 @@ impl SpatialIndexMap {
         self.blocked[idx].is_blocked()
     }
 
+    pub fn get_tile_contents(&self, idx: usize) -> Vec<Entity> {
+        self.tile_content[idx].iter().map(|ent| *ent).collect()
+    }
     ///Handles all the steps of correctly carrying out an entity movement action
     pub fn move_entity(&mut self, entity: Entity, entity_movement: Movement, state: &mut State) {
         self.blocked[entity_movement.old_pos].set_ent_block(false);
@@ -113,6 +116,14 @@ impl SpatialIndexMap {
 
     pub fn set_tile_blocked_by_entity(&mut self, idx: usize) {
         self.blocked[idx].set_ent_block(true);
+    }
+
+    pub fn set_tile_unblocked_by_entity(&mut self, idx: usize) {
+        self.blocked[idx].set_ent_block(false);
+    }
+
+    pub fn get_prop_entity_at_idx(&self, idx: i32) -> Option<Entity> {
+        self.props.get(&idx).cloned()
     }
 }
 

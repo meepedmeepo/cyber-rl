@@ -3,6 +3,7 @@ use std::f32::consts::PI;
 
 use super::tile_type::*;
 use super::TileType;
+use crate::map_indexing::SPATIAL_INDEX;
 use crate::statistics::Pools;
 use crate::State;
 use bracket_lib::pathfinding::{a_star_search, DistanceAlg, SmallVec};
@@ -18,10 +19,7 @@ impl Map {
 
             revealed_tiles: vec![false; (width * height) as usize],
             visible_tiles: vec![false; (width * height) as usize],
-            blocked: vec![false; (width * height) as usize],
-            tile_contents: vec![Vec::new(); (width * height) as usize],
             depth: new_depth,
-            props: HashMap::new(),
             view_blocked: HashSet::new(),
             map_width: width,
             map_height: height,
@@ -38,10 +36,7 @@ pub struct Map {
     pub map: Vec<TileType>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
-    pub blocked: Vec<bool>,
-    pub tile_contents: Vec<Vec<Entity>>,
     pub depth: i32,
-    pub props: HashMap<i32, Entity>,
     pub view_blocked: HashSet<usize>,
     pub map_width: i32,
     pub map_height: i32,
@@ -119,7 +114,8 @@ impl Map {
             return false;
         }
         let idx = self.xy_idx(x, y);
-        !self.blocked[idx as usize]
+
+        !SPATIAL_INDEX.lock().unwrap().is_tile_blocked(idx as usize)
     }
 
     pub fn populate_blocked(&mut self) -> HashSet<usize> {
@@ -136,22 +132,6 @@ impl Map {
                 },
             )
             .collect()
-    }
-
-    pub fn reset_tile_contents(&mut self) {
-        for (_i, tile_contents) in self.tile_contents.iter_mut().enumerate() {
-            tile_contents.clear();
-        }
-    }
-
-    pub fn get_mob_entities_at_position(&self, state: &State, position: Point) -> Vec<Entity> {
-        let mut mobs = Vec::new();
-        for ent in self.tile_contents[self.xy_idx(position.x, position.y)].iter() {
-            if state.world.get::<&Pools>(*ent).is_ok() {
-                mobs.push(*ent);
-            }
-        }
-        mobs
     }
 }
 

@@ -2,7 +2,7 @@ use bracket_lib::prelude::console;
 
 use crate::{map_indexing::SPATIAL_INDEX, Trigger};
 
-use super::{BlocksTiles, Map, Position, State};
+use super::{BlocksTiles, Position, State};
 
 pub struct MapIndexingSystem {}
 

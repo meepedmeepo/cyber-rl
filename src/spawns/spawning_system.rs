@@ -3,6 +3,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::ai::Energy;
 use crate::components::{Consumable, EffectSpawnerPrefab, Interactable};
+use crate::map_indexing::SPATIAL_INDEX;
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
 use crate::{
     raws::RawMaster, DamageEffect, HealingEffect, Item, Name, Position, RangedTargetting,
@@ -131,7 +132,10 @@ pub fn spawn_entity(
                         spawn_item_equipped(state, eq, mob_ent);
                     }
                     let idx = state.map.xy_idx(x, y);
-                    state.map.blocked[idx] = true;
+                    SPATIAL_INDEX
+                        .lock()
+                        .unwrap()
+                        .set_tile_blocked_by_entity(idx);
                 }
 
                 None => {

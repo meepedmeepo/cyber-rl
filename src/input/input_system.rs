@@ -9,6 +9,7 @@ use crate::{
         BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equipped, FoV, HasMoved, InContainer,
         Item, Name, RangedWeapon, Renderable, WantsToPickupItem, WantsToRest,
     },
+    effects::{add_effect, EffectType, Targets},
     gamelog::DEBUGLOG,
     go_down_stairs,
     gui::{mqui::ItemWindowMode, TargettingMode},
@@ -320,18 +321,11 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
     }
 
     for door in door_to_open.iter() {
-        let _ = state.world.remove_one::<BlocksTiles>(*door);
-        let _ = state.world.remove_one::<BlocksVisibility>(*door);
-        state
-            .world
-            .query_one_mut::<&mut Renderable>(*door)
-            .unwrap()
-            .glyph = "/".to_string();
-        state
-            .world
-            .query_one_mut::<&mut FoV>(state.player_ent.unwrap())
-            .unwrap()
-            .dirty = true;
+        add_effect(
+            state.player_ent,
+            EffectType::ToggleDoor,
+            Targets::Single { target: *door },
+        );
 
         apply_energy_cost(
             state,
@@ -346,6 +340,7 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
             .world
             .insert_one(state.player_ent.unwrap(), HasMoved {})
             .unwrap();
+
         apply_energy_cost(
             state,
             crate::ai::ActionType::Move,

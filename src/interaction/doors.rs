@@ -1,7 +1,6 @@
 use hecs::Entity;
 
 use crate::{
-    ai::apply_energy_cost,
     components::{BlocksTiles, BlocksVisibility, FoV, Renderable},
     visibility_system::VisibilitySystem,
     State,

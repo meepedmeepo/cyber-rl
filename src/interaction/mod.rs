@@ -6,7 +6,7 @@ mod doors;
 pub use doors::*;
 
 use crate::{
-    components::{AoE, Creator},
+    components::AoE,
     effects::{add_effect, get_aoe_tiles, EffectType, Targets},
     State,
 };

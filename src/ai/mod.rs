@@ -21,6 +21,8 @@ mod spot_traps;
 use spot_traps::*;
 mod chase_ai;
 pub use chase_ai::*;
+mod pathing;
+pub use pathing::*;
 
 use crate::{statistics::BaseStatistics, State};
 

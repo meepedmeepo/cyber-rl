@@ -2,8 +2,11 @@ use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
 use crate::{
-    components::DescendFloors, gamelog, raws::RawMaster, Consumable, DamageEffect, GivesFood,
-    HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State,
+    components::{DescendFloors, Door},
+    gamelog,
+    raws::RawMaster,
+    Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile,
+    RangedWeapon, State,
 };
 
 use super::{
@@ -72,6 +75,11 @@ pub fn entry_trigger_fire(
 
 fn event_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, state: &mut State) {
     //do .get on item for different Components and then execute relevant code you nerdd!!!!!!
+
+    if let Ok(door) = state.world.get::<&Door>(item) {
+        //attempts to toggle door state
+        //
+    }
 
     if let Ok(damage) = state.world.get::<&DamageEffect>(item) {
         add_effect(

@@ -125,6 +125,14 @@ impl SpatialIndexMap {
     pub fn get_prop_entity_at_idx(&self, idx: i32) -> Option<Entity> {
         self.props.get(&idx).cloned()
     }
+
+    pub fn get_width(&self) -> usize {
+        self.map_width
+    }
+
+    pub fn get_height(&self) -> usize {
+        self.map_height
+    }
 }
 
 pub struct Movement {

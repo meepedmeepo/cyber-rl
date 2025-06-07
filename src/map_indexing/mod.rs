@@ -1,6 +1,8 @@
+mod pathing;
 mod spatial_index;
 use bracket_lib::{pathfinding::DijkstraMap, prelude::SmallVec};
 
+pub use pathing::*;
 pub use spatial_index::SPATIAL_INDEX;
 
 pub struct MapIndex {
@@ -13,7 +15,7 @@ pub struct DijkstraMapSearcher {
 }
 
 impl DijkstraMapSearcher {
-    pub fn get_highest_exit(&self, tile_idx: usize) {
+    pub fn get_lowest_exit(&self, tile_idx: usize) {
         //
         //bracket_lib::pathfinding::DijkstraMap::find_lowest_exit(dm, position, map)
     }

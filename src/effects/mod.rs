@@ -1,4 +1,7 @@
-use crate::{map_indexing::SPATIAL_INDEX, particles::ParticleBuilder, Projectile, State};
+use crate::{
+    effects::door::toggle_door, map_indexing::SPATIAL_INDEX, particles::ParticleBuilder,
+    Projectile, State,
+};
 use bracket_lib::{color::RGB, prelude::FontCharType};
 use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
@@ -11,6 +14,7 @@ use triggers::{
 
 mod animation;
 mod damage;
+mod door;
 mod hunger;
 mod movement;
 mod particles;
@@ -73,6 +77,7 @@ pub enum EffectType {
     PlayerDecendFloor {
         to_descend: u32,
     },
+    ToggleDoor,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -178,6 +183,7 @@ fn affect_entity(state: &mut State, effect: &EffectSpawner, target: Entity) {
         EffectType::Healing { .. } => heal_damage(state, effect, target),
         EffectType::Feed { .. } => restore_hunger(state, effect, target),
         EffectType::PlayerDecendFloor { .. } => player_decend_floor(state, effect),
+        EffectType::ToggleDoor => toggle_door(state, effect, target),
         _ => {}
     }
 }

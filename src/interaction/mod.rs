@@ -2,6 +2,8 @@ use std::clone;
 
 use bracket_lib::prelude::Point;
 use hecs::Entity;
+mod doors;
+pub use doors::*;
 
 use crate::{
     components::{AoE, Creator},

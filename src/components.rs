@@ -70,6 +70,15 @@ pub struct HasMoved {}
 
 pub struct WantsToRest {}
 
+pub struct Password {
+    pub controls_target: Entity,
+    pub owner: Entity,
+}
+
+pub struct PasswordProtected {
+    pub difficulty_class: i32,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct GivesFood {
     pub amount: i32,

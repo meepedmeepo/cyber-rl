@@ -7,6 +7,8 @@ use bracket_lib::{
 use hecs::Entity;
 use serde::Deserialize;
 
+use crate::statistics::StatType;
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MovementType {
     Static,
@@ -179,6 +181,29 @@ pub enum EquipmentSlot {
     OffHand,
     Ranged,
     Quiver,
+}
+
+#[derive(Clone, Copy)]
+pub struct GrantsAttribute {
+    pub target_attribute: StatType,
+    pub modifier: i32,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct StatusEffect {
+    pub target: Entity,
+    pub source: Entity,
+}
+
+#[derive(Debug, Clone)]
+pub struct GrantsStatus {
+    pub effects: HashMap<String, String>,
+    pub duration: Option<i32>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct EffectDuration {
+    pub rounds: i32,
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]

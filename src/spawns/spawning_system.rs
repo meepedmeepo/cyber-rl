@@ -2,7 +2,9 @@ use core::panic;
 use std::collections::{HashMap, HashSet};
 
 use crate::ai::Energy;
-use crate::components::{Consumable, EffectSpawnerPrefab, Interactable};
+use crate::components::{
+    Consumable, EffectDuration, EffectSpawnerPrefab, Interactable, StatusEffect,
+};
 use crate::map_indexing::SPATIAL_INDEX;
 use crate::raws::{get_spawn_table_for_depth, SpawnType, RAWS};
 use crate::{
@@ -13,7 +15,7 @@ use crate::{EquipmentSlot, Equippable, Equipped, InContainer, Map, TileType, Usa
 use bracket_lib::prelude::{console, Rect};
 use bracket_lib::random::RandomNumberGenerator;
 use bracket_lib::terminal::Point;
-use hecs::Entity;
+use hecs::{Entity, EntityBuilder};
 
 use super::randomtable::RandomTable;
 
@@ -22,6 +24,31 @@ pub enum EntityType {
     Item,
     Mob,
     Prop,
+}
+
+pub fn spawn_effect_entity(
+    state: &mut State,
+    effects: HashMap<String, String>,
+    duration: Option<i32>,
+    item: Entity,
+    target: Entity,
+) {
+    let mut eb = EntityBuilder::new();
+
+    eb.add(StatusEffect {
+        source: item,
+        target,
+    });
+
+    if duration.is_some() {
+        eb.add(EffectDuration {
+            rounds: duration.unwrap(),
+        });
+    }
+
+    eb = RawMaster::add_effects_comps(eb, effects);
+
+    state.world.spawn(eb.build());
 }
 
 /// TODO: add checks for if there is already an item equipped in that slot

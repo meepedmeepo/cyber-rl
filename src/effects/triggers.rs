@@ -2,7 +2,7 @@ use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
 use crate::{
-    components::{DescendFloors, Door},
+    components::{DescendFloors, Door, GrantsStatus},
     gamelog,
     raws::RawMaster,
     Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile,
@@ -79,6 +79,20 @@ fn event_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, state
     if let Ok(door) = state.world.get::<&Door>(item) {
         //attempts to toggle door state
         //
+        //add_effect(creator, EffectType::ToggleDoor, targets);
+    }
+
+    if let Ok(status) = state.world.get::<&GrantsStatus>(item) {
+        add_effect(
+            Some(item),
+            EffectType::StatusEffect {
+                effects: status.effects.clone(),
+                duration: status.duration,
+            },
+            Targets::Single {
+                target: creator.unwrap(),
+            },
+        );
     }
 
     if let Ok(damage) = state.world.get::<&DamageEffect>(item) {

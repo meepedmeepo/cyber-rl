@@ -23,3 +23,4 @@
 - [ ] Network Generation
 - [ ] Network Commands
 - [ ] Extra Items and Enemies
+- [ ] Change ProgramState::AwaitingMenu to use WantsToEquip, and WantsToPickup tags and let systems handle the actions

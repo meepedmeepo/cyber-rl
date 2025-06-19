@@ -1,5 +1,7 @@
 use crate::{
-    effects::door::toggle_door, map_indexing::SPATIAL_INDEX, particles::ParticleBuilder,
+    effects::{door::toggle_door, status::spawn_status_effect},
+    map_indexing::SPATIAL_INDEX,
+    particles::ParticleBuilder,
     Projectile, State,
 };
 use bracket_lib::{color::RGB, prelude::FontCharType};
@@ -7,7 +9,10 @@ use damage::{heal_damage, inflict_damage};
 use hecs::Entity;
 use hunger::restore_hunger;
 use movement::player_decend_floor;
-use std::{collections::VecDeque, sync::Mutex};
+use std::{
+    collections::{HashMap, VecDeque},
+    sync::Mutex,
+};
 use triggers::{
     command_trigger, entry_trigger_fire, interact_trigger, item_trigger, ranged_trigger,
 };
@@ -18,6 +23,7 @@ mod door;
 mod hunger;
 mod movement;
 mod particles;
+mod status;
 mod targetting;
 mod triggers;
 pub use animation::*;
@@ -29,7 +35,7 @@ lazy_static! {
     pub static ref ANIMATIONQUEUE: Mutex<Vec<(Animation, Projectile)>> = Mutex::new(Vec::new());
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum EffectType {
     Damage {
         amount: i32,
@@ -78,6 +84,10 @@ pub enum EffectType {
         to_descend: u32,
     },
     ToggleDoor,
+    StatusEffect {
+        effects: HashMap<String, String>,
+        duration: Option<i32>,
+    },
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -184,6 +194,7 @@ fn affect_entity(state: &mut State, effect: &EffectSpawner, target: Entity) {
         EffectType::Feed { .. } => restore_hunger(state, effect, target),
         EffectType::PlayerDecendFloor { .. } => player_decend_floor(state, effect),
         EffectType::ToggleDoor => toggle_door(state, effect, target),
+        EffectType::StatusEffect { .. } => spawn_status_effect(state, effect, target),
         _ => {}
     }
 }

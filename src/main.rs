@@ -108,6 +108,7 @@ use new_egui_macroquad::egui;
 
 use crate::item_systems::item_unequip_system;
 use crate::map_indexing::SPATIAL_INDEX;
+use crate::statistics::stat_calculation_system;
 pub mod input;
 mod item_systems;
 pub mod map_indexing;
@@ -654,6 +655,8 @@ impl State {
 }
 
 fn run_systems(state: &mut State) {
+    stat_calculation_system(state);
+
     VisibilitySystem::run(state);
 
     item_equip_system::run(state);

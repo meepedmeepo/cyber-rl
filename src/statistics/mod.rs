@@ -6,8 +6,10 @@ use crate::{gamelog::DEBUGLOG, State};
 use super::Attribute;
 mod leveling;
 mod skills;
+mod stat_calculation_system;
 pub use leveling::*;
 pub use skills::*;
+pub use stat_calculation_system::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StatType {
@@ -51,7 +53,7 @@ impl BaseStatistics {
             mental_fortitude: Attribute::new(rng.roll(dice_pool)),
         }
     }
-    pub fn get_stat(self, stat: StatType) -> Attribute {
+    pub fn get_stat(&self, stat: StatType) -> Attribute {
         match stat {
             StatType::Strength => {
                 return self.strength;
@@ -69,6 +71,34 @@ impl BaseStatistics {
                 return self.mental_fortitude;
             }
         }
+    }
+
+    pub fn change_stat_bonus(&mut self, stat: StatType, bonus: i32) {
+        match stat {
+            StatType::Strength => {
+                self.strength.bonuses += bonus;
+            }
+            StatType::Dexterity => {
+                self.dexterity.bonuses += bonus;
+            }
+            StatType::Intelligence => {
+                self.intelligence.bonuses += bonus;
+            }
+            StatType::Toughness => {
+                self.toughness.bonuses += bonus;
+            }
+            StatType::MentalFortitude => {
+                self.mental_fortitude.bonuses += bonus;
+            }
+        }
+    }
+
+    pub fn reset_stat_bonuses(&mut self) {
+        self.dexterity.bonuses = 0;
+        self.intelligence.bonuses = 0;
+        self.mental_fortitude.bonuses = 0;
+        self.strength.bonuses = 0;
+        self.toughness.bonuses = 0;
     }
 }
 #[derive(Clone, Copy)]

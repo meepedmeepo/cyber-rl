@@ -8,7 +8,7 @@
 - [ ] Fix Project Structure
 - [ ] Implement System Scheduling and Multithreading
 - [ ] Attribute Granting Items
-- [ ] Status Effects
+- [x] Status Effects
 - [ ] On Hit / On Recieve Damage Effects
 - [ ] Skill Leveling Implementation
 - [ ] Cybernetics
@@ -18,7 +18,7 @@
 # Alpha Release 0.1 Checklist
 - [ ] Chase AI System
 - [ ] Skill Leveling
-- [ ] Status Effects
+- [x] Status Effects
 - [ ] Attribute Items
 - [ ] Network Generation
 - [ ] Network Commands

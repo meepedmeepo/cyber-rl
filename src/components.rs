@@ -271,6 +271,12 @@ pub struct HealingEffect {
     pub healing_amount: i32,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct GrantStat {
+    pub stat: StatType,
+    pub amount: i32,
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct WantsToPickupItem {
     pub item: Entity,

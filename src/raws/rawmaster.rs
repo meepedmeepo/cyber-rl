@@ -10,10 +10,13 @@ use hecs::{BuiltEntity, Entity, EntityBuilder, EntityBuilderClone};
 use super::{Building, Consumable, Mob, MobStats, Raws, Reaction, Renderable};
 use crate::{
     ai::Energy,
-    components::{self, AIQuips, DescendFloors, EffectSpawner, EffectSpawnerPrefab, MovementType},
+    components::{
+        self, AIQuips, DescendFloors, EffectSpawner, EffectSpawnerPrefab, GrantStat, GrantsStatus,
+        MovementType,
+    },
     effects::{Particle, ParticleAnimation, ParticleBurst, ParticleLine},
     randomtable::RandomTable,
-    statistics::{self, Pools, StatPool},
+    statistics::{self, Pools, StatPool, StatType},
     AoE, Attribute, BlocksTiles, BlocksVisibility, DamageEffect, Door, EquipmentDirty,
     EquipmentSlot, Equippable, Faction, FoV, GivesFood, HealingEffect, Hidden, Monster, Name,
     Naturals, Position, RangedTargetting, RangedWeapon, SingleActivation, Trigger, TriggerOnEnter,
@@ -153,6 +156,31 @@ impl RawMaster {
                 "descendfloor" => {
                     eb.add(DescendFloors {
                         num_floors: effect.1.parse::<u32>().unwrap_or(1),
+                    });
+                }
+
+                "grantstat" => {
+                    let attribute_value_pair = effect.1.split(":").collect::<Vec<_>>();
+
+                    let stat = StatType::from_string(attribute_value_pair[0]);
+                    let amount = attribute_value_pair[1].parse::<i32>().unwrap_or(0);
+
+                    eb.add(GrantStat { stat, amount });
+                }
+
+                "spawnstatus" => {
+                    let status_list = effect.1.split("_").collect::<Vec<_>>();
+                    let mut effect_map: HashMap<String, String> = HashMap::new();
+
+                    for status in status_list.iter() {
+                        let pair = status.split(".").collect::<Vec<_>>();
+                        effect_map.insert(pair[0].into(), pair[1].into());
+                    }
+
+                    //todo: actually figure out how to handle duration in this fucking awful mess wtf am I doing  :( ¬¬¬
+                    eb.add(GrantsStatus {
+                        effects: effect_map,
+                        duration: None,
                     });
                 }
                 _ => {

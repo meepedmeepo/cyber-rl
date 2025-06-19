@@ -20,6 +20,20 @@ pub enum StatType {
     MentalFortitude,
 }
 
+impl StatType {
+    pub fn from_string<S: Into<String>>(value: S) -> Self {
+        let val = value.into();
+        match val.as_str() {
+            "strength" => StatType::Strength,
+            "dexterity" => StatType::Dexterity,
+            "toughness" => StatType::Toughness,
+            "intelligence" => StatType::Intelligence,
+            "mentalfortitude" => StatType::MentalFortitude,
+            _ => panic!("{} is not a valid StatType", val),
+        }
+    }
+}
+
 impl std::fmt::Display for StatType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {

@@ -105,6 +105,9 @@ mod time_system;
 use macroquad::prelude::*;
 use new_egui_macroquad as em;
 use new_egui_macroquad::egui;
+
+use crate::item_systems::item_unequip_system;
+use crate::map_indexing::SPATIAL_INDEX;
 pub mod input;
 mod item_systems;
 pub mod map_indexing;
@@ -205,6 +208,11 @@ pub fn go_down_stairs(state: &mut State) {
     cleanup_ECS(state);
     //Map::generate_map_checked(state);
     state.generate_world_map(state.map.depth + 1);
+
+    SPATIAL_INDEX
+        .lock()
+        .unwrap()
+        .resize(state.map.dimensions().to_unsigned_tuple());
 
     for (_id, (_player, pos, fov)) in state
         .world
@@ -649,7 +657,9 @@ fn run_systems(state: &mut State) {
     VisibilitySystem::run(state);
 
     item_equip_system::run(state);
+    item_unequip_system(state);
     item_use_system::run(state);
+
     interaction_system(state);
     calculate_attribute_system::run(state);
 

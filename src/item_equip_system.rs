@@ -3,7 +3,7 @@ use std::iter;
 use bracket_lib::prelude::console;
 
 use crate::{
-    components::{EffectDuration, GrantsStatus, StatusEffect},
+    components::{EffectDuration, GrantsStatus, StatusEffect, WantsToUnequipItems},
     effects::{add_effect, EffectType, Targets},
     EquipmentDirty, Equipped, InContainer, Item, Name, State, WantsToEquipItem,
 };
@@ -48,21 +48,16 @@ pub fn run(state: &mut State) {
             .iter()
             .filter(|item| item.1 .0.owner == info.0 && item.1 .0.slot == info.1.slot)
         {
-            items_to_unequip.push((id, equipped.owner));
+            items_to_unequip.push(id);
         }
 
-        //Unequips items and adds them back to inventory
-        for (item, owner) in items_to_unequip.iter() {
-            state
-                .world
-                .remove_one::<Equipped>(*item)
-                .expect("Couldn't remove Equipped component from item to be unequipped");
-
-            state
-                .world
-                .insert_one(*item, InContainer { owner: *owner })
-                .expect("Couldn't add InContainer component onto unequipped item!");
-        }
+        //Adds WantsToUnequip marker for all items that need to be removed to equip new item.
+        let _ = state.world.insert_one(
+            state.player_ent.unwrap(),
+            WantsToUnequipItems {
+                item_entities: items_to_unequip,
+            },
+        );
 
         state
             .world

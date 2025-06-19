@@ -106,6 +106,7 @@ use macroquad::prelude::*;
 use new_egui_macroquad as em;
 use new_egui_macroquad::egui;
 pub mod input;
+mod item_systems;
 pub mod map_indexing;
 mod screen_manager;
 pub mod utils;

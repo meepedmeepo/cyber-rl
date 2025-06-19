@@ -1,4 +1,7 @@
 use bracket_lib::random::DiceType;
+use hecs::Entity;
+
+use crate::{gamelog::DEBUGLOG, State};
 
 use super::Attribute;
 mod leveling;
@@ -97,4 +100,45 @@ impl StatPool {
     pub fn damage(&mut self, value: i32) {
         self.current_value = std::cmp::max(0, self.current_value - value);
     }
+}
+
+pub fn stat_check(
+    stat: StatType,
+    entity: Entity,
+    state: &mut State,
+    difficulty_class: i32,
+) -> bool {
+    let entity_stats = state
+        .world
+        .get::<&BaseStatistics>(entity)
+        .expect("Stat check ran against entity that doesn't have stats.");
+
+    let roll = state.rng.roll_dice(1, 20);
+
+    let stat_mod = entity_stats.get_stat(stat).get_modifier();
+
+    let total = roll + stat_mod;
+    let res = total >= difficulty_class;
+
+    let check_status_msg;
+
+    if res {
+        check_status_msg = "passed";
+    } else {
+        check_status_msg = "failed";
+    }
+
+    let msg = format!(
+        "Stat check {}: stat : {} ({}) + roll ({}) = total ({})",
+        check_status_msg,
+        stat.to_string(),
+        stat_mod,
+        roll,
+        total
+    );
+
+    DEBUGLOG.add_log(msg.clone());
+    state.game_log.add_log(msg);
+
+    res
 }

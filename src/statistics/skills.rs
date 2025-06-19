@@ -61,8 +61,19 @@ pub fn skill_check(
     let roll = state.rng.roll_dice(1, 20);
     let res = roll + skill_mod + stat_mod;
 
+    let is_success = res >= difficulty_class;
+
+    let check_status_msg;
+
+    if is_success {
+        check_status_msg = "passed";
+    } else {
+        check_status_msg = "failed";
+    }
+
     let msg = format!(
-        "Skill check: skill : {} ({}) + stat : {} ({}) + roll({}) = total ({})",
+        "Skill check {}: skill : {} ({}) + stat : {} ({}) + roll({}) = total ({})",
+        check_status_msg,
         skill.to_string(),
         skill_mod,
         stat.to_string(),
@@ -74,5 +85,5 @@ pub fn skill_check(
     DEBUGLOG.add_log(msg.clone());
     state.game_log.add_log(msg);
 
-    res >= difficulty_class
+    is_success
 }

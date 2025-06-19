@@ -310,3 +310,8 @@ impl FoV {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct WantsToUnequipItems {
+    pub item_entities: Vec<Entity>,
+}

@@ -37,7 +37,8 @@ pub fn run(state: &mut State) {
         }
     }
 
-    for (index, info) in entities_to_equip_items.iter().enumerate() {
+    //todo: destructure the tuple for readability reasons.
+    for info in entities_to_equip_items.iter() {
         //Creates list of items that will need to be unequipped as they take up the same slot as the new item that will
         //be equipped.
         let mut items_to_unequip = Vec::new();

@@ -1,6 +1,6 @@
 use crate::{
     components::{FoV, Hidden, Name},
-    gamelog::DEBUGLOG,
+    logging::gamelog::DEBUGLOG,
     statistics::BaseStatistics,
     State,
 };

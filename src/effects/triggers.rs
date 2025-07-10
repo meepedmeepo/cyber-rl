@@ -2,8 +2,8 @@ use bracket_lib::prelude::{console, Point};
 use hecs::Entity;
 
 use crate::{
-    components::DescendFloors, gamelog, raws::RawMaster, Consumable, DamageEffect, GivesFood,
-    HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State,
+    components::DescendFloors, logging::gamelog, raws::RawMaster, Consumable, DamageEffect,
+    GivesFood, HealingEffect, Hidden, Map, Position, Projectile, RangedWeapon, State,
 };
 
 use super::{

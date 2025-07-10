@@ -1,7 +1,7 @@
 use macroquad::input::KeyCode;
 use new_egui_macroquad::egui::{self, RichText};
 
-use crate::{dev_console::Terminal, gamelog::DEBUGLOG, input::INPUT};
+use crate::{dev_console::Terminal, input::INPUT, logging::gamelog::DEBUGLOG};
 
 pub struct DevConsole<'a> {
     current_cmd: String,

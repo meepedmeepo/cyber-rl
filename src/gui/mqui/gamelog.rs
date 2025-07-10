@@ -1,7 +1,7 @@
 use macroquad::window::screen_height;
 use new_egui_macroquad::egui;
 
-use crate::gamelog::GameLog;
+use crate::logging::gamelog::GameLog;
 
 pub fn bottom_panel(ctx: &egui::Context, gamelog: &GameLog) {
     egui::TopBottomPanel::bottom("gamelog")

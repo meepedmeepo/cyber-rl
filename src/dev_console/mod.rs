@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    gamelog::{DebugLog, DEBUGLOG},
+    logging::gamelog::{DebugLog, DEBUGLOG},
     raws::scripting::load_scripting_commands,
     scripting,
 };

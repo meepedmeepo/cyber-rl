@@ -1,6 +1,6 @@
 use crate::{
     effects::{add_effect, EffectType, Targets},
-    gamelog::DEBUGLOG,
+    logging::gamelog::DEBUGLOG,
     scripting::ScriptingEngine,
 };
 

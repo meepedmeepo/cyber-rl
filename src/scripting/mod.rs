@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::gamelog::DEBUGLOG;
+use crate::logging::gamelog::DEBUGLOG;
 mod commands;
 mod healing;
 pub struct ScriptingEngine {

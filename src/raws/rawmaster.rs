@@ -167,7 +167,10 @@ impl RawMaster {
 
                     eb.add(GrantStat { stat, amount });
                 }
-
+                // Demonstration of how to add components to spawn a status effect that grants a +2 to strength.
+                // ``` json
+                // "spawnstatus" : "grantstat.strength:2"
+                // ```
                 "spawnstatus" => {
                     let status_list = effect.1.split("_").collect::<Vec<_>>();
                     let mut effect_map: HashMap<String, String> = HashMap::new();
@@ -220,7 +223,7 @@ impl RawMaster {
     pub fn parse_particle_string(particle_string: String) -> Particle {
         let parts = particle_string.split(';').collect::<Vec<_>>();
 
-        let mut glyph_str = parts[0].clone().to_string();
+        let glyph_str = parts[0].to_string();
 
         let glyph = glyph_str;
         let fg = RGB::from_hex(parts[1]).expect("not valid hex rgb for particle fg");

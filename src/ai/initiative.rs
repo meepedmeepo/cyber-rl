@@ -1,6 +1,5 @@
 use crate::{
-    hunger::hunger_system, statistics::BaseStatistics, time_system, Map, Position, ProgramState,
-    State,
+    hunger::hunger_system, statistics::BaseStatistics, time_system, Position, ProgramState, State,
 };
 
 use super::{spot_traps, Energy, MyTurn};

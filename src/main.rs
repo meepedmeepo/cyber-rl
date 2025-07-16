@@ -371,8 +371,8 @@ impl State {
 
                         //run current goal behaviour
                         ai::approach_ai_system(self);
-
                         ai::flee_ai_system(self);
+                        ai::chase_ai_system(self);
 
                         //idle movement
                         ai::idle_movement_ai(self);

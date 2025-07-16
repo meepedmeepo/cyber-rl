@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{console, DijkstraMap};
+use bracket_lib::prelude::DijkstraMap;
 use hecs::Entity;
 
 use crate::{

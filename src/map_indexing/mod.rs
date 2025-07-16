@@ -3,6 +3,7 @@ mod spatial_index;
 use bracket_lib::{pathfinding::DijkstraMap, prelude::SmallVec};
 
 pub use pathing::*;
+pub use spatial_index::Movement;
 pub use spatial_index::SPATIAL_INDEX;
 
 pub struct MapIndex {

@@ -1,13 +1,12 @@
-use bracket_lib::prelude::Point;
 use hecs::Entity;
 
 use crate::{
     raws::{self, Reaction},
     utils::get_mobs_at_idx,
-    Attack, Faction, Map, Player, Position, State,
+    Attack, Faction, Player, Position, State,
 };
 
-use super::{apply_energy_cost, MyTurn};
+use super::{apply_energy_cost, InCombat, MyTurn};
 
 pub fn adjacent_ai_system(state: &mut State) {
     let mut turn_done: Vec<Entity> = Vec::new();
@@ -68,6 +67,10 @@ pub fn adjacent_ai_system(state: &mut State) {
         let _ = state
             .world
             .insert_one(attack.0, Attack { target: attack.1 });
+
+        let _ = state
+            .world
+            .insert_one(attack.0, InCombat { target: attack.1 });
     }
 
     for done in turn_done.iter() {

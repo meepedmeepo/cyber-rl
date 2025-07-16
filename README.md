@@ -7,7 +7,7 @@
 - [ ] Network Commands
 - [ ] Fix Project Structure
 - [ ] Implement System Scheduling and Multithreading
-- [ ] Attribute Granting Items
+- [x] Attribute Granting Items
 - [x] Status Effects
 - [ ] On Hit / On Recieve Damage Effects
 - [ ] Skill Leveling Implementation
@@ -19,7 +19,7 @@
 - [ ] Chase AI System
 - [ ] Skill Leveling
 - [x] Status Effects
-- [ ] Attribute Items
+- [x] Attribute Items
 - [ ] Network Generation
 - [ ] Network Commands
 - [ ] Extra Items and Enemies

@@ -1,6 +1,6 @@
 use hecs::Entity;
 
-use crate::{map_indexing::SPATIAL_INDEX, FoV, HasMoved, Map, Position, State, WantsToApproach};
+use crate::{map_indexing::SPATIAL_INDEX, FoV, HasMoved, Position, State, WantsToApproach};
 
 use super::{apply_energy_cost, MyTurn};
 

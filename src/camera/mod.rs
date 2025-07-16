@@ -1,12 +1,5 @@
-use std::borrow::Cow;
-
-use bracket_lib::{
-    color::{BLACK, GRAY, RGB},
-    prelude::{to_char, to_cp437, BTerm, FontCharType},
-};
-use codepage_437::CP437_CONTROL;
+use bracket_lib::color::{BLACK, GRAY, RGB};
 use codepage_437::*;
-use encode_unicode::{StrExt, Utf16Char};
 
 use crate::{
     particles::particle_system, renderer::rgb_to_color, Hidden, Map, Position, Renderable, State,

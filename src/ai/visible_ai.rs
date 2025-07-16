@@ -1,4 +1,4 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use bracket_lib::prelude::Point;
 use hecs::Entity;
@@ -11,11 +11,11 @@ use crate::{
     Faction, FoV, Map, Player, Position, State, WantsToApproach, WantsToFlee,
 };
 
-use super::MyTurn;
+use super::{InCombat, MyTurn};
 
 pub fn visible_ai_system(state: &mut State) {
     //stores possible targets for each entity that can see enemies
-    let mut possible_attacks: HashMap<Entity, Vec<usize>> = HashMap::new();
+    let mut possible_attacks: HashMap<Entity, Vec<(usize, Entity)>> = HashMap::new();
 
     //stores lists of indices to flee from for targets that want to flee
     let mut flee_targets: HashMap<Entity, Vec<usize>> = HashMap::new();
@@ -27,7 +27,7 @@ pub fn visible_ai_system(state: &mut State) {
         .iter()
     {
         let my_idx = state.map.xy_idx(pos.x, pos.y);
-        let mut reactions: Vec<(usize, Reaction)> = Vec::new();
+        let mut reactions: Vec<(usize, Reaction, Entity)> = Vec::new();
         let mut flee: Vec<usize> = Vec::new();
 
         for tile in fov.visible_tiles.iter() {
@@ -42,7 +42,7 @@ pub fn visible_ai_system(state: &mut State) {
         for reaction in reactions.iter() {
             match reaction.1 {
                 Reaction::Attack => {
-                    attacks.push(reaction.0);
+                    attacks.push((reaction.0, reaction.2));
                     done = true;
                 }
                 Reaction::Flee => flee.push(reaction.0),
@@ -71,7 +71,14 @@ pub fn visible_ai_system(state: &mut State) {
         let _ = state.world.insert_one(
             *id,
             WantsToApproach {
-                target: targets[index] as i32,
+                target: targets[index].0 as i32,
+            },
+        );
+
+        let _ = state.world.insert_one(
+            *id,
+            InCombat {
+                target: targets[index].1,
             },
         );
     }
@@ -91,13 +98,14 @@ fn evaluate(
     idx: usize,
     state: &State,
     my_faction: &str,
-    reactions: &mut Vec<(usize, raws::Reaction)>,
+    reactions: &mut Vec<(usize, raws::Reaction, Entity)>,
 ) {
     for ent in get_mobs_at_idx(state, idx) {
         if let Ok(faction) = state.world.get::<&Faction>(ent) {
             reactions.push((
                 idx,
                 raws::faction_reaction(my_faction, &faction.name, &raws::RAWS.lock().unwrap()),
+                ent,
             ));
         }
     }

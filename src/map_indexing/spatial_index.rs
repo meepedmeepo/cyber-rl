@@ -4,12 +4,15 @@ use std::{
     sync::{LazyLock, Mutex},
 };
 
-use bracket_lib::prelude::{Algorithm2D, Point};
+use bracket_lib::prelude::{Algorithm2D, DijkstraMap, Point};
 use hecs::Entity;
 
 use crate::{components::HasMoved, maps::TileType, Position, State};
 
 use super::TileBlocked;
+
+pub static PLAYER_CHASE_MAP: LazyLock<Mutex<DijkstraMap>> =
+    LazyLock::new(|| Mutex::new(bracket_lib::pathfinding::DijkstraMap::new_empty(1, 1, 20.0)));
 
 pub static SPATIAL_INDEX: LazyLock<Mutex<SpatialIndexMap>> = LazyLock::new(|| {
     Mutex::new({

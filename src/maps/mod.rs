@@ -142,12 +142,21 @@ impl BuilderChain {
             None => panic!("Cannot run map builder chain without starting builder!"),
             Some(starter) => {
                 starter.build_map(rng, &mut self.build_data);
+
+                SPATIAL_INDEX
+                    .lock()
+                    .unwrap()
+                    .resize(self.build_data.map.dimensions().to_unsigned_tuple());
             }
         }
 
         //Build the rest of the layers one by one self.lay_concrete(build_data);
         for metabuilder in self.builders.iter_mut() {
             metabuilder.build_map(rng, &mut self.build_data);
+            SPATIAL_INDEX
+                .lock()
+                .unwrap()
+                .resize(self.build_data.map.dimensions().to_unsigned_tuple());
         }
     }
 

@@ -288,7 +288,7 @@
       "stats": {
         "max_hp": 30,
         "hp": 30,
-        "natural_ac" : 12
+        "natural_ac" : 8
       }
     },
     {
@@ -333,7 +333,7 @@
         "strength": 12,
         "intelligence": 8,
         "mental": 7,
-        "natural_ac": 8
+        "natural_ac": 5
       },
       "faction" : "criminals",
       "equipment" : [
@@ -357,7 +357,7 @@
         "strength": 14,
         "intelligence": 6,
         "mental": 7,
-        "natural_ac": 10
+        "natural_ac": 7
       },
       "faction" : "peacekeeper",
       "equipment" : [
@@ -372,7 +372,7 @@
         "bg": "#000000",
         "order": 3
       },
-      "vision_range": 4,
+      "vision_range": 8,
       "blocks_tiles": true,
       "stats": {
         "max_hp": 10,
@@ -381,7 +381,7 @@
         "strength": 6,
         "intelligence": 9,
         "mental": 4,
-        "natural_ac": 6
+        "natural_ac": 3
       },
       "faction" : "vermin",
       "naturals": [
@@ -410,7 +410,7 @@
       "stats": {
         "max_hp": 15,
         "hp": 15,
-        "natural_ac": 6
+        "natural_ac": 2
       },
       "faction" : "townsfolk",
       "movement_mode" : "random",
@@ -450,7 +450,7 @@
       "stats": {
         "max_hp": 15,
         "hp": 15,
-        "natural_ac": 6
+        "natural_ac": 2
       },
       "faction" : "townsfolk",
       "movement_mode" : "drunk",

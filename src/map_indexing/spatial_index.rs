@@ -7,7 +7,7 @@ use std::{
 use bracket_lib::prelude::{Algorithm2D, DijkstraMap, Point};
 use hecs::Entity;
 
-use crate::{components::HasMoved, maps::TileType, Position, State};
+use crate::{Position, State, components::HasMoved, maps::TileType};
 
 use super::TileBlocked;
 
@@ -41,6 +41,10 @@ impl SpatialIndexMap {
         F: FnMut(Entity, &mut State),
     {
         self.tile_content[idx].iter().for_each(|ent| f(*ent, state));
+    }
+
+    pub fn get_tile_content(&self, idx: usize) -> std::slice::Iter<Entity> {
+        self.tile_content[idx].iter()
     }
 
     ///Returns list of entities in tile that matches a provided predicate

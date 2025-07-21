@@ -21,10 +21,6 @@ pub struct Chasing {
     pub turns: u32,
 }
 
-pub struct LastKnownPosition {
-    pub pos: Point,
-}
-
 #[derive(Debug, Clone)]
 pub struct ChasePathCache {
     pub time_to_live: u32,
@@ -133,26 +129,25 @@ pub fn chase_ai_system(state: &mut State) {
                     let ent_pos = state.world.get::<&Position>(*ent).unwrap().as_tuple();
                     let start_idx = state.map.xy_idx(ent_pos.0, ent_pos.1);
 
-                    let target_pos = state
-                        .world
-                        .get::<&Position>(chase.target)
-                        .unwrap()
-                        .as_tuple();
-                    let end_idx = state.map.xy_idx(target_pos.0, target_pos.1);
+                    let target_pos_res = state.world.get::<&Position>(chase.target);
 
-                    let cache = a_star_search(start_idx, end_idx, &state.map)
-                        .steps
-                        .iter()
-                        .skip(1)
-                        .cloned()
-                        .collect::<VecDeque<usize>>();
+                    if let Ok(target_pos) = target_pos_res {
+                        let end_idx = state.map.xy_idx(target_pos.x, target_pos.y);
 
-                    let cache_comp = ChasePathCache {
-                        time_to_live: 2,
-                        path: cache,
-                    };
+                        let cache = a_star_search(start_idx, end_idx, &state.map)
+                            .steps
+                            .iter()
+                            .skip(1)
+                            .cloned()
+                            .collect::<VecDeque<usize>>();
 
-                    cache_to_create.push((*ent, cache_comp));
+                        let cache_comp = ChasePathCache {
+                            time_to_live: 2,
+                            path: cache,
+                        };
+
+                        cache_to_create.push((*ent, cache_comp));
+                    }
                 }
             }
         }

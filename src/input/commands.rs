@@ -40,7 +40,7 @@ impl CommandManager {
     pub fn new() -> Self {
         Self {
             command_queue: VecDeque::new(),
-            cooldown: utils::timer::Timer::new_stopped(0.3),
+            cooldown: utils::timer::Timer::new_stopped(0.2),
             command_locked: false,
             keymap: default_keymap(), //todo: actually add keybindings and keybinding loading
         }

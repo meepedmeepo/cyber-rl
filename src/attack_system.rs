@@ -1,8 +1,8 @@
 use crate::{
-    damage_system::DamageSystem,
-    effects::{add_effect, Targets},
-    statistics::{BaseStatistics, Pools},
     EquipmentSlot, Equippable, Equipped, Naturals, Position, Weapon, WeaponStat,
+    damage_system::DamageSystem,
+    effects::{Targets, add_effect},
+    statistics::{BaseStatistics, Pools},
 };
 use hecs::{Entity, World};
 
@@ -40,7 +40,7 @@ impl AttackSystem {
             let stats = query.0.clone();
             let pools = query.1.clone();
 
-            //Idiomatic way of mem::drop -ing something that implements copy trait
+            //Idiomatic way of mem::drop -ing something that doesn't implements copy trait
             let _ = query;
 
             let mut weapons = state
@@ -50,7 +50,7 @@ impl AttackSystem {
                 .filter(|(_ent, (equip, _wep))| {
                     equip.owner == attacker && equip.slot == EquipmentSlot::MainHand
                 })
-                .map(|ent| *ent.1 .1)
+                .map(|ent| *ent.1.1)
                 .collect::<Vec<_>>();
 
             if weapons.len() < 1 {

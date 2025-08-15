@@ -2,24 +2,24 @@ use bracket_lib::prelude::Point;
 use hecs::Entity;
 
 use crate::{
-    ai::{apply_energy_cost, MyTurn},
+    Position, ProgramState, State,
+    ai::{MyTurn, apply_energy_cost},
     attack_system::AttackSystem,
     camera,
     components::{
         BlocksTiles, BlocksVisibility, Door, EquipmentSlot, Equipped, FoV, HasMoved, InContainer,
         Item, Name, RangedWeapon, Renderable, WantsToPickupItem, WantsToRest,
     },
-    effects::{add_effect, EffectType, Targets},
+    effects::{EffectType, Targets, add_effect},
     gamelog::DEBUGLOG,
     go_down_stairs,
-    gui::{mqui::ItemWindowMode, TargettingMode},
+    gui::{TargettingMode, mqui::ItemWindowMode},
     map_indexing::SPATIAL_INDEX,
     maps::TileType,
     player::Player,
     ranged_combat::ranged_aim::select_nearest_target_pos,
     screen_manager::{self, MANAGER},
     statistics::Pools,
-    Position, ProgramState, State,
 };
 
 use super::{Command, INPUT};
@@ -187,7 +187,7 @@ fn open_inventory(state: &mut State) -> ProgramState {
             .world
             .query::<(&Item, &InContainer, &Name)>()
             .iter()
-            .filter(|ent| ent.1 .1.owner == state.player_ent.unwrap())
+            .filter(|ent| ent.1.1.owner == state.player_ent.unwrap())
             .map(|ent| (ent.0, false))
             .collect::<Vec<(Entity, bool)>>();
 
@@ -312,28 +312,30 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
         return false;
     }
 
-    let mut door_to_open = Vec::new();
+    if !moved {
+        let mut door_to_open = Vec::new();
 
-    for (ent, (door, pos)) in state.world.query_mut::<(&Door, &Position)>() {
-        if state.map.xy_idx(pos.x, pos.y) == destination_id && door.open == false {
-            door_to_open.push(ent);
+        for (ent, (door, pos)) in state.world.query_mut::<(&Door, &Position)>() {
+            if state.map.xy_idx(pos.x, pos.y) == destination_id && door.open == false {
+                door_to_open.push(ent);
+            }
         }
-    }
 
-    for door in door_to_open.iter() {
-        add_effect(
-            state.player_ent,
-            EffectType::ToggleDoor,
-            Targets::Single { target: *door },
-        );
+        for door in door_to_open.iter() {
+            add_effect(
+                state.player_ent,
+                EffectType::ToggleDoor,
+                Targets::Single { target: *door },
+            );
 
-        apply_energy_cost(
-            state,
-            crate::ai::ActionType::OpenDoor,
-            state.player_ent.unwrap(),
-        );
-        let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
-        return true;
+            apply_energy_cost(
+                state,
+                crate::ai::ActionType::OpenDoor,
+                state.player_ent.unwrap(),
+            );
+            let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+            return true;
+        }
     }
     if moved {
         state
@@ -347,6 +349,7 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
             state.player_ent.unwrap(),
         );
         let _ = state.world.remove_one::<MyTurn>(state.player_ent.unwrap());
+        return true;
     }
 
     let contents = spatial_map.get_tile_contents(destination_id);
@@ -381,5 +384,6 @@ pub fn try_move(state: &mut State, delta_x: i32, delta_y: i32) -> bool {
         }
     }
 
-    true
+    println!("This should be basically unreachable");
+    false
 }

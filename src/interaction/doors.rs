@@ -1,9 +1,9 @@
 use hecs::Entity;
 
 use crate::{
-    components::{BlocksTiles, BlocksVisibility, FoV, Renderable},
-    visibility_system::VisibilitySystem,
     State,
+    components::{BlocksTiles, BlocksVisibility, Door, FoV, Renderable},
+    visibility_system::VisibilitySystem,
 };
 
 pub fn open_door(state: &mut State, interactor: Entity, door: Entity) {
@@ -19,6 +19,8 @@ pub fn open_door(state: &mut State, interactor: Entity, door: Entity) {
         .query_one_mut::<&mut FoV>(state.player_ent.unwrap())
         .unwrap()
         .dirty = true;
+
+    state.world.get::<&mut Door>(door).unwrap().open = true;
 
     VisibilitySystem::run(state);
 }
@@ -36,6 +38,8 @@ pub fn close_door(state: &mut State, interactor: Entity, door: Entity) {
         .query_one_mut::<&mut FoV>(state.player_ent.unwrap())
         .unwrap()
         .dirty = true;
+
+    state.world.get::<&mut Door>(door).unwrap().open = false;
 
     VisibilitySystem::run(state);
 }

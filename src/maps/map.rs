@@ -1,12 +1,12 @@
-use std::collections::{hash_map, HashMap, HashSet};
+use std::collections::{HashMap, HashSet, hash_map};
 use std::f32::consts::PI;
 
-use super::tile_type::*;
 use super::TileType;
+use super::tile_type::*;
+use crate::State;
 use crate::map_indexing::SPATIAL_INDEX;
 use crate::statistics::Pools;
-use crate::State;
-use bracket_lib::pathfinding::{a_star_search, DistanceAlg, SmallVec};
+use bracket_lib::pathfinding::{DistanceAlg, SmallVec, a_star_search};
 use bracket_lib::prelude::*;
 use hecs::Entity;
 
@@ -115,7 +115,7 @@ impl Map {
         }
         let idx = self.xy_idx(x, y);
 
-        !SPATIAL_INDEX.lock().unwrap().is_tile_blocked(idx as usize)
+        tile_walkable(self.map[idx as usize])
     }
 
     pub fn populate_blocked(&mut self) -> HashSet<usize> {
@@ -124,11 +124,7 @@ impl Map {
             .enumerate()
             .filter_map(
                 |(i, tile)| {
-                    if !tile_walkable(*tile) {
-                        Some(i)
-                    } else {
-                        None
-                    }
+                    if !tile_walkable(*tile) { Some(i) } else { None }
                 },
             )
             .collect()

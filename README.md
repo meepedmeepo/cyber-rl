@@ -1,7 +1,7 @@
 # Cyber-RL
 
 # Next Steps
-- [ ] Chase AI System
+- [x] Chase AI System
 - [ ] Add Event System
 - [ ] Basic Network Generation
 - [ ] Network Commands

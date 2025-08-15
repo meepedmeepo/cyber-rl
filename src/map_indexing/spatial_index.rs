@@ -7,7 +7,11 @@ use std::{
 use bracket_lib::prelude::{Algorithm2D, DijkstraMap, Point};
 use hecs::Entity;
 
-use crate::{Position, State, components::HasMoved, maps::TileType};
+use crate::{
+    Position, State,
+    components::{FoV, HasMoved},
+    maps::TileType,
+};
 
 use super::TileBlocked;
 
@@ -73,6 +77,8 @@ impl SpatialIndexMap {
 
         let pos = state.map.index_to_point2d(entity_movement.new_pos);
         *state.world.query_one_mut::<&mut Position>(entity).unwrap() = pos.into();
+
+        state.world.get::<&mut FoV>(entity).unwrap().dirty = true;
         let _ = state.world.insert_one(entity, HasMoved {});
     }
 

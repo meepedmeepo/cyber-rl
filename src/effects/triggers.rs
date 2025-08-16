@@ -1,17 +1,18 @@
-use bracket_lib::prelude::{console, Point};
+use bracket_lib::prelude::{Point, console};
 use hecs::Entity;
 
 use crate::{
-    components::{DescendFloors, Door, GrantsStatus},
-    gamelog,
-    raws::RawMaster,
     Consumable, DamageEffect, GivesFood, HealingEffect, Hidden, Map, Position, Projectile,
     RangedWeapon, State,
+    components::{DescendFloors, Door, GrantsStatus},
+    events::Event,
+    gamelog,
+    raws::RawMaster,
 };
 
 use super::{
-    add_effect, animation::Animation, EffectType, ParticleAnimation, ParticleBurst, ParticleLine,
-    Targets, ANIMATIONQUEUE,
+    ANIMATIONQUEUE, EffectType, ParticleAnimation, ParticleBurst, ParticleLine, Targets,
+    add_effect, animation::Animation,
 };
 
 pub fn ranged_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, state: &mut State) {
@@ -28,6 +29,10 @@ pub fn item_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, st
             console::log("Couldn't despawn consumable item after use!");
         }
     }
+}
+
+pub fn event_message_trigger(e: Event, creator: Option<Entity>, listener: Entity) {
+    //correctly select targets here
 }
 
 pub fn interact_trigger(

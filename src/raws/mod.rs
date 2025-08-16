@@ -3,11 +3,12 @@ use std::{collections::HashMap, fs};
 mod rawmaster;
 pub use rawmaster::*;
 mod spawn_table_structs;
-use crate::{lazy_static::LazyStatic, Faction};
+use crate::{Faction, lazy_static::LazyStatic};
 use spawn_table_structs::*;
 use std::sync::Mutex;
 mod faction_structs;
 pub use faction_structs::*;
+mod items;
 
 pub mod scripting;
 //makes it safe to use RawMaster as a global static singleton.

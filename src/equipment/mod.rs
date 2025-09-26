@@ -1,5 +1,7 @@
 use hecs::Entity;
 
+use crate::events::HasOwner;
+
 ///This is spawned in ECS by an item as a container for effects that
 /// happen when an entity hits a target with an attack.
 pub struct HitEffect {
@@ -10,6 +12,12 @@ pub struct HitEffect {
 pub struct DamageRecieveEffect {
     pub owner: Entity,
     pub source: Entity,
+}
+
+impl HasOwner for DamageRecieveEffect {
+    fn get_owner(&self) -> Entity {
+        self.owner
+    }
 }
 
 pub struct DeathEffect {

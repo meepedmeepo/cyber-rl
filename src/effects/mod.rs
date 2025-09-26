@@ -1,8 +1,8 @@
 use crate::{
+    Projectile, State,
     effects::{door::toggle_door, status::spawn_status_effect},
     map_indexing::SPATIAL_INDEX,
     particles::ParticleBuilder,
-    Projectile, State,
 };
 use bracket_lib::{color::RGB, prelude::FontCharType};
 use damage::{heal_damage, inflict_damage};
@@ -29,7 +29,7 @@ mod triggers;
 pub use animation::*;
 pub use particles::*;
 pub use targetting::*;
-
+pub use triggers::event_message_trigger;
 lazy_static! {
     pub static ref EFFECTQUEUE: Mutex<VecDeque<EffectSpawner>> = Mutex::new(VecDeque::new());
     pub static ref ANIMATIONQUEUE: Mutex<Vec<(Animation, Projectile)>> = Mutex::new(Vec::new());
